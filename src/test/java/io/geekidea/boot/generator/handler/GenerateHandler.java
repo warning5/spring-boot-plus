@@ -496,8 +496,7 @@ public class GenerateHandler {
             cfgMap.put("appControllerName", appControllerName);
 
             objectMap.put("cfg", cfgMap);
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
         }

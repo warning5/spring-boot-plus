@@ -12,6 +12,9 @@ server:
 
 # spring配置
 spring:
+  devtools:
+    restart:
+      enabled: true
   application:
   # 当前项目maven激活环境，例如：dev/test/prod
   profiles:
@@ -101,7 +104,7 @@ login:
   # 排除路径
   exclude-paths:
     -
-  # 管理后台登录配置
+    # 管理后台登录配置
   admin:
     # 是否启用管理后台登录权限校验
     enable: true
@@ -173,7 +176,7 @@ file:
     accessKeySecret:
     endpoint:
     bucketName:
-    accessDomain: 
+    accessDomain:
 
 # 微信小程序配置
 wx:

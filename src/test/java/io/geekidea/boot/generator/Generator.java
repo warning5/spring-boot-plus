@@ -15,11 +15,11 @@ public class Generator {
     public static void main(String[] args) throws Exception {
         GeneratorConfig config = new GeneratorConfig();
         // 项目信息配置
-        config.setParentPackage("io.geekidea.boot")
-                .setModuleName("demo")
-                .setAuthor("geekidea");
+        config.setParentPackage("com.hwtx.framework")
+                .setModuleName("domain")
+                .setAuthor("hwtx");
         // 表名称和需要去掉的表前缀
-        config.setTableNames("demo")
+        config.setTableNames("form_def")
                 .setTablePrefix("");
         // 设置生成的类型
         config.setGeneratorType(GeneratorType.FULL);

@@ -1,0 +1,55 @@
+{
+  "type": "form",
+  "actions": [],
+  "wrapWithPanel": false,
+  "name": "sample-edit-form",
+  "api": {
+    "method": "post",
+    "url": "http://localhost:8888/api/form/save"
+  },
+  "body": [
+    {
+      "type": "input-text",
+      "name": "engine",
+      "label": "Engine",
+      "required": true,
+      "zh-CN": {
+        "label": "引擎"
+      },
+      "validations": {
+        "isAlpha": true,
+        "minLength": 3,
+        "maxLength": 10
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "input-text",
+      "name": "browser",
+      "label": "Browser"    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "input-text",
+      "name": "platform",
+      "label": "Platform(s)"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "label": "CSS grade",
+      "type": "input-text",
+      "name": "grade"
+    },
+    {
+      "type": "input-text",
+      "name": "formId",
+      "value": 1,
+      "hidden": true
+    }
+  ]
+}
