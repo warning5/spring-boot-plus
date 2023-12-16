@@ -7,6 +7,7 @@
     "method": "post",
     "url": "http://localhost:8888/api/form/save"
   },
+  "initApi": "http://localhost:8888/api/form/get?valueId=${id}",
   "body": [
     {
       "type": "input-text",
@@ -28,7 +29,8 @@
     {
       "type": "input-text",
       "name": "browser",
-      "label": "Browser"    },
+      "label": "Browser"
+    },
     {
       "type": "divider"
     },
@@ -42,13 +44,25 @@
     },
     {
       "label": "CSS grade",
-      "type": "input-text",
-      "name": "grade"
+      "type": "select",
+      "name": "grade",
+      "source": "http://localhost:8888/api/demo/options?formId=2"
     },
     {
       "type": "input-text",
       "name": "formId",
-      "value": 1,
+      "value": 2,
+      "hidden": true
+    },
+    {
+      "type": "input-text",
+      "name": "pageX",
+      "value": "page1",
+      "hidden": true
+    },
+    {
+      "type": "input-text",
+      "name": "id",
       "hidden": true
     }
   ]

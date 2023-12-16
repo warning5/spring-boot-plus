@@ -15,6 +15,7 @@ spring:
   devtools:
     restart:
       enabled: true
+      additional-paths: src/main/java
   application:
   # 当前项目maven激活环境，例如：dev/test/prod
   profiles:

@@ -19,12 +19,12 @@ public class Generator {
                 .setModuleName("domain")
                 .setAuthor("hwtx");
         // 表名称和需要去掉的表前缀
-        config.setTableNames("form_def")
+        config.setTableNames("form_value")
                 .setTablePrefix("");
         // 设置生成的类型
         config.setGeneratorType(GeneratorType.FULL);
         // 是否生成APP端代码
-        config.setGeneratorApp(true);
+//        config.setGeneratorApp(true);
         // 是否只更新实体类
         config.setOnlyOverrideEntity(false);
         // 代码生成

@@ -6,7 +6,6 @@ import io.geekidea.boot.common.constant.CommonConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
 import java.io.Serializable;
@@ -118,18 +117,12 @@ public class Api2Result implements Serializable {
         if (ApiCode.SUCCESS.getCode() == code) {
             success = true;
         }
-        String outMessage;
-        if (StringUtils.isBlank(message)) {
-            outMessage = apiCode.getMsg();
-        } else {
-            outMessage = message;
-        }
         String traceId = MDC.get(CommonConstant.TRACE_ID);
         Api2Result api2Result = new Api2Result();
         api2Result.setCode(code);
-        api2Result.setMsg(outMessage);
+        api2Result.setMsg(message);
         api2Result.setData(data);
-        api2Result.setStatus(success ? 0 : -1);
+        api2Result.setStatus(success ? 0 : 422);
         api2Result.setTime(new Date());
         api2Result.setTraceId(traceId);
         if (errors != null) {

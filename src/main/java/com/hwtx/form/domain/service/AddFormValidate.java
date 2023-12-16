@@ -20,7 +20,7 @@ public class AddFormValidate implements FormValidate {
             try {
                 int grade = Integer.parseInt(value);
                 if (grade < 1 || grade > 12) {
-                    return FormDef.ValidationResult.builder().pass(false).message("grade只能设定为1到12之间的整数").key(name).build();
+                    return FormDef.ValidationResult.builder().pass(false).message("grade只能设定为1到3之间的整数").key(name).build();
                 } else {
                     return FormDef.ValidationResult.builder().pass(true).build();
                 }

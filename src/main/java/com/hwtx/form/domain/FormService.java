@@ -1,10 +1,14 @@
 package com.hwtx.form.domain;
 
+import com.alibaba.fastjson2.JSON;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.hwtx.form.annotation.FormValidation;
+import com.hwtx.form.domain.dto.FormValueDto;
+import com.hwtx.form.domain.query.FormValueQuery;
+import com.hwtx.form.persistence.FormValueEntity;
 import io.geekidea.boot.framework.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -12,16 +16,15 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class FormService {
 
     public static final String INPUT_FORM_ID = "formId";
+    public static final String INPUT_FORM_VALUE_ID = "id";
+    public static final String INPUT_FORM_PAGE = "pageX";
 
     @Resource
     ApplicationContext applicationContext;
@@ -46,6 +49,9 @@ public class FormService {
 
     @Resource
     FormRepo formRepo;
+    @Resource
+    FormValueRepo formValueRepo;
+
     private static final Cache<Long, FormDef> formCache = CacheBuilder.newBuilder()
             // 供应商数量目前不超过2W, 占用内存可控, 暂不设置过期设置预期最大值
             .maximumSize(50000)
@@ -59,6 +65,26 @@ public class FormService {
             return formContent;
         }
         return "";
+    }
+
+    public void saveFormData(Map<String, String> formData, String user) throws Exception {
+        FormValueDto formValue = new FormValueDto();
+        formValue.setForm(formData.get(INPUT_FORM_ID));
+        formValue.setContent(JSON.toJSONString(formData));
+        formValue.setPage(formData.get(INPUT_FORM_PAGE));
+
+        formValue.setLastModifyBy(user);
+        formValue.setLastModifyTime(new Date());
+        formValue.setK1(user);
+
+        if (StringUtils.isEmpty(formData.get(INPUT_FORM_VALUE_ID))) {
+            formValue.setCreateTime(new Date());
+            formValue.setCreateBy(user);
+            formValueRepo.addFormValue(formValue);
+        } else {
+            formValue.setId(Long.parseLong(formData.get(INPUT_FORM_VALUE_ID)));
+            formValueRepo.updateFormValue(formValue);
+        }
     }
 
     public Map<String, String> validateForm(Long formId, Map<String, String> formValues) throws Exception {
@@ -88,5 +114,23 @@ public class FormService {
                     }
                 });
         return validationResultMap;
+    }
+
+    public String getFormData(FormValueQuery formValueQuery) throws Exception {
+        FormValueEntity formValueVo = formValueRepo.getFormValue(formValueQuery);
+        if (formValueVo != null) {
+            return formValueVo.getContent();
+        }
+        return null;
+    }
+
+    public void removeValue(FormValueQuery formValueQuery) throws Exception {
+        FormValueDto formValue = new FormValueDto();
+        formValue.setLastModifyBy(formValueQuery.getUser());
+        formValue.setLastModifyTime(new Date());
+        formValue.setId(formValueQuery.getValueId());
+        formValue.setK1(formValueQuery.getUser());
+        formValue.setStatus(false);
+        formValueRepo.updateFormValue(formValue);
     }
 }

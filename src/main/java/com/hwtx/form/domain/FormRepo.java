@@ -1,13 +1,11 @@
 package com.hwtx.form.domain;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.geekidea.boot.framework.page.Paging;
 import com.hwtx.form.domain.dto.FormDefDto;
-import com.hwtx.form.persistence.FormDefEntity;
-import com.hwtx.form.domain.query.FormDefQuery;
-import com.hwtx.form.domain.vo.FormDefVo;
 import com.hwtx.form.domain.query.FormDefAppQuery;
 import com.hwtx.form.domain.vo.FormDefAppVo;
+import com.hwtx.form.persistence.FormDefEntity;
+import io.geekidea.boot.framework.page.Paging;
 
 
 /**
@@ -53,15 +51,6 @@ public interface FormRepo extends IService<FormDefEntity> {
      * @throws Exception
      */
     String getFormRawContent(Long id) throws Exception;
-
-    /**
-     * 表单定义分页列表
-     *
-     * @param query
-     * @return
-     * @throws Exception
-     */
-    Paging<FormDefVo> getFormDefPage(FormDefQuery query) throws Exception;
 
     /**
      * App表单定义详情

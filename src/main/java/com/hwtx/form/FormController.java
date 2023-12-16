@@ -1,6 +1,7 @@
 package com.hwtx.form;
 
 import com.hwtx.form.domain.FormService;
+import com.hwtx.form.domain.query.FormValueQuery;
 import io.geekidea.boot.framework.response.Api2Result;
 import io.geekidea.boot.framework.response.ApiCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +32,7 @@ public class FormController {
     @PostMapping("/save")
     @Operation(summary = "获取表单定义")
     public Api2Result save(@RequestBody Map<String, String> content) throws Exception {
-        String formId = content.get("formId");
+        String formId = content.get(FormService.INPUT_FORM_ID);
         if (StringUtils.isEmpty(formId)) {
             return Api2Result.fail(ApiCode.FAIL, "表单ID不能为空");
         }
@@ -39,6 +40,28 @@ public class FormController {
         if (!validationResult.isEmpty()) {
             return Api2Result.validate(ApiCode.FAIL, "参数校验失败", validationResult);
         }
-        return Api2Result.result(ApiCode.SUCCESS, "加载成功", formService.getRawFormDef(1L));
+        formService.saveFormData(content, "admin");
+        return Api2Result.result(ApiCode.SUCCESS, "保存成功", "");
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获取表单数据")
+    public String get(FormValueQuery formValueQuery) throws Exception {
+        if (formValueQuery.getValueId() == null) {
+            return Api2Result.build(ApiCode.SUCCESS, "", "{}");
+        }
+        formValueQuery.setUser("admin");
+        return Api2Result.build(ApiCode.SUCCESS, "加载成功", formService.getFormData(formValueQuery));
+    }
+
+    @PostMapping("/remove")
+    @Operation(summary = "删除表单数据")
+    public String remove(FormValueQuery formValueQuery) throws Exception {
+        if (formValueQuery.getValueId() == null) {
+            return Api2Result.build(ApiCode.FAIL, "数据ID不能为空", "");
+        }
+        formValueQuery.setUser("admin");
+        formService.removeValue(formValueQuery);
+        return Api2Result.build(ApiCode.SUCCESS, "删除成功", "");
     }
 }
