@@ -51,6 +51,10 @@ public class FormService {
     FormRepo formRepo;
     @Resource
     FormValueRepo formValueRepo;
+    @Resource
+    FormAppValueRepo formAppValueRepo;
+    @Resource
+    FormListService service;
 
     private static final Cache<Long, FormDef> formCache = CacheBuilder.newBuilder()
             // 供应商数量目前不超过2W, 占用内存可控, 暂不设置过期设置预期最大值
@@ -61,6 +65,7 @@ public class FormService {
 
     public String getRawFormDef(Long formId) throws Exception {
         String formContent = formRepo.getFormRawContent(formId);
+        formAppValueRepo.query();
         if (StringUtils.isNotEmpty(formContent)) {
             return formContent;
         }
@@ -118,9 +123,11 @@ public class FormService {
 
     public String getFormData(FormValueQuery formValueQuery) throws Exception {
         FormValueEntity formValueVo = formValueRepo.getFormValue(formValueQuery);
+        service.add();
         if (formValueVo != null) {
             return formValueVo.getContent();
         }
+
         return null;
     }
 

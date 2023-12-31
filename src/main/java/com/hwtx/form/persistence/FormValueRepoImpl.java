@@ -8,7 +8,6 @@ import com.hwtx.form.domain.query.FormValueQuery;
 import io.geekidea.boot.framework.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class FormValueRepoImpl extends ServiceImpl<FormValueMapper, FormValueEntity> implements FormValueRepo {
 
-    @Autowired
-    private FormValueMapper formValueMapper;
-
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean addFormValue(FormValueDto dto) throws Exception {
@@ -36,6 +32,7 @@ public class FormValueRepoImpl extends ServiceImpl<FormValueMapper, FormValueEnt
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateFormValue(FormValueDto dto) throws Exception {
+        Long id = dto.getId();
         FormValueEntity formValueEntity = getValue(dto.getId(), dto.getK1());
         if (formValueEntity == null) {
             throw new BusinessException("表单值不存在");

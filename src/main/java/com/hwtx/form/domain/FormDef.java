@@ -3,6 +3,7 @@ package com.hwtx.form.domain;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.hwtx.form.Util;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -143,7 +144,7 @@ public class FormDef {
                             if (StringUtils.isEmpty(msg)) {
                                 throw new RuntimeException("未能获取验证规则【" + fieldName + "】对应的验证提示消息");
                             }
-                            String predicateClass = predicateClassPrefix + firstCharToUpperCase(fieldName) + validateActionSuffix;
+                            String predicateClass = predicateClassPrefix + Util.firstCharToUpperCase(fieldName) + validateActionSuffix;
                             Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(predicateClass);
                             Constructor<?> constructor = clazz.getDeclaredConstructor(declaredField.getType());
                             declaredField.setAccessible(true);
@@ -218,12 +219,5 @@ public class FormDef {
             }
         }
         return ValidationResult.builder().pass(true).message("验证通过").key(name).build();
-    }
-
-    public String firstCharToUpperCase(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 }
