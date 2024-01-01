@@ -1,14 +1,14 @@
 package io.geekidea.boot.demo.controller;
 
-import io.geekidea.boot.common.enums.SysLogType;
-import io.geekidea.boot.framework.annotation.Log;
 import io.geekidea.boot.auth.annotation.Permission;
-import io.geekidea.boot.framework.page.Paging;
-import io.geekidea.boot.framework.response.ApiResult;
+import io.geekidea.boot.common.enums.SysLogType;
 import io.geekidea.boot.demo.dto.DemoDto;
 import io.geekidea.boot.demo.query.DemoQuery;
 import io.geekidea.boot.demo.service.DemoService;
 import io.geekidea.boot.demo.vo.DemoVo;
+import io.geekidea.boot.framework.annotation.Log;
+import io.geekidea.boot.framework.page.Paging;
+import io.geekidea.boot.framework.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

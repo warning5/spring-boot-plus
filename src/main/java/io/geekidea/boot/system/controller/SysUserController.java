@@ -1,7 +1,7 @@
 package io.geekidea.boot.system.controller;
 
-import io.geekidea.boot.auth.util.LoginUtil;
 import io.geekidea.boot.auth.annotation.Permission;
+import io.geekidea.boot.auth.util.LoginUtil;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.framework.response.ApiResult;

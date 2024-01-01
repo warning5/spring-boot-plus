@@ -1,10 +1,10 @@
 package io.geekidea.boot.demo.controller;
 
-import io.geekidea.boot.framework.page.Paging;
-import io.geekidea.boot.framework.response.ApiResult;
 import io.geekidea.boot.demo.query.DemoMerchantAppQuery;
 import io.geekidea.boot.demo.service.DemoMerchantService;
 import io.geekidea.boot.demo.vo.DemoMerchantAppVo;
+import io.geekidea.boot.framework.page.Paging;
+import io.geekidea.boot.framework.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

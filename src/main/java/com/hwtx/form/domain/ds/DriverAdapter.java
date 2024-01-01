@@ -1,13 +1,6 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.adapter.DataReader;
 import org.anyline.adapter.DataWriter;
-import org.anyline.data.adapter.DataReaderFactory;
-import org.anyline.data.adapter.DataWriterFactory;
-import org.anyline.data.adapter.SystemDataReaderFactory;
-import org.anyline.data.adapter.SystemDataWriterFactory;
-import org.anyline.data.param.ConfigStore;
-import org.anyline.data.run.RunValue;
 import org.anyline.entity.Compare;
 import org.anyline.entity.DataSet;
 import org.anyline.metadata.*;
@@ -127,102 +120,23 @@ public interface DriverAdapter {
     ColumnType type(String type);
 
     /**
-     * 写入数据库前 类型转换
-     *
-     * @param supports 写入的原始类型 class ColumnType StringColumnType
-     * @param writer   DataWriter
-     */
-    default void reg(Object[] supports, DataWriter writer) {
-        SystemDataWriterFactory.reg(type(), supports, writer);
-    }
-
-    /**
-     * 写入数据库时 类型转换 写入的原始类型需要writer中实现supports
-     *
-     * @param writer DataWriter
-     */
-    default void reg(DataWriter writer) {
-        SystemDataWriterFactory.reg(type(), null, writer);
-    }
-
-    /**
-     * 读取数据库入 类型转换
-     *
-     * @param supports 读取的原始类型 class ColumnType StringColumnType
-     * @param reader   DataReader
-     */
-    default void reg(Object[] supports, DataReader reader) {
-        SystemDataReaderFactory.reg(type(), supports, reader);
-    }
-
-    /**
-     * 读取数据库入 类型转换 读取的原始类型需要reader中实现supports
-     *
-     * @param reader DataReader
-     */
-    default void reg(DataReader reader) {
-        SystemDataReaderFactory.reg(type(), null, reader);
-    }
-
-    /**
-     * 根据读出的数据类型 定位DataReader
-     *
-     * @param type class ColumnType StringColumnType
-     * @return DataReader
-     */
-    default DataReader reader(Object type) {
-        DataReader reader = DataReaderFactory.reader(type(), type);
-        if (null == reader) {
-            reader = SystemDataReaderFactory.reader(type(), type);
-        }
-        if (null == reader) {
-            reader = DataReaderFactory.reader(DatabaseType.NONE, type);
-        }
-        if (null == reader) {
-            reader = SystemDataReaderFactory.reader(DatabaseType.NONE, type);
-        }
-        return reader;
-    }
-
-    /**
      * 根据写入的数据类型 定位DataWriter
-     *
      * @param type class ColumnType StringColumnType
      * @return DataWriter
      */
-    default DataWriter writer(Object type) {
+    default DataWriter writer(Object type){
         DataWriter writer = DataWriterFactory.writer(type(), type);
-        if (null == writer) {
+        if(null == writer){
             writer = SystemDataWriterFactory.writer(type(), type);
         }
-        if (null == writer) {
+        if(null == writer){
             writer = DataWriterFactory.writer(DatabaseType.NONE, type);
         }
-        if (null == writer) {
+        if(null == writer){
             writer = SystemDataWriterFactory.writer(DatabaseType.NONE, type);
         }
         return writer;
     }
-
-    /* *****************************************************************************************************************
-     *
-     * 													metadata
-     *
-     * =================================================================================================================
-     * database			: 数据库(catalog, schema)
-     * table			: 表
-     * master table		: 主表
-     * partition table	: 分区表
-     * column			: 列
-     * tag				: 标签
-     * primary key      : 主键
-     * foreign key		: 外键
-     * index			: 索引
-     * constraint		: 约束
-     * trigger		    : 触发器
-     * procedure        : 存储过程
-     * function         : 函数
-     ******************************************************************************************************************/
 
     /**
      * 根据运行环境识别 catalog与schema
@@ -1311,47 +1225,6 @@ public interface DriverAdapter {
      * @return Object
      */
     Object getPrimaryValue(DataRuntime runtime, Object obj);
-    /*
-     */
-
-    /**
-     * 数据类型转换
-     * 子类先解析(有些同名的类型以子类为准)、失败后再调用默认转换
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param catalog catalog
-     * @param schema  schema
-     * @param table   表
-     * @param run     值
-     * @return boolean 返回false表示转换失败 如果有多个 adapter 则交给adapter继续转换
-     */
-    boolean convert(DataRuntime runtime, Catalog catalog, Schema schema, String table, RunValue run);
-
-    boolean convert(DataRuntime runtime, Table table, Run run);
-
-    boolean convert(DataRuntime runtime, ConfigStore configs, Run run);
-
-    /**
-     * 数据类型转换
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param columns 列
-     * @param run     值
-     * @return boolean 返回false表示转换失败 如果有多个adapter 则交给adapter继续转换
-     */
-    boolean convert(DataRuntime runtime, Map<String, Column> columns, RunValue run);
-
-    /**
-     * 数据类型转换,没有提供column的根据value类型
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param column  列
-     * @param run     值
-     * @return boolean 返回false表示转换失败 如果有多个adapter 则交给adapter继续转换
-     */
-    boolean convert(DataRuntime runtime, Column column, RunValue run);
-
-    Object convert(DataRuntime runtime, Column column, Object value);
 
     /**
      * 在不检测数据库结构时才生效,否则会被convert代替
@@ -1373,17 +1246,6 @@ public interface DriverAdapter {
      * @param value value
      */
     //void format(StringBuilder builder, Object value);
-
-    /**
-     * 从数据库中读取数据,常用的基本类型可以自动转换,不常用的如json/point/polygon/blob等转换成anyline对应的类型
-     *
-     * @param runtime  运行环境主要包含驱动适配器 数据源或客户端
-     * @param metadata Column 用来定位数据类型
-     * @param value    value
-     * @param clazz    目标数据类型(给entity赋值时可以根据class, DataRow赋值时可以指定class，否则按检测metadata类型转换 转换不不了的原样返回)
-     * @return Object
-     */
-    Object read(DataRuntime runtime, Column metadata, Object value, Class clazz);
 
     /**
      * 通过占位符写入数据库前转换成数据库可接受的Java数据类型<br/>

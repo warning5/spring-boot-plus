@@ -1,18 +1,18 @@
 package io.geekidea.boot.demo.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.geekidea.boot.demo.dto.FooBarDto;
+import io.geekidea.boot.demo.entity.FooBar;
+import io.geekidea.boot.demo.mapper.FooBarMapper;
+import io.geekidea.boot.demo.query.FooBarAppQuery;
+import io.geekidea.boot.demo.query.FooBarQuery;
+import io.geekidea.boot.demo.service.FooBarService;
+import io.geekidea.boot.demo.vo.FooBarAppVo;
+import io.geekidea.boot.demo.vo.FooBarVo;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.OrderByItem;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.util.PagingUtil;
-import io.geekidea.boot.demo.dto.FooBarDto;
-import io.geekidea.boot.demo.entity.FooBar;
-import io.geekidea.boot.demo.mapper.FooBarMapper;
-import io.geekidea.boot.demo.query.FooBarQuery;
-import io.geekidea.boot.demo.service.FooBarService;
-import io.geekidea.boot.demo.vo.FooBarVo;
-import io.geekidea.boot.demo.query.FooBarAppQuery;
-import io.geekidea.boot.demo.vo.FooBarAppVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,13 +1,5 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.data.param.ConfigParser;
-import org.anyline.data.param.ConfigStore;
-import org.anyline.data.param.ParseResult;
-import org.anyline.data.prepare.*;
-import org.anyline.data.prepare.auto.init.DefaultAutoCondition;
-import org.anyline.data.prepare.auto.init.DefaultAutoConditionChain;
-import org.anyline.data.prepare.init.DefaultGroupStore;
-import org.anyline.data.run.RunValue;
 import org.anyline.entity.*;
 import org.anyline.entity.Compare.EMPTY_VALUE_SWITCH;
 import org.anyline.metadata.Column;
@@ -31,7 +23,6 @@ public abstract class BasicRun implements Run {
     protected StringBuilder builder = new StringBuilder();
     protected int batch;
     protected int vol;//每行多少个值
-    protected RunPrepare prepare;
     protected String catalog;
     protected String schema;
     protected String table;
@@ -39,12 +30,8 @@ public abstract class BasicRun implements Run {
     protected List<RunValue> values;
     protected List<RunValue> batchValues;
     protected PageNavi pageNavi;
-    protected ConditionChain conditionChain;            // 查询条件
-    protected ConfigStore configStore;
     protected OrderStore orderStore;
-    protected GroupStore groupStore;
     protected String having;
-    protected List<Variable> variables;
 
     protected Object filter;
     protected Object update;
@@ -94,21 +81,6 @@ public abstract class BasicRun implements Run {
             this.delimiterFr = runtime.getAdapter().getDelimiterFr();
             this.delimiterTo = runtime.getAdapter().getDelimiterTo();
         }
-
-        if (null != configStore) {
-            setPageNavi(configStore.getPageNavi());
-			/*OrderStore orderStore = configStore.getOrders();
-			List<Order> orders = null;
-			if (null != orderStore) {
-				orders = orderStore.getOrders();
-			}
-			if (null != orders) {
-				for (Order order : orders) {
-					orderStore.order(order);
-				}
-			}*/
-        }
-
     }
 
     @Override
@@ -156,19 +128,6 @@ public abstract class BasicRun implements Run {
         if (BasicUtil.isEmpty(group)) {
             return this;
         }
-
-        if (null == groupStore) {
-            groupStore = new DefaultGroupStore();
-        }
-
-        group = group.trim().toUpperCase();
-
-
-        /*添加新分组条件*/
-        if (!groupStore.getGroups().contains(group)) {
-            groupStore.group(group);
-        }
-
         return this;
     }
 
@@ -178,18 +137,6 @@ public abstract class BasicRun implements Run {
             orderStore = new DefaultOrderStore();
         }
         orderStore.order(order);
-        return this;
-    }
-
-    @Override
-    public RunPrepare getPrepare() {
-        return prepare;
-    }
-
-    @Override
-    public Run setPrepare(RunPrepare prepare) {
-        this.prepare = prepare;
-        this.table = prepare.getTable();
         return this;
     }
 
@@ -383,16 +330,6 @@ public abstract class BasicRun implements Run {
     }
 
     @Override
-    public ConfigStore getConfigStore() {
-        return configStore;
-    }
-
-    @Override
-    public void setConfigStore(ConfigStore configStore) {
-        this.configStore = configStore;
-    }
-
-    @Override
     public OrderStore getOrderStore() {
         return orderStore;
     }
@@ -400,16 +337,6 @@ public abstract class BasicRun implements Run {
     @Override
     public void setOrderStore(OrderStore orderStore) {
         this.orderStore = orderStore;
-    }
-
-    @Override
-    public GroupStore getGroupStore() {
-        return groupStore;
-    }
-
-    @Override
-    public void setGroupStore(GroupStore groupStore) {
-        this.groupStore = groupStore;
     }
 
     public String getDelimiterFr() {
@@ -485,77 +412,6 @@ public abstract class BasicRun implements Run {
     }
 
     @Override
-    public Run setConditionChain(ConditionChain chain) {
-        this.conditionChain = chain;
-        return this;
-    }
-
-    @Override
-    public ConditionChain getConditionChain() {
-        return this.conditionChain;
-    }
-
-    /*******************************************************************************************
-     *
-     * 										添加条件
-     *
-     ********************************************************************************************/
-    /**
-     * 添加查询条件
-     *
-     * @param swt     遇到空值处理方式
-     * @param prefix  表名
-     * @param var     列名
-     * @param value   值
-     * @param compare 比较方式
-     */
-    @Override
-    public Run addCondition(EMPTY_VALUE_SWITCH swt, Compare compare, String prefix, String var, Object value) {
-        Condition condition = new DefaultAutoCondition(swt, compare, prefix, var, value);
-        if (null == conditionChain) {
-            conditionChain = new DefaultAutoConditionChain();
-        }
-        if (condition.isActive()) {
-            conditionChain.addCondition(condition);
-        } else {
-            if (swt == EMPTY_VALUE_SWITCH.BREAK) {
-                conditionChain.setValid(false);
-            }
-        }
-        return this;
-    }
-
-    @Override
-    public Run addCondition(Condition condition) {
-        if (null != conditionChain) {
-            conditionChain.addCondition(condition);
-        }
-        return this;
-    }
-
-
-    @Override
-    public Condition getCondition(String name) {
-        for (Condition con : conditionChain.getConditions()) {
-            if (null != con && null != con.getId() && con.getId().equalsIgnoreCase(name)) {
-                return con;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public List<Condition> getConditions(String name) {
-        List<Condition> list = new ArrayList<>();
-        for (Condition con : conditionChain.getConditions()) {
-            if (null != con && null != con.getId() && con.getId().equalsIgnoreCase(name)) {
-                list.add(con);
-            }
-        }
-        return list;
-    }
-
-    @Override
     public String getFinalDelete(boolean placeholder) {
         if (ConfigTable.IS_SQL_DELIMITER_PLACEHOLDER_OPEN) {
             return SQLUtil.placeholder(builder.toString(), delimiterFr, delimiterTo);
@@ -589,14 +445,6 @@ public abstract class BasicRun implements Run {
             text = replace(text);
         }
         return text;
-    }
-
-    public Run addVariable(Variable var) {
-        if (null == variables) {
-            variables = new ArrayList<Variable>();
-        }
-        variables.add(var);
-        return this;
     }
 
     @Override
@@ -727,91 +575,6 @@ public abstract class BasicRun implements Run {
         return this;
     }
 
-    /**
-     * 添加条件
-     *
-     * @param conditions 简单过滤条件 ORDER GROUP 等
-     * @return Run 最终执行命令 如果是JDBC类型库 会包含 SQL 与 参数值
-     */
-    @Override
-    public Run addCondition(String... conditions) {
-        /*添加查询条件*/
-        if (null != conditions) {
-            for (String condition : conditions) {
-                if (null == condition) {
-                    continue;
-                }
-                condition = condition.trim();
-                String up = condition.toUpperCase().replaceAll("\\s+", " ").trim();
-
-                if (up.startsWith("ORDER BY")) {
-                    // 排序条件
-                    String orderStr = condition.substring(up.indexOf("ORDER BY") + "ORDER BY".length()).trim();
-                    String orders[] = orderStr.split(",");
-                    for (String item : orders) {
-                        order(item);
-                        if (null != configStore) {
-                            configStore.order(item);
-                        }
-                        if (null != this.orderStore) {
-                            this.orderStore.order(item);
-                        }
-                    }
-                    continue;
-                } else if (up.startsWith("GROUP BY")) {
-                    // 分组条件
-                    String groupStr = condition.substring(up.indexOf("GROUP BY") + "GROUP BY".length()).trim();
-                    String groups[] = groupStr.split(",");
-                    for (String item : groups) {
-                        if (null == groupStore) {
-                            groupStore = new DefaultGroupStore();
-                        }
-                        groupStore.group(item);
-                    }
-                    continue;
-                } else if (up.startsWith("HAVING")) {
-                    // 分组过滤
-                    String haveStr = condition.substring(up.indexOf("HAVING") + "HAVING".length()).trim();
-                    this.having = haveStr;
-                    continue;
-                }
-//				if(up.contains(" OR ") && !(condition.startsWith("(") && condition.endsWith(")"))){
-//					condition = "(" + condition + ")";
-//				}
-
-
-                //if(condition.startsWith("${") && condition.endsWith("}")){
-                if (BasicUtil.checkEl(condition)) {
-                    // 原生SQL  不处理
-                    Condition con = new DefaultAutoCondition(condition.substring(2, condition.length() - 1));
-                    addCondition(con);
-                    continue;
-                }
-
-                if (condition.contains(":")) {
-                    // :符号是否表示时间
-                    boolean isTime = false;
-                    int idx = condition.indexOf(":");
-                    // ''之内
-                    if (condition.indexOf("'") < idx && condition.indexOf("'", idx + 1) > 0) {
-                        isTime = true;
-                    }
-                    if (!isTime) {
-                        // 需要解析的SQL
-                        ParseResult parser = ConfigParser.parse(condition, false);
-                        Object value = ConfigParser.getValues(parser);
-                        addCondition(parser.getSwitch(), parser.getCompare(), parser.getPrefix(), parser.getVar(), value);
-                        continue;
-                    }
-                }
-                //原生SQL
-                Condition con = new DefaultAutoCondition(condition);
-                addCondition(con);
-            }
-        }
-        return this;
-    }
-
     protected static boolean endWithWhere(String txt) {
 		/*boolean result = false;
 		txt = txt.toUpperCase();
@@ -875,51 +638,6 @@ public abstract class BasicRun implements Run {
             return txt.contains("WHERE");
         }
     }
-
-
-    public List<Variable> getVariables() {
-        return variables;
-    }
-
-    public void setVariables(List<Variable> variables) {
-        this.variables = variables;
-    }
-
-
-    public boolean isSetValue(String condition, String variable) {
-        Condition con = getCondition(condition);
-        if (null == con) {
-            Variable var = con.getVariable(variable);
-            if (null != var) {
-                return var.isSetValue();
-            }
-        }
-        return false;
-    }
-
-    public boolean isSetValue(String variable) {
-        Variable var = getVariable(variable);
-        if (null != var) {
-            return var.isSetValue();
-        }
-        return false;
-    }
-
-    public Variable getVariable(String var) {
-        if (null == variables || null == var) {
-            return null;
-        }
-        for (Variable variable : variables) {
-            if (null == variable) {
-                continue;
-            }
-            if (var.equalsIgnoreCase(variable.getKey())) {
-                return variable;
-            }
-        }
-        return null;
-    }
-
     @Override
     public void setFilter(Object filter) {
         this.filter = filter;
@@ -1024,31 +742,6 @@ public abstract class BasicRun implements Run {
     @Override
     public void setVol(int vol) {
         this.vol = vol;
-    }
-
-    /**
-     * 需要查询的列
-     *
-     * @return String
-     */
-    @Override
-    public String getQueryColumn() {
-        String result = "*";
-        if (null != prepare) {
-            List<String> cols = prepare.getFetchKeys();
-            if (null != cols && cols.size() > 0) {
-                result = null;
-                for (String col : cols) {
-                    if (null == result) {
-
-                        result = SQLUtil.delimiter(col, runtime.getAdapter().getDelimiterFr(), runtime.getAdapter().getDelimiterTo());
-                    } else {
-                        result += "," + SQLUtil.delimiter(col, runtime.getAdapter().getDelimiterFr(), runtime.getAdapter().getDelimiterTo());
-                    }
-                }
-            }
-        }
-        return result;
     }
 
     /**

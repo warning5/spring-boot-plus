@@ -4,7 +4,6 @@ import com.hwtx.form.domain.ds.DataRuntime;
 import com.hwtx.form.domain.ds.DefaultJDBCAdapter;
 import com.hwtx.form.domain.ds.Run;
 import com.hwtx.form.domain.ds.SimpleRun;
-import org.anyline.data.param.ConfigStore;
 import org.anyline.entity.DataRow;
 import org.anyline.entity.DataSet;
 import org.anyline.metadata.*;
@@ -874,27 +873,6 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
         }
         ;
         return builder;
-    }
-
-    public String insertHead(ConfigStore configs) {
-
-        Boolean override = null;
-        if (null != configs) {
-            override = configs.override();
-        }
-        if (null == override) {
-            return "INSERT INTO ";
-        } else {
-            if (override) {
-                return "REPLACE INTO ";
-            } else {
-                return "INSERT IGNORE INTO ";
-            }
-        }
-    }
-
-    public String insertFoot(ConfigStore configs, LinkedHashMap<String, Column> columns) {
-        return "";
     }
 
     /**

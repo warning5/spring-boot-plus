@@ -1,9 +1,9 @@
 package io.geekidea.boot.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.geekidea.boot.system.vo.SysMenuTreeVo;
 import io.geekidea.boot.system.entity.SysMenu;
 import io.geekidea.boot.system.query.SysMenuQuery;
+import io.geekidea.boot.system.vo.SysMenuTreeVo;
 import io.geekidea.boot.system.vo.SysMenuVo;
 import io.geekidea.boot.system.vo.SysNavMenuTreeVo;
 import org.apache.ibatis.annotations.Mapper;

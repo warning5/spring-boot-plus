@@ -1,11 +1,10 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.data.run.RunValue;
 import org.anyline.metadata.ACTION;
 
 import java.util.ArrayList;
 
-public class SimpleRun extends BasicRun implements Run {
+public class SimpleRun extends BasicRun {
     public SimpleRun(DataRuntime runtime) {
         this.runtime = runtime;
     }

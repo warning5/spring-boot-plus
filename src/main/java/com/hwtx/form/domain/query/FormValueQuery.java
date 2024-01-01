@@ -1,6 +1,5 @@
 package com.hwtx.form.domain.query;
 
-import io.geekidea.boot.framework.page.BasePageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

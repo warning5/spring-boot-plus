@@ -2,10 +2,10 @@ package io.geekidea.boot.demo.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.geekidea.boot.demo.entity.DemoMerchant;
-import io.geekidea.boot.demo.query.DemoMerchantQuery;
-import io.geekidea.boot.demo.vo.DemoMerchantVo;
 import io.geekidea.boot.demo.query.DemoMerchantAppQuery;
+import io.geekidea.boot.demo.query.DemoMerchantQuery;
 import io.geekidea.boot.demo.vo.DemoMerchantAppVo;
+import io.geekidea.boot.demo.vo.DemoMerchantVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

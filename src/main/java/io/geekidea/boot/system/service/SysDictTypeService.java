@@ -1,7 +1,6 @@
 package io.geekidea.boot.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.system.dto.SysDictTypeDto;
 import io.geekidea.boot.system.entity.SysDictType;
 import io.geekidea.boot.system.query.SysDictTypeQuery;

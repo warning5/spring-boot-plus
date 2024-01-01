@@ -1,18 +1,18 @@
 package io.geekidea.boot.demo.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.geekidea.boot.demo.dto.DemoDto;
+import io.geekidea.boot.demo.entity.Demo;
+import io.geekidea.boot.demo.mapper.DemoMapper;
+import io.geekidea.boot.demo.query.DemoAppQuery;
+import io.geekidea.boot.demo.query.DemoQuery;
+import io.geekidea.boot.demo.service.DemoService;
+import io.geekidea.boot.demo.vo.DemoAppVo;
+import io.geekidea.boot.demo.vo.DemoVo;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.OrderByItem;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.util.PagingUtil;
-import io.geekidea.boot.demo.dto.DemoDto;
-import io.geekidea.boot.demo.entity.Demo;
-import io.geekidea.boot.demo.mapper.DemoMapper;
-import io.geekidea.boot.demo.query.DemoQuery;
-import io.geekidea.boot.demo.service.DemoService;
-import io.geekidea.boot.demo.vo.DemoVo;
-import io.geekidea.boot.demo.query.DemoAppQuery;
-import io.geekidea.boot.demo.vo.DemoAppVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

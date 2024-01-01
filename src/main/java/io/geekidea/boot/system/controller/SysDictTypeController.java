@@ -1,8 +1,8 @@
 package io.geekidea.boot.system.controller;
 
-import io.geekidea.boot.framework.annotation.Log;
 import io.geekidea.boot.auth.annotation.Permission;
 import io.geekidea.boot.common.enums.SysLogType;
+import io.geekidea.boot.framework.annotation.Log;
 import io.geekidea.boot.framework.response.ApiResult;
 import io.geekidea.boot.system.dto.SysDictTypeDto;
 import io.geekidea.boot.system.query.SysDictTypeQuery;

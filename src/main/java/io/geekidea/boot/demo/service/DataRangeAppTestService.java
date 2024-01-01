@@ -1,13 +1,13 @@
 package io.geekidea.boot.demo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.demo.dto.DataRangeAppTestDto;
 import io.geekidea.boot.demo.entity.DataRangeAppTest;
-import io.geekidea.boot.demo.query.DataRangeAppTestQuery;
-import io.geekidea.boot.demo.vo.DataRangeAppTestVo;
 import io.geekidea.boot.demo.query.DataRangeAppTestAppQuery;
+import io.geekidea.boot.demo.query.DataRangeAppTestQuery;
 import io.geekidea.boot.demo.vo.DataRangeAppTestAppVo;
+import io.geekidea.boot.demo.vo.DataRangeAppTestVo;
+import io.geekidea.boot.framework.page.Paging;
 
 
 /**

@@ -2,10 +2,10 @@ package io.geekidea.boot.demo.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.geekidea.boot.demo.entity.FooBar;
-import io.geekidea.boot.demo.query.FooBarQuery;
-import io.geekidea.boot.demo.vo.FooBarVo;
 import io.geekidea.boot.demo.query.FooBarAppQuery;
+import io.geekidea.boot.demo.query.FooBarQuery;
 import io.geekidea.boot.demo.vo.FooBarAppVo;
+import io.geekidea.boot.demo.vo.FooBarVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

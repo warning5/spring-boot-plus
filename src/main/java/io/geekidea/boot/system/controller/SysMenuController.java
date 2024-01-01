@@ -1,13 +1,13 @@
 package io.geekidea.boot.system.controller;
 
+import io.geekidea.boot.auth.annotation.Permission;
+import io.geekidea.boot.framework.response.ApiResult;
 import io.geekidea.boot.system.dto.SysMenuDto;
 import io.geekidea.boot.system.query.SysMenuQuery;
 import io.geekidea.boot.system.service.SysMenuService;
 import io.geekidea.boot.system.vo.SysMenuTreeVo;
 import io.geekidea.boot.system.vo.SysMenuVo;
 import io.geekidea.boot.system.vo.SysNavMenuTreeVo;
-import io.geekidea.boot.auth.annotation.Permission;
-import io.geekidea.boot.framework.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

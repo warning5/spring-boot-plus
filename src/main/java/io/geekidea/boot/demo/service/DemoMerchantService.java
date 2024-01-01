@@ -1,13 +1,13 @@
 package io.geekidea.boot.demo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.demo.dto.DemoMerchantDto;
 import io.geekidea.boot.demo.entity.DemoMerchant;
-import io.geekidea.boot.demo.query.DemoMerchantQuery;
-import io.geekidea.boot.demo.vo.DemoMerchantVo;
 import io.geekidea.boot.demo.query.DemoMerchantAppQuery;
+import io.geekidea.boot.demo.query.DemoMerchantQuery;
 import io.geekidea.boot.demo.vo.DemoMerchantAppVo;
+import io.geekidea.boot.demo.vo.DemoMerchantVo;
+import io.geekidea.boot.framework.page.Paging;
 
 
 /**

@@ -1,7 +1,6 @@
 package com.hwtx.form.persistence;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.framework.domain.vo.FormValueVo;
 import org.apache.ibatis.annotations.Mapper;
 

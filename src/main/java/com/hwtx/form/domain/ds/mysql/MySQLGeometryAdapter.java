@@ -713,11 +713,6 @@ Geometry 1, Geometry 2, ..., Geometry N: 表示 GeometryCollection 中的每个�
             wkb(buffer, (MultiPolygon)geometry, head);
         }
     }
-    /*public static void head(ByteBuffer buffer, Geometry geometry){
-        buffer.put(geometry.srid());
-        buffer.put((byte) geometry.endian());
-        buffer.put(geometry.type());
-    }*/
 
     public static byte[] wkb(Point point){
         init(point);

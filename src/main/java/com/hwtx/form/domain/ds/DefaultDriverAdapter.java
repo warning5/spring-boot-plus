@@ -1,15 +1,11 @@
 package com.hwtx.form.domain.ds;
 
 
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.anyline.adapter.DataReader;
 import org.anyline.adapter.DataWriter;
 import org.anyline.adapter.KeyAdapter;
 import org.anyline.adapter.init.ConvertAdapter;
-import org.anyline.data.metadata.StandardColumnType;
-import org.anyline.data.param.ConfigStore;
-import org.anyline.data.run.RunValue;
-import org.anyline.data.util.DataSourceUtil;
 import org.anyline.entity.Compare;
 import org.anyline.entity.DataRow;
 import org.anyline.entity.DataSet;
@@ -36,7 +32,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
     public String delimiterTo = "";
 
     //根据名称定准数据类型
-    protected Map<String, ColumnType> types = new Hashtable();
+    protected Map<String, ColumnType> types = Maps.newHashMap();
 
     public DefaultDriverAdapter() {
         //当前数据库支持的数据类型,子类根据情况覆盖
@@ -114,40 +110,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
             }
         }
         return pvs;
-    }
-
-    /**
-     * 过滤掉表结构中不存在的列
-     *
-     * @param table   表
-     * @param columns columns
-     * @return List
-     */
-    public LinkedHashMap<String, Column> checkMetadata(DataRuntime runtime, String table, ConfigStore configs, LinkedHashMap<String, Column> columns) {
-        if (!IS_AUTO_CHECK_METADATA(configs)) {
-            return columns;
-        }
-        LinkedHashMap<String, Column> result = new LinkedHashMap<>();
-        LinkedHashMap<String, Column> metadatas = columns(runtime, null, false, new Table(table), false);
-        if (metadatas.size() > 0) {
-            for (String key : columns.keySet()) {
-                if (metadatas.containsKey(key)) {
-                    result.put(key, metadatas.get(key));
-                } else {
-                    if (IS_LOG_SQL_WARN(configs)) {
-                        log.warn("[{}][column:{}.{}][insert/update忽略当前列名]", LogUtil.format("列名检测不存在", 33), table, key);
-                    }
-                }
-            }
-        } else {
-            if (IS_LOG_SQL_WARN(configs)) {
-                log.warn("[{}][table:{}][忽略列名检测]", LogUtil.format("表结构检测失败(检查表名是否存在)", 33), table);
-            }
-        }
-        if (IS_LOG_SQL_WARN(configs)) {
-            log.info("[check column metadata][src:{}][result:{}]", columns.size(), result.size());
-        }
-        return result;
     }
 
     /**
@@ -1771,9 +1733,9 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         Map<String, Index> idx = indexs(runtime, meta.getTable());
         if (idx.values().stream().anyMatch(index -> {
             Map<String, Column> indexCols = index.getColumns();
-            Collection<String> cols = indexCols.values().stream().map(BaseMetadata::getName).toList();
+            Collection<String> cols = indexCols.values().stream().map(BaseMetadata::getName).collect(Collectors.toList());
             Map<String, Column> incomingIndexCols = meta.getColumns();
-            Collection<String> incomingCols = incomingIndexCols.values().stream().map(BaseMetadata::getName).toList();
+            Collection<String> incomingCols = incomingIndexCols.values().stream().map(BaseMetadata::getName).collect(Collectors.toList());
             return CollectionUtils.isEqualCollection(cols, incomingCols);
         })) {
             log.info("索引已存在，index = {}", meta.getName());
@@ -2053,22 +2015,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         }
     }
 
-    public String parseTable(String table) {
-        if (null == table) {
-            return table;
-        }
-        table = table.replace(getDelimiterFr(), "").replace(getDelimiterTo(), "");
-        table = DataSourceUtil.parseDataSource(table, null);
-        if (table.contains(".")) {
-            String tmps[] = table.split("\\.");
-            table = SQLUtil.delimiter(tmps[0], getDelimiterFr(), getDelimiterTo()) + "." + SQLUtil.delimiter(tmps[1], getDelimiterFr(), getDelimiterTo());
-        } else {
-            table = SQLUtil.delimiter(table, getDelimiterFr(), getDelimiterTo());
-        }
-        return table;
-    }
-
-
     /**
      * 写入数据库前类型转换<br/>
      *
@@ -2141,59 +2087,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         return result;
     }
 
-    /**
-     * 从数据库中读取数据<br/>
-     * 先由子类根据metadata.typeName(CHAR,INT)定位到具体的数据库类型ColumnType<br/>
-     * 如果定准成功由CoumnType根据class转换(class可不提供)<br/>
-     * 如果没有定位到ColumnType再根据className(String,BigDecimal)定位到JavaType<br/>
-     * 如果定准失败或转换失败(返回null)再由父类转换<br/>
-     * 如果没有提供metadata和class则根据value.class<br/>
-     * 常用类型jdbc可以自动转换直接返回就可以(一般子类DataType返回null父类原样返回)<br/>
-     * 不常用的如json/point/polygon/blob等转换成anyline对应的类型<br/>
-     *
-     * @param metadata Column 用来定位数据类型
-     * @param value    value
-     * @param clazz    目标数据类型(给entity赋值时应该指定属性class, DataRow赋值时可以通过JDBChandler指定class)
-     * @return Object
-     */
-    @Override
-    public Object read(DataRuntime runtime, Column metadata, Object value, Class clazz) {
-        //Object result = ConvertAdapter.convert(value, clazz);
-        Object result = value;
-        if (null == value) {
-            return null;
-        }
-        DataReader reader = null;
-        ColumnType ctype = null;
-        if (null != metadata) {
-            ctype = metadata.getColumnType();
-            if (null != ctype) {
-                reader = reader(ctype);
-            }
-            if (null == reader) {
-                String typeName = metadata.getTypeName();
-                if (null != typeName) {
-                    reader = reader(typeName);
-                    if (null == reader) {
-                        reader = reader(type(typeName));
-                    }
-                }
-            }
-        }
-        if (null == reader) {
-            reader = reader(value.getClass());
-        }
-        if (null != reader) {
-            result = reader.read(value);
-        }
-        if (null == reader || null == result) {
-            if (null != ctype) {
-                result = ctype.read(value, null, clazz);
-            }
-        }
-        return result;
-    }
-
     @Override
     public void value(DataRuntime runtime, StringBuilder builder, Object obj, String key) {
         Object value = null;
@@ -2221,18 +2114,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         } else {
             builder.append("null");
         }
-    }
-
-    @Override
-    public boolean convert(DataRuntime runtime, Catalog catalog, Schema schema, String table, RunValue value) {
-        boolean result = false;
-        if (ConfigTable.IS_AUTO_CHECK_METADATA) {
-            LinkedHashMap<String, Column> columns = columns(runtime, null, false, new Table(catalog, schema, table), false);
-            result = convert(runtime, columns, value);
-        } else {
-            result = convert(runtime, (Column) null, value);
-        }
-        return result;
     }
 
     /**
@@ -2264,110 +2145,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
             //value = convert(runtime, column, rv); //统一调用
         }
     }
-
-    @Override
-    public boolean convert(DataRuntime runtime, ConfigStore configs, Run run) {
-        boolean result = false;
-        if (null != run) {
-            result = convert(runtime, new Table<>(run.getTable()), run);
-        }
-        return result;
-    }
-
-    @Override
-    public boolean convert(DataRuntime runtime, Table table, Run run) {
-        boolean result = false;
-        LinkedHashMap<String, Column> columns = table.getColumns();
-
-        if (ConfigTable.IS_AUTO_CHECK_METADATA) {
-            if (null == columns || columns.isEmpty()) {
-                columns = columns(runtime, null, false, table, false);
-            }
-        }
-        List<RunValue> values = run.getRunValues();
-        if (null != values) {
-            for (RunValue value : values) {
-                if (ConfigTable.IS_AUTO_CHECK_METADATA) {
-                    result = convert(runtime, columns, value);
-                } else {
-                    result = convert(runtime, (Column) null, value);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public boolean convert(DataRuntime runtime, Map<String, Column> columns, RunValue value) {
-        boolean result = false;
-        if (null != columns && null != value) {
-            String key = value.getKey();
-            if (null != key) {
-                Column meta = columns.get(key.toUpperCase());
-                result = convert(runtime, meta, value);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 根据数据库列属性 类型转换(一般是在更新数据库时调用)
-     * 子类先解析(有些同名的类型以子类为准)、失败后再到这里解析
-     *
-     * @param metadata 列
-     * @param run      最终待执行的命令和参数(如果是JDBC环境就是SQL)Value
-     * @return boolean 是否完成类型转换,决定下一步是否继续
-     */
-    @Override
-    public boolean convert(DataRuntime runtime, Column metadata, RunValue run) {
-        if (null == run) {
-            return true;
-        }
-        Object value = run.getValue();
-        if (null == value) {
-            return true;
-        }
-        try {
-            if (null != metadata) {
-                //根据列属性转换(最终也是根据java类型转换)
-                value = convert(runtime, metadata, value);
-            } else {
-                DataWriter writer = writer(value.getClass());
-                if (null != writer) {
-                    value = writer.write(value, true);
-                }
-            }
-            run.setValue(value);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    @Override
-    public Object convert(DataRuntime runtime, Column metadata, Object value) {
-        if (null == value) {
-            return value;
-        }
-        try {
-            if (null != metadata) {
-                ColumnType columnType = metadata.getColumnType();
-                if (null == columnType) {
-                    columnType = type(metadata.getTypeName());
-                    if (null != columnType) {
-                        columnType.setArray(metadata.isArray());
-                        metadata.setColumnType(columnType);
-                    }
-                }
-//                value = convert(runtime, columnType, value);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return value;
-    }
-
 
     @Override
     public String objectName(DataRuntime runtime, String name) {
@@ -2460,139 +2237,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
 
     public <T extends BaseMetadata> T search(List<T> list, String name) {
         return BaseMetadata.search(list, name);
-    }
-
-
-    /**
-     * 是否输出SQL日志
-     *
-     * @param configs ConfigStore
-     * @return boolean
-     */
-    protected boolean IS_LOG_SQL(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_LOG_SQL();
-        }
-        return ConfigTable.IS_LOG_SQL;
-    }
-
-    /**
-     * insert update 时是否自动检测表结构(删除表中不存在的属性)
-     *
-     * @param configs ConfigStore
-     * @return boolean
-     */
-    protected boolean IS_AUTO_CHECK_METADATA(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_AUTO_CHECK_METADATA();
-        }
-        return ConfigTable.IS_AUTO_CHECK_METADATA;
-    }
-
-    /**
-     * 查询返回空DataSet时，是否检测元数据信息
-     *
-     * @param configs ConfigStore
-     * @return boolean
-     */
-    protected boolean IS_CHECK_EMPTY_SET_METADATA(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_CHECK_EMPTY_SET_METADATA();
-        }
-        return ConfigTable.IS_CHECK_EMPTY_SET_METADATA;
-    }
-
-    /**
-     * 是否输出慢SQL日志
-     *
-     * @param configs ConfigStore
-     * @return boolean
-     */
-    protected boolean IS_LOG_SLOW_SQL(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_LOG_SLOW_SQL();
-        }
-        return ConfigTable.IS_LOG_SLOW_SQL;
-    }
-
-
-    /**
-     * 异常时是否输出SQL日志
-     *
-     * @param configs ConfigStore
-     * @return boolean
-     */
-    protected boolean IS_LOG_SQL_WHEN_ERROR(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_LOG_SQL_WHEN_ERROR();
-        }
-        return ConfigTable.IS_LOG_SQL_WHEN_ERROR;
-    }
-
-    /**
-     * 是否输出异常堆栈日志
-     *
-     * @param configs ConfigStore
-     * @return boolean
-     */
-    protected boolean IS_PRINT_EXCEPTION_STACK_TRACE(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_PRINT_EXCEPTION_STACK_TRACE();
-        }
-        return ConfigTable.IS_PRINT_EXCEPTION_STACK_TRACE;
-    }
-
-    protected boolean IS_SQL_LOG_PLACEHOLDER(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_SQL_LOG_PLACEHOLDER();
-        }
-        return ConfigTable.IS_SQL_LOG_PLACEHOLDER;
-    }
-
-    /**
-     * 是否显示SQL耗时
-     *
-     * @param configs ConfigStore
-     * @return boolean
-     */
-    protected boolean IS_LOG_SQL_TIME(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_LOG_SQL_TIME();
-        }
-        return ConfigTable.IS_LOG_SQL_TIME;
-    }
-
-    /**
-     * 慢SQL判断标准
-     *
-     * @param configs ConfigStore
-     * @return long
-     */
-    protected long SLOW_SQL_MILLIS(ConfigStore configs) {
-        if (null != configs) {
-            return configs.SLOW_SQL_MILLIS();
-        }
-        return ConfigTable.SLOW_SQL_MILLIS;
-    }
-
-    /**
-     * 是否抛出查询异常
-     *
-     * @param configs ConfigStore
-     * @return boolean
-     */
-    protected boolean IS_THROW_SQL_QUERY_EXCEPTION(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_THROW_SQL_QUERY_EXCEPTION();
-        }
-        return ConfigTable.IS_THROW_SQL_QUERY_EXCEPTION;
-    }
-
-    protected boolean IS_LOG_SQL_WARN(ConfigStore configs) {
-        if (null != configs) {
-            return configs.IS_LOG_SQL_WARN();
-        }
-        return ConfigTable.IS_LOG_SQL_WARN;
     }
 
     protected <T extends BaseMetadata> void fillSchema(T source, T target) {

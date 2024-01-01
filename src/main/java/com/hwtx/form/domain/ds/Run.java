@@ -1,8 +1,5 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.data.param.ConfigStore;
-import org.anyline.data.prepare.*;
-import org.anyline.data.run.RunValue;
 import org.anyline.entity.Compare;
 import org.anyline.entity.Compare.EMPTY_VALUE_SWITCH;
 import org.anyline.entity.Order;
@@ -28,49 +25,13 @@ public interface Run {
 	 * @return Run 最终执行命令 如果是JDBC类型库 会包含 SQL 与 参数值
 	 */
 	Run setConditionValue(EMPTY_VALUE_SWITCH swt, Compare compare, String prefix, String variable, Object value);
-	void setGroupStore(GroupStore groups) ;
-	GroupStore getGroupStore() ; 
 	Run group(String group);
  
 	void setOrderStore(OrderStore orders) ; 
 	void setOrders(String[] orders); 
 	OrderStore getOrderStore() ; 
 	Run order(String order);
-	 
-	void setConfigStore(ConfigStore configs);
-	ConfigStore getConfigStore() ; 
-	 
- 
-	/** 
-	 * 添加查询条件 
-	 * @param swt 遇到空值处理方式
-	 * @param prefix 表名
-	 * @param var 列名
-	 * @param value 值 
-	 * @param compare 比较方式 
-	 * @return Run 最终执行命令 如果是JDBC类型库 会包含 SQL 与 参数值
-	 */
-	Run addCondition(EMPTY_VALUE_SWITCH swt, Compare compare, String prefix, String var, Object value);
-	Run setConditionChain(ConditionChain chain);
-
 	/**
-	 * 添加条件
-	 * @param conditions  简单过滤条件、ORDER、GROUP、HAVING 等
-	 * @return Run 最终执行命令 如果是JDBC类型库 会包含 SQL 与 参数值
-	 */
-	Run addCondition(String ... conditions);
-	Run addCondition(Condition condition);
-	Condition getCondition(String name);
-
-	/**
-	 * 根据key查询条件,包括sql主体部分,有可能有多个相同key的条件
-	 * @param name name
-	 * @return List
-	 */
-	List<Condition> getConditions(String name);
-	ConditionChain getConditionChain() ; 
-
-	/** 
 	 * 添加参数值
 	 * @param compare  compare
 	 * @param column  column
@@ -82,12 +43,10 @@ public interface Run {
 	Run addValue(RunValue value);
 	Run addOrders(OrderStore orderStore);
 	Run addOrder(Order order);
-	RunPrepare getPrepare() ;
 	String getTable();
 	String getCatalog();
 	String getSchema();
 	String getDataSource();
-	Run setPrepare(RunPrepare prepare) ;
 	Run setInsertColumns(List<String> keys);
 	Run setInsertColumns(LinkedHashMap<String, Column> columns);
 	List<String> getInsertColumns();
@@ -134,8 +93,6 @@ public interface Run {
 	List<Object> getValues() ;
 	PageNavi getPageNavi() ; 
 	void setPageNavi(PageNavi pageNavi) ;
-	String getQueryColumn();
-
 	EMPTY_VALUE_SWITCH getStrict();
 
 	void setSwitch(EMPTY_VALUE_SWITCH swt);
@@ -147,10 +104,6 @@ public interface Run {
 	//1-DataRow 2-Entity
 	int getFrom();
 	void setFrom(int from);
-	boolean isSetValue(String condition, String variable);
-	boolean isSetValue(String variable);
-	Variable getVariable(String var);
-
 	void setFilter(Object filter);
 	Object getFilter();
 	void setUpdate(Object update);

@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>org.anyline</groupId>
-            <artifactId>anyline-data-jdbc-mysql</artifactId>
+            <artifactId>anyline-core</artifactId>
             <version>8.7.1-jdk21-20231215</version>
         </dependency>
         <dependency>

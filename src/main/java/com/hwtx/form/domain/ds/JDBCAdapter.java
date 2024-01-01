@@ -1,7 +1,5 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.data.param.ConfigStore;
-import org.anyline.entity.DataRow;
 import org.anyline.metadata.Column;
 import org.anyline.metadata.Table;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -85,17 +83,4 @@ public interface JDBCAdapter extends DriverAdapter {
      * @return Column
      */
     Column column(DataRuntime runtime, Column column, SqlRowSetMetaData rsm, int index);
-
-    /**
-     * query[结果集封装-子流程]
-     * 封装查询结果行,在外层遍历中修改rs下标
-     *
-     * @param system    系统表不检测列属性
-     * @param runtime   runtime
-     * @param metadatas metadatas
-     * @param rs        jdbc返回结果
-     * @return DataRow
-     */
-    DataRow row(boolean system, DataRuntime runtime, LinkedHashMap<String, Column> metadatas, ConfigStore configs, ResultSet rs);
-
 }
