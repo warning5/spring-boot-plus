@@ -4,12 +4,7 @@ import com.hwtx.form.domain.ds.DataRuntime;
 import com.hwtx.form.domain.ds.DefaultJDBCAdapter;
 import com.hwtx.form.domain.ds.Run;
 import com.hwtx.form.domain.ds.SimpleRun;
-import org.anyline.entity.DataRow;
-import org.anyline.entity.DataSet;
-import org.anyline.metadata.*;
-import org.anyline.metadata.type.DatabaseType;
-import org.anyline.util.BasicUtil;
-import org.anyline.util.regular.RegularUtil;
+import com.hwtx.form.domain.ds.metadata.*;
 
 import java.util.*;
 
@@ -46,31 +41,6 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
             builder.append(" LIKE '").append(name).append("'");
         }
         return runs;
-    }
-
-    /**
-     * schema[结果集封装]<br/>
-     * 根据查询结果集构造 Database
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照 buildQueryDatabaseRun 返回顺序
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param schemas 上一步查询结果
-     * @param set     查询结果集
-     * @return databases
-     * @throws Exception 异常
-     */
-    @Override
-    public LinkedHashMap<String, Schema> schemas(DataRuntime runtime, int index, boolean create, LinkedHashMap<String, Schema> schemas, DataSet set) throws Exception {
-        if (null == schemas) {
-            schemas = new LinkedHashMap<>();
-        }
-        for (DataRow row : set) {
-            Schema schema = new Schema();
-            schema.setName(row.getString("DATABASE"));
-            schemas.put(schema.getName().toUpperCase(), schema);
-        }
-        return schemas;
     }
 
 
@@ -124,57 +94,6 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
         return runs;
     }
 
-
-    /**
-     * table[命令合成]<br/>
-     * 查询表DDL
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param table   表
-     * @return List
-     */
-    @Override
-    public List<Run> buildQueryDDLRun(DataRuntime runtime, Table table) throws Exception {
-        List<Run> runs = new ArrayList<>();
-        Run run = new SimpleRun(runtime);
-        runs.add(run);
-        StringBuilder builder = run.getBuilder();
-        builder.append("show create table ");
-        name(runtime, builder, table);
-        return runs;
-    }
-
-    /**
-     * table[结果集封装]<br/>
-     * 查询表DDL
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照 buildQueryDDLRun 返回顺序
-     * @param table   表
-     * @param ddls    上一步查询结果
-     * @param set     sql执行的结果集
-     * @return List
-     */
-    @Override
-    public List<String> ddl(DataRuntime runtime, int index, Table table, List<String> ddls, DataSet set) {
-        if (null == ddls) {
-            ddls = new ArrayList<>();
-        }
-        for (DataRow row : set) {
-            ddls.add(row.getString("CREATE TABLE"));
-        }
-
-        if (BasicUtil.isEmpty(table.getCharset())) {
-            for (String item : ddls) {
-                if (item.contains("CHARSET=")) {
-                    String charset = RegularUtil.cut(item, "CHARSET=", " ");
-                    table.setCharset(charset);
-                }
-            }
-        }
-        return ddls;
-    }
-
     /**
      * column[命令合成]<br/>
      * 查询表上的列
@@ -218,15 +137,6 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
         return runs;
     }
 
-    @Override
-    public <T extends Column> List<T> columns(DataRuntime runtime, int index, boolean create, Table table, List<T> columns, DataSet set) throws Exception {
-        columns = super.columns(runtime, index, create, table, columns, set);
-        for (Column column : columns) {
-            column.setCatalog((Catalog) null);
-        }
-        return columns;
-    }
-
     /**
      * primary[命令合成]<br/>
      * 查询表上的主键
@@ -245,31 +155,6 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
         name(runtime, builder, table);
 
         return runs;
-    }
-
-    /**
-     * primary[结构集封装]<br/>
-     * 根据查询结果集构造PrimaryKey
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条查询SQL 对照 buildQueryIndexRun 返回顺序
-     * @param table   表
-     * @param set     sql查询结果
-     * @throws Exception 异常
-     */
-    @Override
-    public PrimaryKey primary(DataRuntime runtime, int index, Table table, DataSet set) throws Exception {
-        PrimaryKey primary = null;
-        set = set.getRows("Key_name", "PRIMARY");
-        if (set.size() > 0) {
-            primary = new PrimaryKey();
-            for (DataRow row : set) {
-                primary.setName(row.getString("Key_name"));
-                Column column = new Column(row.getString("Column_name"));
-                primary.addColumn(column);
-            }
-        }
-        return primary;
     }
 
     /**
@@ -303,6 +188,7 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
         builder.append("ORDER BY SEQ_IN_INDEX");
         return runs;
     }
+
     /**
      * table[命令合成]<br/>
      * 修改列

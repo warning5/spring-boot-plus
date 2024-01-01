@@ -1,7 +1,7 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.adapter.DataWriter;
-import org.anyline.metadata.type.DatabaseType;
+import com.hwtx.form.domain.ds.metadata.DataWriter;
+import com.hwtx.form.domain.ds.metadata.DatabaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

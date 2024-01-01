@@ -1,6 +1,6 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.metadata.Column;
+import com.hwtx.form.domain.ds.metadata.Column;
 
 public class RunValue {
     private String key;

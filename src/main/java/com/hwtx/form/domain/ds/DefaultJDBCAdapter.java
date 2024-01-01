@@ -3,19 +3,7 @@ package com.hwtx.form.domain.ds;
 
 import cn.hutool.db.meta.MetaUtil;
 import cn.hutool.db.meta.TableType;
-import org.anyline.entity.Compare;
-import org.anyline.entity.DataRow;
-import org.anyline.entity.DataSet;
-import org.anyline.exception.SQLUpdateException;
-import org.anyline.metadata.*;
-import org.anyline.metadata.type.ColumnType;
-import org.anyline.metadata.type.DatabaseType;
-import org.anyline.proxy.EntityAdapterProxy;
-import org.anyline.util.BasicUtil;
-import org.anyline.util.BeanUtil;
-import org.anyline.util.ConfigTable;
-import org.anyline.util.LogUtil;
-import org.anyline.util.encrypt.MD5Util;
+import com.hwtx.form.domain.ds.metadata.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
@@ -57,22 +45,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         return runtime.getProcessor();
     }
 
-    private void init(Table table, DataRow row) {
-        table.setObjectId(row.getLong("OBJECT_ID", (Long) null));
-        table.setEngine(row.getString("ENGINE"));
-        table.setComment(row.getString("TABLE_COMMENT", "COMMENTS", "COMMENT"));
-        table.setDataRows(row.getLong("TABLE_ROWS", (Long) null));
-        table.setCollate(row.getString("TABLE_COLLATION"));
-        table.setDataLength(row.getLong("DATA_LENGTH", (Long) null));
-        table.setDataFree(row.getLong("DATA_FREE", (Long) null));
-        table.setIncrement(row.getLong("AUTO_INCREMENT", (Long) null));
-        table.setIndexLength(row.getLong("INDEX_LENGTH", (Long) null));
-        table.setCreateTime(row.getDate("CREATE_TIME", (Date) null));
-        table.setUpdateTime(row.getDate("UPDATE_TIME", (Date) null));
-        table.setType(row.getString("TABLE_TYPE"));
-        table.setEngine(row.getString("ENGINE"));
-    }
-
     protected void init(Table table, ResultSet set, Map<String, Integer> keys) {
         try {
             table.setType(BasicUtil.evl(string(keys, "TABLE_TYPE", set), table.getType()));
@@ -99,259 +71,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         } catch (Exception e) {
         }
 
-    }
-
-    /**
-     * table[结果集封装]<br/>
-     * 表备注
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照buildQueryTableRun返回顺序
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param catalog catalog
-     * @param schema  schema
-     * @param tables  上一步查询结果
-     * @param set     查询结果集
-     * @return tables
-     * @throws Exception 异常
-     */
-    @Override
-    public <T extends Table> LinkedHashMap<String, T> comments(DataRuntime runtime, int index, boolean create, Catalog catalog, Schema schema, LinkedHashMap<String, T> tables, DataSet set) throws Exception {
-        if (null == tables) {
-            tables = new LinkedHashMap<>();
-        }
-        for (DataRow row : set) {
-            String name = row.getString("TABLE_NAME");
-            String comment = row.getString("TABLE_COMMENT");
-            if (null != name && null != comment) {
-                Table table = tables.get(name.toUpperCase());
-                if (null != table) {
-                    table.setComment(comment);
-                }
-            }
-        }
-        return tables;
-    }
-
-    /**
-     * table[结果集封装]<br/>
-     * 表备注
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照buildQueryTableRun返回顺序
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param catalog catalog
-     * @param schema  schema
-     * @param tables  上一步查询结果
-     * @param set     查询结果集
-     * @return tables
-     * @throws Exception 异常
-     */
-    @Override
-    public <T extends Table> List<T> comments(DataRuntime runtime, int index, boolean create, Catalog catalog, Schema schema, List<T> tables, DataSet set) throws Exception {
-        if (null == tables) {
-            tables = new ArrayList<>();
-        }
-        for (DataRow row : set) {
-            String name = row.getString("TABLE_NAME");
-            String comment = row.getString("TABLE_COMMENT");
-            if (null == catalog) {
-                catalog = new Catalog(row.getString("TABLE_CATALOG"));
-            }
-            if (null == schema) {
-                schema = new Schema(row.getString("TABLE_SCHEMA"));
-            }
-
-            boolean contains = true;
-            T table = table(tables, catalog, schema, name);
-            if (null == table) {
-                if (create) {
-                    table = (T) new Table(catalog, schema, name);
-                    contains = false;
-                } else {
-                    continue;
-                }
-            }
-            table.setComment(comment);
-            if (!contains) {
-                tables.add(table);
-            }
-        }
-        return tables;
-    }
-
-
-    /* *****************************************************************************************************************
-     * 													column
-     * -----------------------------------------------------------------------------------------------------------------
-     * [调用入口]
-     * <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, String random, boolean greedy, Table table, boolean primary);
-     * <T extends Column> List<T> columns(DataRuntime runtime, String random, boolean greedy, Catalog catalog, Schema schema, String table);
-     * [命令合成]
-     * List<Run> buildQueryColumnRun(DataRuntime runtime, Table table, boolean metadata) throws Exception;
-     * [结果集封装]
-     * <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, int index, boolean create, Table table, LinkedHashMap<String, T> columns, DataSet set) throws Exception;
-     * <T extends Column> List<T> columns(DataRuntime runtime, int index, boolean create, Table table, List<T> columns, DataSet set) throws Exception;
-     * <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, boolean create, LinkedHashMap<String, T> columns, Table table, String pattern) throws Exception;
-     ******************************************************************************************************************/
-
-    /**
-     * column[调用入口]<br/>
-     * 查询表结构
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param random  用来标记同一组命令
-     * @param greedy  贪婪模式 true:如果不填写catalog或schema则查询全部 false:只在当前catalog和schema中查询
-     * @param table   表
-     * @param primary 是否检测主键
-     * @param <T>     Column
-     * @return Column
-     */
-    @Override
-    public <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, String random, boolean greedy, Table table, boolean primary) {
-        if (!greedy) {
-            checkSchema(runtime, table);
-        }
-        Catalog catalog = table.getCatalog();
-        Schema schema = table.getSchema();
-
-        LinkedHashMap<String, T> columns = null;
-        long fr = System.currentTimeMillis();
-        if (null == random) {
-            random = random(runtime);
-        }
-        try {
-
-            int qty_total = 0;
-            int qty_dialect = 0; //优先根据系统表查询
-            int qty_metadata = 0; //再根据metadata解析
-            int qty_jdbc = 0; //根据驱动内置接口补充
-
-            // 1.优先根据系统表查询
-            try {
-                List<Run> runs = buildQueryColumnRun(runtime, table, false);
-                if (null != runs) {
-                    int idx = 0;
-                    for (Run run : runs) {
-//                        DataSet set = select(runtime, random, true, (String) null, new DefaultConfigStore().keyCase(KeyAdapter.KEY_CASE.PUT_UPPER), run);
-//                        columns = columns(runtime, idx, true, table, columns, set);
-                        idx++;
-                    }
-                }
-                if (null != columns) {
-                    qty_dialect = columns.size();
-                    qty_total = columns.size();
-                }
-            } catch (Exception e) {
-                if (ConfigTable.IS_PRINT_EXCEPTION_STACK_TRACE) {
-                    e.printStackTrace();
-                }
-                if (primary) {
-                    e.printStackTrace();
-                }
-                if (ConfigTable.IS_LOG_SQL && log.isWarnEnabled()) {
-                    log.warn("{}[columns][{}][catalog:{}][schema:{}][table:{}][msg:{}]", random, LogUtil.format("根据系统表查询失败", 33), catalog, schema, table, e.toString());
-                }
-            }
-            // 根据驱动内置接口补充
-            // 再根据metadata解析 SELECT * FROM T WHERE 1=0
-            if (null == columns || columns.size() == 0) {
-                try {
-                    List<Run> runs = buildQueryColumnRun(runtime, table, true);
-                    if (null != runs) {
-                        for (Run run : runs) {
-                            //todo
-                            String sql = null; //run.getFinalQuery();
-                            if (BasicUtil.isNotEmpty(sql)) {
-                                SqlRowSet set = jdbc(runtime).queryForRowSet(sql);
-                                columns = columns(runtime, true, columns, table, set);
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    if (ConfigTable.IS_PRINT_EXCEPTION_STACK_TRACE) {
-                        e.printStackTrace();
-                    } else {
-                        if (ConfigTable.IS_LOG_SQL && log.isWarnEnabled()) {
-                            log.warn("{}[columns][{}][catalog:{}][schema:{}][table:{}][msg:{}]", random, LogUtil.format("根据metadata解析失败", 33), catalog, schema, table, e.toString());
-                        }
-                    }
-                }
-                if (null != columns) {
-                    qty_metadata = columns.size() - qty_dialect;
-                    qty_total = columns.size();
-                }
-            }
-            if (ConfigTable.IS_LOG_SQL && log.isInfoEnabled()) {
-                log.info("{}[columns][catalog:{}][schema:{}][table:{}][total:{}][根据metadata解析:{}][根据系统表查询:{}][根据驱动内置接口补充:{}][执行耗时:{}ms]", random, catalog, schema, table, qty_total, qty_metadata, qty_dialect, qty_jdbc, System.currentTimeMillis() - fr);
-            }
-
-            // 方法(3)根据根据驱动内置接口补充
-
-            if (null == columns || columns.size() == 0) {
-                DataSource ds = null;
-                Connection con = null;
-                DatabaseMetaData metadata = null;
-                try {
-                    ds = jdbc(runtime).getDataSource();
-                    con = DataSourceUtils.getConnection(ds);
-                    metadata = con.getMetaData();
-                    columns = columns(runtime, true, columns, metadata, table, null);
-                } catch (Exception e) {
-                    if (ConfigTable.IS_PRINT_EXCEPTION_STACK_TRACE) {
-                        e.printStackTrace();
-                    }
-                } finally {
-                    if (!DataSourceUtils.isConnectionTransactional(con, ds)) {
-                        DataSourceUtils.releaseConnection(con, ds);
-                    }
-                }
-
-                if (null != columns) {
-                    qty_total = columns.size();
-                    qty_jdbc = columns.size() - qty_metadata - qty_dialect;
-                }
-            }
-            if (ConfigTable.IS_LOG_SQL && log.isInfoEnabled()) {
-                log.info("{}[columns][catalog:{}][schema:{}][table:{}][total:{}][根据metadata解析:{}][根据系统表查询:{}][根据根据驱动内置接口补充:{}][执行耗时:{}ms]", random, catalog, schema, table, qty_total, qty_metadata, qty_dialect, qty_jdbc, System.currentTimeMillis() - fr);
-            }
-            //检测主键
-            if (ConfigTable.IS_METADATA_AUTO_CHECK_COLUMN_PRIMARY) {
-                if (null != columns || columns.size() > 0) {
-                    boolean exists = false;
-                    for (Column column : columns.values()) {
-                        if (column.isPrimaryKey() != -1) {
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if (!exists) {
-                        PrimaryKey pk = primary(runtime, table);
-                        if (null != pk) {
-                            LinkedHashMap<String, Column> pks = pk.getColumns();
-                            if (null != pks) {
-                                for (String k : pks.keySet()) {
-                                    Column column = columns.get(k);
-                                    if (null != column) {
-                                        column.primary(true);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            if (ConfigTable.IS_PRINT_EXCEPTION_STACK_TRACE) {
-                e.printStackTrace();
-            } else {
-                log.error("[columns][result:fail][table:{}][msg:{}]", random, table, e.toString());
-            }
-        }
-        if (null == columns) {
-            columns = new LinkedHashMap<>();
-        }
-        return columns;
     }
 
     /**
@@ -401,58 +120,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             builder.append(" WHERE 1=0");
         }
         return runs;
-    }
-
-    /**
-     * column[结果集封装]<br/>
-     * 根据查询结果集构造Tag
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照 buildQueryColumnRun返回顺序
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param table   表
-     * @param columns 上一步查询结果
-     * @param set     查询结果集
-     * @return tags tags
-     * @throws Exception 异常
-     */
-    @Override
-    public <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, int index, boolean create, Table table, LinkedHashMap<String, T> columns, DataSet set) throws Exception {
-        if (null == columns) {
-            columns = new LinkedHashMap<>();
-        }
-        for (DataRow row : set) {
-            String name = row.getString("COLUMN_NAME", "COLNAME");
-            T column = columns.get(name.toUpperCase());
-            if (null == column) {
-                column = (T) new Column();
-            }
-            column.setName(name);
-            init(column, table, row);
-            columns.put(name.toUpperCase(), column);
-        }
-        return columns;
-    }
-
-    @Override
-    public <T extends Column> List<T> columns(DataRuntime runtime, int index, boolean create, Table table, List<T> columns, DataSet set) throws Exception {
-        if (null == columns) {
-            columns = new ArrayList<>();
-        }
-        for (DataRow row : set) {
-            String name = row.getString("COLUMN_NAME", "COLNAME");
-            T tmp = (T) new Column();
-            tmp.setName(name);
-            init(tmp, table, row);
-            T column = column(tmp, columns);
-            if (null == column) {
-                column = (T) new Column();
-                column.setName(name);
-                init(column, table, row);
-                columns.add(column);
-            }
-        }
-        return columns;
     }
 
     @Override
@@ -627,7 +294,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             }
             log.info("执行sql - {},spend = {}ms", sql, System.currentTimeMillis() - fr);
         } catch (Exception e) {
-            SQLUpdateException ex = new SQLUpdateException("update异常:" + e.toString(), e);
+            HwtxSQLUpdateException ex = new HwtxSQLUpdateException("update异常:" + e.toString(), e);
             ex.setSql(sql);
             ex.setValues(values);
             throw ex;
@@ -1724,119 +1391,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     }
 
     /**
-     * column [结果集封装-子流程](方法1)<br/>
-     * 方法(1)内部遍历
-     *
-     * @param column
-     * @param table
-     * @param row
-     */
-    protected void init(Column column, Table table, DataRow row) {
-        String catalog = BasicUtil.evl(row.getString("TABLE_CATALOG"), column.getCatalogName(), table.getCatalogName());
-        if (null != catalog) {
-            catalog = catalog.trim();
-        }
-        String schema = BasicUtil.evl(row.getString("TABLE_SCHEMA", "TABSCHEMA", "SCHEMA_NAME", "OWNER"), column.getSchemaName(), table.getSchemaName());
-        if (null != schema) {
-            schema = schema.trim();
-        }
-        checkSchema(column, catalog, schema);
-        if (null != table.getName()) {//查询全部表
-            column.setTable(table);
-        }
-        column.setTable(BasicUtil.evl(row.getString("TABLE_NAME", "TABNAME"), table.getName(), column.getTableName(true)));
-
-        if (null == column.getPosition()) {
-            try {
-                column.setPosition(row.getInt("ORDINAL_POSITION", "COLNO", "POSITION"));
-            } catch (Exception e) {
-            }
-        }
-        column.setComment(BasicUtil.evl(row.getString("COLUMN_COMMENT", "COMMENTS", "REMARKS"), column.getComment()));
-        String type = row.getString("FULL_TYPE", "DATA_TYPE", "TYPE_NAME", "TYPENAME", "DATA_TYPE_NAME");
-		/*if(null != type){
-			type = type.replace("character varying","VARCHAR");
-		}*/
-        //FULL_TYPE pg中pg_catalog.format_type合成的
-        //character varying
-        //TODO timestamp without time zone
-        //TODO 子类型  geometry(Polygon,4326) geometry(Polygon) geography(Polygon,4326)
-        if (null != type && type.contains(" ")) {
-            type = row.getString("UDT_NAME", "DATA_TYPE", "TYPENAME", "DATA_TYPE_NAME");
-        }
-        column.setTypeName(BasicUtil.evl(type, column.getTypeName()));
-        String def = BasicUtil.evl(row.get("COLUMN_DEFAULT", "DATA_DEFAULT", "DEFAULT", "DEFAULT_VALUE", "DEFAULT_DEFINITION"), column.getDefaultValue()) + "";
-        if (BasicUtil.isNotEmpty(def)) {
-            while (def.startsWith("(") && def.endsWith(")")) {
-                def = def.substring(1, def.length() - 1);
-            }
-            while (def.startsWith("'") && def.endsWith("'")) {
-                def = def.substring(1, def.length() - 1);
-            }
-            column.setDefaultValue(def);
-        }
-        //默认值约束
-        column.setDefaultConstraint(row.getString("DEFAULT_CONSTRAINT"));
-        if (-1 == column.isAutoIncrement()) {
-            column.autoIncrement(row.getBoolean("IS_IDENTITY", null));
-        }
-        if (-1 == column.isAutoIncrement()) {
-            column.autoIncrement(row.getBoolean("IS_AUTOINCREMENT", null));
-        }
-        if (-1 == column.isAutoIncrement()) {
-            column.autoIncrement(row.getBoolean("IDENTITY", null));
-        }
-        if (-1 == column.isAutoIncrement()) {
-            if (row.getStringNvl("EXTRA").toLowerCase().contains("auto_increment")) {
-                column.autoIncrement(true);
-            }
-        }
-
-        column.setObjectId(row.getLong("OBJECT_ID", (Long) null));
-        //主键
-        String column_key = row.getString("COLUMN_KEY");
-        if ("PRI".equals(column_key)) {
-            column.primary(1);
-        }
-        if (row.getBoolean("PK", Boolean.FALSE)) {
-            column.primary(1);
-        }
-
-        //非空
-        if (-1 == column.isNullable()) {
-            try {
-                column.nullable(row.getBoolean("IS_NULLABLE", "NULLABLE", "NULLS"));
-            } catch (Exception e) {
-            }
-        }
-        //oracle中decimal(18,9) data_length == 22 DATA_PRECISION=18
-        try {
-            Integer len = row.getInt("NUMERIC_PRECISION", "PRECISION", "DATA_PRECISION", "");
-            if (null == len || len == 0) {
-                len = row.getInt("CHARACTER_MAXIMUM_LENGTH", "MAX_LENGTH", "DATA_LENGTH", "LENGTH");
-            }
-            column.setPrecision(len);
-        } catch (Exception e) {
-        }
-        try {
-            if (null == column.getScale()) {
-                column.setScale(row.getInt("NUMERIC_SCALE", "SCALE", "DATA_SCALE"));
-            }
-        } catch (Exception e) {
-        }
-        if (null == column.getCharset()) {
-            column.setCharset(row.getString("CHARACTER_SET_NAME"));
-        }
-        if (null == column.getCollate()) {
-            column.setCollate(row.getString("COLLATION_NAME"));
-        }
-        if (null == column.getColumnType()) {
-            ColumnType columnType = type(column.getTypeName());
-            column.setColumnType(columnType);
-        }
-    }
-
-    /**
      * column[结果集封装-子流程](方法2)<br/>
      * 方法(2)表头内部遍历
      *
@@ -2315,16 +1869,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     }
 
     @Override
-    public LinkedHashMap<String, Catalog> catalogs(DataRuntime runtime, int index, boolean create, LinkedHashMap<String, Catalog> catalogs, DataSet set) throws Exception {
-        return null;
-    }
-
-    @Override
-    public List<Catalog> catalogs(DataRuntime runtime, int index, boolean create, List<Catalog> catalogs, DataSet set) throws Exception {
-        return null;
-    }
-
-    @Override
     public LinkedHashMap<String, Catalog> catalogs(DataRuntime runtime, boolean create, LinkedHashMap<String, Catalog> catalogs) throws Exception {
         return null;
     }
@@ -2333,12 +1877,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     public List<Catalog> catalogs(DataRuntime runtime, boolean create, List<Catalog> catalogs) throws Exception {
         return null;
     }
-
-    @Override
-    public Catalog catalog(DataRuntime runtime, int index, boolean create, DataSet set) throws Exception {
-        return null;
-    }
-
 
     public <T extends Column> T column(Catalog catalog, Schema schema, String table, String name, List<T> columns) {
         for (T column : columns) {
@@ -2385,105 +1923,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     }
 
     /**
-     * 生成insert sql的value部分,每个Entity(每行数据)调用一次
-     * (1,2,3)
-     * (?,?,?)
-     *
-     * @param runtime     运行环境主要包含驱动适配器 数据源或客户端
-     * @param run         run
-     * @param obj         Entity或DataRow
-     * @param placeholder 是否使用占位符(批量操作时不要超出数量)
-     * @param scope       是否带(), 拼接在select后时不需要
-     * @param alias       是否添加别名
-     * @param columns     需要插入的列
-     * @param child       是否在子查询中，子查询中不要用序列
-     */
-    protected String insertValue(DataRuntime runtime, Run run, Object obj, boolean child, boolean placeholder, boolean alias, boolean scope, LinkedHashMap<String, Column> columns) {
-        int batch = run.getBatch();
-        StringBuilder builder = new StringBuilder();
-        if (scope && batch <= 1) {
-            builder.append("(");
-        }
-        int from = 1;
-        if (obj instanceof DataRow) {
-            from = 1;
-        }
-        run.setFrom(from);
-        boolean first = true;
-        for (Column column : columns.values()) {
-            boolean place = placeholder;
-            boolean src = false; //直接拼接 如${now()} ${序列}
-            String key = column.getName();
-            if (!first && batch <= 1) {
-                builder.append(",");
-            }
-            first = false;
-            Object value = null;
-            if (obj instanceof DataRow) {
-                value = BeanUtil.getFieldValue(obj, key);
-            } else if (obj instanceof Map) {
-                value = ((Map) obj).get(key);
-            } else {
-                value = BeanUtil.getFieldValue(obj, EntityAdapterProxy.field(obj.getClass(), key));
-            }
-            if (value != null) {
-                if (value instanceof SQL_BUILD_IN_VALUE) {
-                    place = false;
-                } else if (value instanceof String) {
-                    String str = (String) value;
-                    //if(str.startsWith("${") && str.endsWith("}")){
-                    if (BasicUtil.checkEl(str)) {
-                        src = true;
-                        place = false;
-                        value = str.substring(2, str.length() - 1);
-                        if (child && str.toUpperCase().contains(".NEXTVAL")) {
-                            value = null;
-                        }
-                    } else if ("NULL".equals(str)) {
-                        value = null;
-                    }
-                }
-            }
-            if (src) {
-                builder.append(value);
-            } else {
-                if (batch <= 1) {
-                    if (place) {
-                        builder.append("?");
-                        addRunValue(runtime, run, Compare.EQUAL, column, value);
-                    } else {
-                        //value(runtime, builder, obj, key);
-                        builder.append(write(runtime, null, value, false));
-                    }
-                } else {
-                    addRunValue(runtime, run, Compare.EQUAL, column, value);
-                }
-            }
-
-            if (alias && batch <= 1) {
-                builder.append(" AS ").append(key);
-            }
-        }
-        if (scope && batch <= 1) {
-            builder.append(")");
-        }
-        return builder.toString();
-    }
-
-    public String getPrimayKey(Object obj) {
-        String key = null;
-        if (obj instanceof Collection) {
-            obj = ((Collection) obj).iterator().next();
-        }
-        if (obj instanceof DataRow) {
-            key = ((DataRow) obj).getPrimaryKey();
-        } else {
-            key = EntityAdapterProxy.primaryKey(obj.getClass(), true);
-        }
-        return key;
-    }
-
-    /**
      * 拼接字符串
      *
      * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
@@ -2509,7 +1948,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
      * protected String pageXXX()
      * protected String concatXXX()
      ******************************************************************************************************************/
-
 
 
     protected String concatFun(DataRuntime runtime, String... args) {

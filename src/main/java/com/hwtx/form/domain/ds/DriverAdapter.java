@@ -1,12 +1,6 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.adapter.DataWriter;
-import org.anyline.entity.Compare;
-import org.anyline.entity.DataSet;
-import org.anyline.metadata.*;
-import org.anyline.metadata.type.ColumnType;
-import org.anyline.metadata.type.DatabaseType;
-import org.anyline.util.BasicUtil;
+import com.hwtx.form.domain.ds.metadata.*;
 
 import java.util.*;
 
@@ -121,18 +115,19 @@ public interface DriverAdapter {
 
     /**
      * 根据写入的数据类型 定位DataWriter
+     *
      * @param type class ColumnType StringColumnType
      * @return DataWriter
      */
-    default DataWriter writer(Object type){
+    default DataWriter writer(Object type) {
         DataWriter writer = DataWriterFactory.writer(type(), type);
-        if(null == writer){
+        if (null == writer) {
             writer = SystemDataWriterFactory.writer(type(), type);
         }
-        if(null == writer){
+        if (null == writer) {
             writer = DataWriterFactory.writer(DatabaseType.NONE, type);
         }
-        if(null == writer){
+        if (null == writer) {
             writer = SystemDataWriterFactory.writer(DatabaseType.NONE, type);
         }
         return writer;
@@ -208,22 +203,6 @@ public interface DriverAdapter {
 
     /**
      * catalog[结果集封装]<br/>
-     * 根据查询结果集构造 catalog
-     *
-     * @param runtime  运行环境主要包含驱动适配器 数据源或客户端
-     * @param index    第几条SQL 对照 buildQueryDatabaseRun 返回顺序
-     * @param create   上一步没有查到的,这一步是否需要新创建
-     * @param catalogs 上一步查询结果
-     * @param set      查询结果集
-     * @return databases
-     * @throws Exception 异常
-     */
-    LinkedHashMap<String, Catalog> catalogs(DataRuntime runtime, int index, boolean create, LinkedHashMap<String, Catalog> catalogs, DataSet set) throws Exception;
-
-    List<Catalog> catalogs(DataRuntime runtime, int index, boolean create, List<Catalog> catalogs, DataSet set) throws Exception;
-
-    /**
-     * catalog[结果集封装]<br/>
      * 根据驱动内置接口补充 catalog
      *
      * @param runtime  运行环境主要包含驱动适配器 数据源或客户端
@@ -245,41 +224,6 @@ public interface DriverAdapter {
      * @throws Exception 异常
      */
     List<Catalog> catalogs(DataRuntime runtime, boolean create, List<Catalog> catalogs) throws Exception;
-
-    Catalog catalog(DataRuntime runtime, int index, boolean create, DataSet set) throws Exception;
-
-    /* *****************************************************************************************************************
-     * 													schema
-     ******************************************************************************************************************/
-
-    /**
-     * schema[调用入口]
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param random  用来标记同一组命令
-     * @param catalog catalog
-     * @param name    名称统配符或正则
-     * @return LinkedHashMap
-     */
-    LinkedHashMap<String, Schema> schemas(DataRuntime runtime, String random, Catalog catalog, String name);
-
-    default LinkedHashMap<String, Schema> schemas(DataRuntime runtime, String random, String name) {
-        return schemas(runtime, random, null, name);
-    }
-
-    List<Schema> schemas(DataRuntime runtime, String random, boolean greedy, Catalog catalog, String name);
-
-    default List<Schema> schemas(DataRuntime runtime, String random, boolean greedy, String name) {
-        return schemas(runtime, random, greedy, null, name);
-    }
-
-    default Schema schema(DataRuntime runtime, String random, Catalog catalog, String name) {
-        List<Schema> schemas = schemas(runtime, random, false, catalog, name);
-        if (!schemas.isEmpty()) {
-            return schemas.get(0);
-        }
-        return null;
-    }
 
     /**
      * schema[命令合成]<br/>
@@ -304,23 +248,6 @@ public interface DriverAdapter {
 
     /**
      * schema[结果集封装]<br/>
-     * 根据查询结果集构造 schema
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照 buildQueryDatabaseRun 返回顺序
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param schemas 上一步查询结果
-     * @param set     查询结果集
-     * @return databases
-     * @throws Exception 异常
-     */
-    LinkedHashMap<String, Schema> schemas(DataRuntime runtime, int index, boolean create, LinkedHashMap<String, Schema> schemas, DataSet set) throws Exception;
-
-    List<Schema> schemas(DataRuntime runtime, int index, boolean create, List<Schema> schemas, DataSet set) throws Exception;
-
-
-    /**
-     * schema[结果集封装]<br/>
      * 根据驱动内置接口补充 schema
      *
      * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
@@ -342,8 +269,6 @@ public interface DriverAdapter {
      * @throws Exception 异常
      */
     List<Schema> schemas(DataRuntime runtime, boolean create, List<Schema> schemas) throws Exception;
-
-    Schema schema(DataRuntime runtime, int index, boolean create, DataSet set) throws Exception;
 
     /**
      * table[命令合成]<br/>
@@ -370,59 +295,6 @@ public interface DriverAdapter {
      * @return String
      */
     List<Run> buildQueryTableCommentRun(DataRuntime runtime, Catalog catalog, Schema schema, String pattern, String types) throws Exception;
-
-    /**
-     * table[结果集封装]<br/>
-     * 表备注
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照buildQueryTableRun返回顺序
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param catalog catalog
-     * @param schema  schema
-     * @param tables  上一步查询结果
-     * @param set     查询结果集
-     * @return tables
-     * @throws Exception 异常
-     */
-    <T extends Table> LinkedHashMap<String, T> comments(DataRuntime runtime, int index, boolean create, Catalog catalog, Schema schema, LinkedHashMap<String, T> tables, DataSet set) throws Exception;
-
-    /**
-     * table[命令合成]<br/>
-     * 查询表DDL
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param table   表
-     * @return List
-     */
-    List<Run> buildQueryDDLRun(DataRuntime runtime, Table table) throws Exception;
-
-    /**
-     * table[结果集封装]<br/>
-     * 查询表DDL
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照 buildQueryDDLRun 返回顺序
-     * @param table   表
-     * @param ddls    上一步查询结果
-     * @param set     sql执行的结果集
-     * @return List
-     */
-    List<String> ddl(DataRuntime runtime, int index, Table table, List<String> ddls, DataSet set);
-
-    /**
-     * column[调用入口](多方法合成)<br/>
-     * 查询表结构
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param random  用来标记同一组命令
-     * @param greedy  贪婪模式 true:如果不填写catalog或schema则查询全部 false:只在当前catalog和schema中查询
-     * @param table   表 如果不提供表名则根据data解析,表名可以事实前缀&lt;数据源名&gt;表示切换数据源
-     * @param primary 是否检测主键
-     * @param <T>     Column
-     * @return Column
-     */
-    <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, String random, boolean greedy, Table table, boolean primary);
 
     /**
      * column[调用入口](方法1)<br/>
@@ -466,41 +338,6 @@ public interface DriverAdapter {
      */
     List<Run> buildQueryColumnRun(DataRuntime runtime, Table table, boolean metadata) throws Exception;
 
-    /**
-     * column[结果集封装](方法1)<br/>
-     * 根据系统表查询SQL获取表结构
-     * 根据查询结果集构造Column
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照 buildQueryColumnRun返回顺序
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param table   表
-     * @param columns 上一步查询结果
-     * @param set     系统表查询SQL结果集
-     * @return columns
-     * @throws Exception 异常
-     */
-    <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, int index, boolean create, Table table, LinkedHashMap<String, T> columns, DataSet set) throws Exception;
-
-    /**
-     * column[结果集封装](方法1)<br/>
-     * 根据系统表查询SQL获取表结构
-     * 根据查询结果集构造Column
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条SQL 对照 buildQueryColumnRun返回顺序
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param table   表
-     * @param columns 上一步查询结果
-     * @param set     系统表查询SQL结果集
-     * @return columns
-     * @throws Exception 异常
-     */
-    <T extends Column> List<T> columns(DataRuntime runtime, int index, boolean create, Table table, List<T> columns, DataSet set) throws Exception;
-    /* *****************************************************************************************************************
-     * 													primary
-     ******************************************************************************************************************/
-
     PrimaryKey primary(DataRuntime runtime, Table table);
 
     /**
@@ -512,18 +349,6 @@ public interface DriverAdapter {
      * @return sqls
      */
     List<Run> buildQueryPrimaryRun(DataRuntime runtime, Table table) throws Exception;
-
-    /**
-     * primary[结构集封装]<br/>
-     * 根据查询结果集构造PrimaryKey
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param index   第几条查询SQL 对照 buildQueryIndexRun 返回顺序
-     * @param table   表
-     * @param set     sql查询结果
-     * @throws Exception 异常
-     */
-    PrimaryKey primary(DataRuntime runtime, int index, Table table, DataSet set) throws Exception;
 
     /**
      * index[命令合成]<br/>
@@ -1209,45 +1034,6 @@ public interface DriverAdapter {
     StringBuilder name(DataRuntime runtime, StringBuilder builder, BaseMetadata table);
 
     /**
-     * 获取单主键列名
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param obj     obj
-     * @return String
-     */
-    String getPrimaryKey(DataRuntime runtime, Object obj);
-
-    /**
-     * 获取单主键值
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param obj     obj
-     * @return Object
-     */
-    Object getPrimaryValue(DataRuntime runtime, Object obj);
-
-    /**
-     * 在不检测数据库结构时才生效,否则会被convert代替
-     * 生成value格式 主要确定是否需要单引号  或  类型转换
-     * 有些数据库不提供默认的 隐式转换 需要显示的把String转换成相应的数据类型
-     * 如 TO_DATE('')
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param builder builder
-     * @param row     DataRow 或 Entity
-     * @param key     列名
-     */
-    void value(DataRuntime runtime, StringBuilder builder, Object row, String key);
-
-    /**
-     * 根据数据类型生成SQL(如是否需要'',是否需要格式转换函数)
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param builder builder
-     * @param value value
-     */
-    //void format(StringBuilder builder, Object value);
-
-    /**
      * 通过占位符写入数据库前转换成数据库可接受的Java数据类型<br/>
      *
      * @param runtime     运行环境主要包含驱动适配器 数据源或客户端
@@ -1296,8 +1082,6 @@ public interface DriverAdapter {
      * @return boolean
      */
     boolean isCharColumn(DataRuntime runtime, Column column);
-
-    void addRunValue(DataRuntime runtime, Run run, Compare compare, Column column, Object value);
 
     /**
      * 对象名称格式化(大小写转换)，在查询系统表时需要

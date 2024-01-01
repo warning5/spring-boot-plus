@@ -1,8 +1,8 @@
 package com.hwtx.form.domain.ds;
 
+import com.hwtx.form.domain.ds.metadata.*;
 import com.hwtx.form.domain.ds.mysql.MySQLGenusAdapter;
 import lombok.extern.slf4j.Slf4j;
-import org.anyline.metadata.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -50,38 +50,6 @@ public class DefaultDao {
         }
         return runtime.getAdapter().catalogs(runtime, random, greedy, name);
     }
-
-
-    public LinkedHashMap<String, Schema> schemas(DataRuntime runtime, String random, Catalog catalog, String name) {
-        if (null == runtime) {
-            runtime = runtime();
-        }
-        return runtime.getAdapter().schemas(runtime, random, catalog, name);
-    }
-
-
-    public List<Schema> schemas(DataRuntime runtime, String random, boolean greedy, Catalog catalog, String name) {
-        if (null == runtime) {
-            runtime = runtime();
-        }
-        return runtime.getAdapter().schemas(runtime, random, greedy, catalog, name);
-    }
-
-    /* *****************************************************************************************************************
-     * 													column
-     * -----------------------------------------------------------------------------------------------------------------
-     * LinkedHashMap<String, Column> columns(Table table)
-     * LinkedHashMap<String, Column> columns(String table)
-     * LinkedHashMap<String, Column> columns(Catalog catalog, Schema schema, String table)
-     ******************************************************************************************************************/
-
-    public <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, String random, boolean greedy, Table table, boolean primary) {
-        if (null == runtime) {
-            runtime = runtime();
-        }
-        return runtime.getAdapter().columns(runtime, random, greedy, table, primary);
-    }
-
 
     public <T extends Column> List<T> columns(DataRuntime runtime, String random, boolean greedy, Catalog catalog, Schema schema) {
         if (null == runtime) {

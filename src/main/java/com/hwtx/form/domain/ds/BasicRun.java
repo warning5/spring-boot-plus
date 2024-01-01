@@ -1,19 +1,12 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.entity.*;
-import org.anyline.entity.Compare.EMPTY_VALUE_SWITCH;
-import org.anyline.metadata.Column;
-import org.anyline.metadata.type.ColumnType;
-import org.anyline.util.BasicUtil;
-import org.anyline.util.BeanUtil;
-import org.anyline.util.ConfigTable;
-import org.anyline.util.SQLUtil;
-import org.anyline.util.regular.RegularUtil;
+import com.hwtx.form.domain.ds.metadata.BeanUtil;
+import com.hwtx.form.domain.ds.metadata.Column;
+import com.hwtx.form.domain.ds.metadata.ColumnType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -29,15 +22,12 @@ public abstract class BasicRun implements Run {
     protected List<String> keys;
     protected List<RunValue> values;
     protected List<RunValue> batchValues;
-    protected PageNavi pageNavi;
-    protected OrderStore orderStore;
     protected String having;
 
     protected Object filter;
     protected Object update;
     protected Object value;
 
-    protected EMPTY_VALUE_SWITCH swt = EMPTY_VALUE_SWITCH.IGNORE;
     protected boolean valid = true;
     protected LinkedHashMap<String, Column> insertColumns = null;
     protected LinkedHashMap<String, Column> updateColumns;
@@ -132,15 +122,6 @@ public abstract class BasicRun implements Run {
     }
 
     @Override
-    public Run order(String order) {
-        if (null == orderStore) {
-            orderStore = new DefaultOrderStore();
-        }
-        orderStore.order(order);
-        return this;
-    }
-
-    @Override
     public List<RunValue> getRunValues() {
         if (null != batchValues) {
             return batchValues;
@@ -178,123 +159,6 @@ public abstract class BasicRun implements Run {
     /**
      * 添加参数值
      *
-     * @param compare compare
-     * @param obj     obj
-     * @param column  column
-     * @param split   遇到集合/数组类型是否拆分处理(DataRow 并且Column不是数组类型)
-     * @return Run 最终执行命令 如果是JDBC类型库 会包含 SQL 与 参数值
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Override
-    public RunValue addValues(Compare compare, Column column, Object obj, boolean split) {
-        RunValue rv = null;
-        if (null != obj) {
-            // from:1-DataRow 2-Entity
-            if (split && (null == column || !column.isArray()) && getFrom() != 2) {
-                /**/
-                boolean json = false;
-                if (null != column) {
-                    String type = column.getTypeName();
-                    if (null != type) {
-                        if (type.toUpperCase().contains("JSON") || type.toUpperCase().contains("BSON")) {
-                            json = true;
-                        }
-                    }
-                }
-                if (obj.getClass().isArray()) {
-                    if (obj instanceof Object[] && !json) {
-                        Object[] list = (Object[]) obj;
-                        for (Object item : list) {
-                            rv = new RunValue(column, item);
-                            addValues(rv);
-                            if (Compare.EQUAL == compare) {
-                                break;
-                            }
-                        }
-                    } else if (obj instanceof double[] && !json) {
-                        double[] list = (double[]) obj;
-                        for (double item : list) {
-                            rv = new RunValue(column, item);
-                            addValues(rv);
-                            if (Compare.EQUAL == compare) {
-                                break;
-                            }
-                        }
-                    } else if (obj instanceof long[] && !json) {
-                        long[] list = (long[]) obj;
-                        for (long item : list) {
-                            rv = new RunValue(column, item);
-                            addValues(rv);
-                            if (Compare.EQUAL == compare) {
-                                break;
-                            }
-                        }
-                    } else if (obj instanceof int[] && !json) {
-                        int[] list = (int[]) obj;
-                        for (int item : list) {
-                            rv = new RunValue(column, item);
-                            addValues(rv);
-                            if (Compare.EQUAL == compare) {
-                                break;
-                            }
-                        }
-                    } else if (obj instanceof float[] && !json) {
-                        float[] list = (float[]) obj;
-                        for (float item : list) {
-                            rv = new RunValue(column, item);
-                            addValues(rv);
-                            if (Compare.EQUAL == compare) {
-                                break;
-                            }
-                        }
-                    } else if (obj instanceof short[] && !json) {
-                        short[] list = (short[]) obj;
-                        for (short item : list) {
-                            rv = new RunValue(column, item);
-                            addValues(rv);
-                            if (Compare.EQUAL == compare) {
-                                break;
-                            }
-                        }
-                    } else if (obj instanceof Object[] && !json) {
-                        Object[] list = (Object[]) obj;
-                        for (Object item : list) {
-                            rv = new RunValue(column, item);
-                            addValues(rv);
-                            if (Compare.EQUAL == compare) {
-                                break;
-                            }
-                        }
-                    }
-                } else if (obj instanceof Collection && !json) {
-                    Collection list = (Collection) obj;
-                    for (Object item : list) {
-                        rv = new RunValue(column, item);
-                        addValues(rv);
-                        if (Compare.EQUAL == compare) {
-                            break;
-                        }
-                    }
-                } else {
-                    rv = new RunValue(column, obj);
-                    addValues(rv);
-                }
-            } else {
-                rv = new RunValue(column, obj);
-                addValues(rv);
-            }
-
-        } else {
-            rv = new RunValue(column, obj);
-            addValues(rv);
-        }
-        return rv;
-    }
-
-
-    /**
-     * 添加参数值
-     *
      * @param run run
      * @return Run 最终执行命令 如果是JDBC类型库 会包含 SQL 与 参数值
      */
@@ -319,26 +183,6 @@ public abstract class BasicRun implements Run {
         return this;
     }
 
-    @Override
-    public PageNavi getPageNavi() {
-        return pageNavi;
-    }
-
-    @Override
-    public void setPageNavi(PageNavi pageNavi) {
-        this.pageNavi = pageNavi;
-    }
-
-    @Override
-    public OrderStore getOrderStore() {
-        return orderStore;
-    }
-
-    @Override
-    public void setOrderStore(OrderStore orderStore) {
-        this.orderStore = orderStore;
-    }
-
     public String getDelimiterFr() {
         return delimiterFr;
     }
@@ -360,47 +204,12 @@ public abstract class BasicRun implements Run {
     }
 
     @Override
-    public Run setConditionValue(EMPTY_VALUE_SWITCH swt, Compare compare, String prefix, String variable, Object value) {
-        return this;
-    }
-
-    @Override
-    public void setOrders(String[] orders) {
-        if (null != orders) {
-            for (String order : orders) {
-                order(order);
-            }
-        }
-    }
-
-    @Override
     public String getBaseQuery(boolean placeholder) {
         String text = builder.toString();
         if (!placeholder) {
             text = replace(text);
         }
         return text;
-    }
-
-    @Override
-    public Run addOrders(OrderStore orderStore) {
-        if (null == orderStore) {
-            return this;
-        }
-        List<Order> orders = orderStore.getOrders();
-        if (null == orders) {
-            return this;
-        }
-        for (Order order : orders) {
-            this.orderStore.order(order);
-        }
-        return this;
-    }
-
-    @Override
-    public Run addOrder(Order order) {
-        this.orderStore.order(order);
-        return this;
     }
 
     public Run addValue(RunValue value) {
@@ -412,52 +221,10 @@ public abstract class BasicRun implements Run {
     }
 
     @Override
-    public String getFinalDelete(boolean placeholder) {
-        if (ConfigTable.IS_SQL_DELIMITER_PLACEHOLDER_OPEN) {
-            return SQLUtil.placeholder(builder.toString(), delimiterFr, delimiterTo);
-        }
-        String text = builder.toString();
-        if (!placeholder) {
-            text = replace(text);
-        }
-        return text;
-    }
-
-    @Override
-    public String getFinalInsert(boolean placeholder) {
-        if (ConfigTable.IS_SQL_DELIMITER_PLACEHOLDER_OPEN) {
-            return SQLUtil.placeholder(builder.toString(), delimiterFr, delimiterTo);
-        }
-        String text = builder.toString();
-        if (!placeholder) {
-            text = replace(text);
-        }
-        return text;
-    }
-
-    @Override
     public String getFinalUpdate(boolean placeholder) {
-        if (ConfigTable.IS_SQL_DELIMITER_PLACEHOLDER_OPEN) {
-            return SQLUtil.placeholder(builder.toString(), delimiterFr, delimiterTo);
-        }
         String text = builder.toString();
         if (!placeholder) {
             text = replace(text);
-        }
-        return text;
-    }
-
-    @Override
-    public String getFinalExecute(boolean placeholder) {
-        String text = builder.toString();
-        if (ConfigTable.IS_SQL_DELIMITER_PLACEHOLDER_OPEN) {
-            text = SQLUtil.placeholder(text, delimiterFr, delimiterTo);
-        }
-        if (!placeholder) {
-            text = replace(text);
-        }
-        if (!supportBr()) {
-            text = text.replace("\r\n", " ").replace("\n", " ");
         }
         return text;
     }
@@ -468,17 +235,6 @@ public abstract class BasicRun implements Run {
 
     public void supportBr(boolean support) {
         this.supportBr = support;
-    }
-
-
-    @Override
-    public EMPTY_VALUE_SWITCH getStrict() {
-        return swt;
-    }
-
-    @Override
-    public void setSwitch(EMPTY_VALUE_SWITCH swt) {
-        this.swt = swt;
     }
 
     @Override
@@ -573,70 +329,6 @@ public abstract class BasicRun implements Run {
     public Run setUpdateColumns(LinkedHashMap<String, Column> columns) {
         this.updateColumns = columns;
         return this;
-    }
-
-    protected static boolean endWithWhere(String txt) {
-		/*boolean result = false;
-		txt = txt.toUpperCase();
-		int fr = 0;
-		while((fr = txt.indexOf("WHERE")) > 0){
-			txt = txt.substring(fr+5);
-			if(txt.indexOf("UNION") > 0){
-				continue;
-			}
-			try{
-				int bSize = 0;//左括号数据
-				if(txt.contains(")")){
-					bSize = RegularUtil.fetch(txt, "\\)").size();
-				}
-				int eSize = 0;//右括号数量
-				if(txt.contains("(")){
-					eSize = RegularUtil.fetch(txt, "\\(").size();
-				}
-				if(bSize == eSize){
-					result = true;
-					break;
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		return result;*/
-        txt = txt.replaceAll("\\s", " ")
-                .replaceAll("'[\\S\\s]*?'", "{}")
-                .replaceAll("\\([^\\(\\)]+?\\)", "{}")
-                .replaceAll("\\([^\\(\\)]+?\\)", "{}")
-                .replaceAll("\\([^\\(\\)]+?\\)", "{}")
-                .toUpperCase();
-        if (txt.contains("UNION")) {
-            boolean result = false;
-            int fr = 0;
-            while ((fr = txt.indexOf("WHERE")) > 0) {
-                txt = txt.substring(fr + 5);
-                if (txt.indexOf("UNION") > 0) {
-                    continue;
-                }
-                try {
-                    int bSize = 0;//左括号数据
-                    if (txt.contains(")")) {
-                        bSize = RegularUtil.fetch(txt, "\\)").size();
-                    }
-                    int eSize = 0;//右括号数量
-                    if (txt.contains("(")) {
-                        eSize = RegularUtil.fetch(txt, "\\(").size();
-                    }
-                    if (bSize == eSize) {
-                        result = true;
-                        break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return result;
-        } else {
-            return txt.contains("WHERE");
-        }
     }
     @Override
     public void setFilter(Object filter) {

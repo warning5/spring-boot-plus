@@ -1,7 +1,7 @@
 package com.hwtx.form.domain.ds;
 
-import org.anyline.metadata.Column;
-import org.anyline.metadata.Table;
+import com.hwtx.form.domain.ds.metadata.Column;
+import com.hwtx.form.domain.ds.metadata.Table;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 

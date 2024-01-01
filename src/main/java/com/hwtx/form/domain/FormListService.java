@@ -2,9 +2,9 @@ package com.hwtx.form.domain;
 
 import com.hwtx.form.domain.ds.DefaultDao;
 import com.hwtx.form.domain.ds.JDBCAdapter;
-import org.anyline.metadata.Column;
-import org.anyline.metadata.Index;
-import org.anyline.metadata.Table;
+import com.hwtx.form.domain.ds.metadata.Column;
+import com.hwtx.form.domain.ds.metadata.Index;
+import com.hwtx.form.domain.ds.metadata.Table;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

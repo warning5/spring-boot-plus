@@ -1,6 +1,4 @@
-package com.hwtx.form.domain.metadata;
-
-import org.anyline.metadata.CMD;
+package com.hwtx.form.domain.ds.metadata;
 
 public interface ACTION {
     enum DML{
