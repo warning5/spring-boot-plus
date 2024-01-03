@@ -3,7 +3,7 @@ package com.hwtx.form.domain.ds.metadata;
 import java.lang.reflect.Field;
 
 public interface ColumnType {
-    public static ColumnType ILLEGAL = new ColumnType() {
+    ColumnType ILLEGAL = new ColumnType() {
 
         @Override
         public String getName() {

@@ -317,7 +317,7 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
     @Override
     public StringBuilder primary(DataRuntime runtime, StringBuilder builder, Table meta) {
         PrimaryKey primary = meta.getPrimaryKey();
-        LinkedHashMap<String, Column> pks = null;
+        Map<String, Column> pks;
         if (null != primary) {
             pks = primary.getColumns();
         } else {

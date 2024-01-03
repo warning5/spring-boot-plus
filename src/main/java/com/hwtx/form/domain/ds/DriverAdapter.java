@@ -897,18 +897,6 @@ public interface DriverAdapter {
     boolean drop(DataRuntime runtime, PrimaryKey meta) throws Exception;
 
     /**
-     * primary[调用入口]<br/>
-     * 添加主键
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param origin  主键
-     * @param name    新名称
-     * @return 是否执行成功
-     * @throws Exception 异常
-     */
-    boolean rename(DataRuntime runtime, PrimaryKey origin, String name) throws Exception;
-
-    /**
      * primary[命令合成]<br/>
      * 添加主键
      *

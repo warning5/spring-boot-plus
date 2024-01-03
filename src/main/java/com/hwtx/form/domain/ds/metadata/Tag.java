@@ -1,19 +1,23 @@
 package com.hwtx.form.domain.ds.metadata;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 public class Tag extends Column implements Serializable {
-    protected String keyword = "TAG"            ;
+    protected String keyword = "TAG";
     protected Tag update = null;
 
-    public Tag(){
+    public Tag() {
     }
-    public Tag(String name, String type, Object value){
+
+    public Tag(String name, String type, Object value) {
         this.name = name;
         this.typeName = type;
         this.value = value;
     }
-    public Tag(String name, Object value){
+
+    public Tag(String name, Object value) {
         this.name = name;
         this.value = value;
     }
@@ -23,23 +27,23 @@ public class Tag extends Column implements Serializable {
         return update;
     }
 
-    public Tag setNewName(String newName){
+    public Tag setNewName(String newName) {
         return setNewName(newName, true, true);
     }
 
     public Tag setNewName(String newName, boolean setmap, boolean getmap) {
-        if(null == update){
+        if (null == update) {
             update(setmap, getmap);
         }
         update.setName(newName);
         return update;
     }
 
-    public Tag update(){
+    public Tag update() {
         return update(true, true);
     }
 
-    public Tag update(boolean setmap, boolean getmap){
+    public Tag update(boolean setmap, boolean getmap) {
         this.setmap = setmap;
         this.getmap = getmap;
         update = clone();
@@ -51,7 +55,7 @@ public class Tag extends Column implements Serializable {
         this.update = update;
         this.setmap = setmap;
         this.getmap = getmap;
-        if(null != update) {
+        if (null != update) {
             update.update = null;
             update.origin = this;
         }
@@ -59,26 +63,28 @@ public class Tag extends Column implements Serializable {
     }
 
 
-    public String toString(){
+    public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(name).append(" ").append(typeName);
-        if(null != precision && precision > 0){
+        if (null != precision && precision > 0) {
             builder.append("(").append(precision);
-            if(null != scale && scale > 0){
+            if (null != scale && scale > 0) {
                 builder.append(",").append(scale);
             }
             builder.append(")");
         }
-        if(BasicUtil.isNotEmpty(value)){
+        if (BasicUtil.isNotEmpty(value)) {
             builder.append(" value: ").append(value);
         }
         return builder.toString();
     }
-    public Tag clone(){
+
+    public Tag clone() {
         Tag copy = new Tag();
         BeanUtil.copyFieldValue(copy, this);
         return copy;
     }
+
     public String getKeyword() {
         return this.keyword;
     }

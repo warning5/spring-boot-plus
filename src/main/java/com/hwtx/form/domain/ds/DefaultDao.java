@@ -115,19 +115,10 @@ public class DefaultDao {
         DataRuntime runtime = runtime();
         return runtime.getAdapter().drop(runtime, meta);
     }
-
-
-    public boolean rename(PrimaryKey origin, String name) throws Exception {
-        DataRuntime runtime = runtime();
-        return runtime.getAdapter().rename(runtime, origin, name);
-    }
-
     public boolean alter(Table table) throws Exception {
         DataRuntime runtime = runtime();
         return runtime.getAdapter().alter(runtime, table);
     }
-
-
     public boolean drop(Index meta) throws Exception {
         DataRuntime runtime = runtime();
         return runtime.getAdapter().drop(runtime, meta);

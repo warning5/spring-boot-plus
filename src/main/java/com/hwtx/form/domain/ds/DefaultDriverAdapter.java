@@ -1789,18 +1789,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         return builder;
     }
 
-    public <T extends BaseMetadata> T search(List<T> list, String catalog, String schema, String name) {
-        return BaseMetadata.search(list, catalog, schema, name);
-    }
-
-    public <T extends BaseMetadata> T search(List<T> list, String catalog, String name) {
-        return BaseMetadata.search(list, catalog, name);
-    }
-
-    public <T extends BaseMetadata> T search(List<T> list, String name) {
-        return BaseMetadata.search(list, name);
-    }
-
     protected <T extends BaseMetadata> void fillSchema(T source, T target) {
         Catalog catalog = source.getCatalog();
         Schema schema = source.getSchema();

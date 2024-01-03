@@ -1,11 +1,10 @@
-
-
-
 package com.hwtx.form.domain.ds.metadata;
 
 
-public class UpperKeyAdapter implements KeyAdapter {
+import lombok.Getter;
 
+public class UpperKeyAdapter implements KeyAdapter {
+    @Getter
     private static KeyAdapter instance = new UpperKeyAdapter();
 
     @Override
@@ -19,9 +18,5 @@ public class UpperKeyAdapter implements KeyAdapter {
     @Override
     public KEY_CASE getKeyCase() {
         return KEY_CASE.UPPER;
-    }
-
-    public static KeyAdapter getInstance() {
-        return instance;
     }
 }

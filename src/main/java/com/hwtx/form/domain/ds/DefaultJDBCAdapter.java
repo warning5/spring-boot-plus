@@ -217,7 +217,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             String[] tmp = checkSchema(table.getCatalogName(), table.getSchemaName());
             ResultSet set = dbmd.getIndexInfo(tmp[0], tmp[1], table.getName(), false, false);
             Map<String, Integer> keys = keys(set);
-            LinkedHashMap<String, Column> columns = null;
+            Map<String, Column> columns;
             while (set.next()) {
                 String name = string(keys, "INDEX_NAME", set);
                 if (null == name) {
@@ -337,9 +337,9 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         StringBuilder builder = run.getBuilder();
         builder.append("CREATE TABLE ");
         name(runtime, builder, meta);
-        LinkedHashMap<String, Column> columnsMap = meta.getColumns();
+        Map<String, Column> columnsMap = meta.getColumns();
         Collection<Column> columns = null;
-        LinkedHashMap<String, Column> pks = null;
+        Map<String, Column> pks = null;
         if (null != meta.getPrimaryKey()) {
             pks = meta.getPrimaryKey().getColumns();
         }
@@ -369,14 +369,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         List<Run> tableComment = buildAppendCommentRun(runtime, meta);
         if (null != tableComment) {
             runs.addAll(tableComment);
-        }
-        if (null != columns) {
-            for (Column column : columns) {
-                List<Run> columnComment = buildAppendCommentRun(runtime, column);
-                if (null != columnComment) {
-                    runs.addAll(columnComment);
-                }
-            }
         }
 
         LinkedHashMap<String, Index> indexs = meta.getIndexs();
@@ -440,7 +432,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     @Override
     public StringBuilder primary(DataRuntime runtime, StringBuilder builder, Table meta) {
         PrimaryKey primary = meta.getPrimaryKey();
-        LinkedHashMap<String, Column> pks = null;
+        Map<String, Column> pks;
         if (null != primary) {
             pks = primary.getColumns();
         } else {

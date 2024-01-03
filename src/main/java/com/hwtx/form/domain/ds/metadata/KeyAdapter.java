@@ -131,11 +131,11 @@ public interface KeyAdapter extends Serializable {
         }
     }
 
-    public String key(String key);
+    String key(String key);
 
-    public KEY_CASE getKeyCase();
+    KEY_CASE getKeyCase();
 
-    public static KeyAdapter parse(KEY_CASE keyCase) {
+    static KeyAdapter parse(KEY_CASE keyCase) {
         KeyAdapter keyAdapter;
         switch (keyCase) {
             case UPPER:

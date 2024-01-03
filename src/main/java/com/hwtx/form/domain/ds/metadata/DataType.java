@@ -1,4 +1,3 @@
-
 package com.hwtx.form.domain.ds.metadata;
 
 public interface DataType {
@@ -62,11 +61,11 @@ public interface DataType {
      *
      * @return boolean
      */
-    public abstract boolean ignorePrecision();
+    boolean ignorePrecision();
 
-    public abstract boolean ignoreScale();
+    boolean ignoreScale();
 
-    public abstract boolean support();
+    boolean support();
 
-    public abstract Class supportClass();
+    Class supportClass();
 }

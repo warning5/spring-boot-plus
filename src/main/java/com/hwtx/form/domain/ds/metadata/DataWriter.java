@@ -1,5 +1,4 @@
 package com.hwtx.form.domain.ds.metadata;
-
 public interface DataWriter {
     /**
      * 写入数据库前类型转换(非基础类型时需要)
