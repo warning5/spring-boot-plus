@@ -76,7 +76,6 @@ public class Table extends BaseMetadata<Table> implements Serializable {
 
     protected PrimaryKey primaryKey;
     protected Map<String, Column> columns = new LinkedHashMap<>();
-    protected Map<String, Tag> tags = new LinkedHashMap<>();
     protected Map<String, Index> indexs = new LinkedHashMap<>();
     protected Map<String, Constraint> constraints = new LinkedHashMap<>();
     protected boolean sort = false; //列是否排序
@@ -363,39 +362,6 @@ public class Table extends BaseMetadata<Table> implements Serializable {
         return this;
     }
 
-    public Table addTag(Tag tag) {
-        if (setmap && null != update) {
-            update.addTag(tag);
-            return this;
-        }
-        tag.setTable(this);
-        if (null == tags) {
-            tags = new LinkedHashMap<>();
-        }
-        tags.put(tag.getName(), tag);
-        return this;
-    }
-
-    public Tag addTag(String name, String type) {
-        return addTag(name, type, true, null);
-    }
-
-    public Tag addTag(String name, String type, Object value) {
-        Tag tag = new Tag(name, type, value);
-        addTag(tag);
-        return tag;
-    }
-
-    public Tag addTag(String name, String type, boolean nullable, Object def) {
-        Tag tag = new Tag();
-        tag.setName(name);
-        tag.nullable(nullable);
-        tag.setDefaultValue(def);
-        tag.setTypeName(type);
-        addTag(tag);
-        return tag;
-    }
-
     public String getName(boolean greedy) {
         String result = "";
         if (greedy) {
@@ -558,35 +524,6 @@ public class Table extends BaseMetadata<Table> implements Serializable {
         return this;
     }
 
-    public List<Tag> tags() {
-        Map<String, Tag> tags = getTags();
-        return new ArrayList<>(tags.values());
-    }
-
-    public Map<String, Tag> getTags() {
-        if (getmap && null != update) {
-            return update.getTags();
-        }
-        if (null == tags) {
-            tags = new LinkedHashMap<>();
-        }
-        return tags;
-    }
-
-    public Table setTags(LinkedHashMap<String, Tag> tags) {
-        if (setmap && null != update) {
-            update.setTags(tags);
-            return this;
-        }
-        this.tags = tags;
-        if (null != tags) {
-            for (Column tag : tags.values()) {
-                tag.setTable(this);
-            }
-        }
-        return this;
-    }
-
     public Index getIndex(String name) {
         if (null != indexs && null != name) {
             return indexs.get(name.toUpperCase());
@@ -691,13 +628,6 @@ public class Table extends BaseMetadata<Table> implements Serializable {
             return null;
         }
         return columns.get(name.toUpperCase());
-    }
-
-    public Column getTag(String name) {
-        if (getmap && null != update) {
-            return update.getTag(name);
-        }
-        return tags.get(name.toUpperCase());
     }
 
     public String getEngine() {

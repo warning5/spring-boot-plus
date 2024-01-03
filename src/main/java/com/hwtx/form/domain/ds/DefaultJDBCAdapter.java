@@ -6,6 +6,7 @@ import cn.hutool.db.meta.TableType;
 import com.hwtx.form.domain.ds.metadata.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -78,8 +79,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
      * 查询所有表的列
      *
      * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param random  用来标记同一组命令
-     * @param greedy  贪婪模式 true:如果不填写catalog或schema则查询全部 false:只在当前catalog和schema中查询
      * @param catalog catalog
      * @param schema  schema
      * @param table   查询所有表时 输入null
@@ -87,8 +86,8 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
      * @return List
      */
     @Override
-    public <T extends Column> List<T> columns(DataRuntime runtime, String random, boolean greedy, Catalog catalog, Schema schema, String table) {
-        return super.columns(runtime, random, greedy, catalog, schema, table);
+    public <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema, String table) {
+        return super.columns(runtime, catalog, schema, table);
     }
 
     /**
@@ -103,14 +102,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     @Override
     public List<Run> buildQueryColumnRun(DataRuntime runtime, Table table, boolean metadata) throws Exception {
         List<Run> runs = new ArrayList<>();
-        Catalog catalog = null;
-        Schema schema = null;
-        String name = null;
-        if (null != table) {
-            name = table.getName();
-            catalog = table.getCatalog();
-            schema = table.getSchema();
-        }
         Run run = new SimpleRun(runtime);
         runs.add(run);
         StringBuilder builder = run.getBuilder();
@@ -130,6 +121,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         try {
             JdbcTemplate jdbc = jdbc(runtime);
             ds = jdbc.getDataSource();
+            assert ds != null;
             con = DataSourceUtils.getConnection(ds);
 
             String catalog = table.getCatalogName();
@@ -211,6 +203,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         JdbcTemplate jdbc = jdbc(runtime);
         try {
             ds = jdbc.getDataSource();
+            assert ds != null;
             con = DataSourceUtils.getConnection(ds);
             DatabaseMetaData dbmd = con.getMetaData();
             checkSchema(runtime, table);
@@ -551,7 +544,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                 }
             } else {
                 //数据类型没变但长度变了
-                if (meta.getPrecision() != update.getPrecision() || meta.getScale() != update.getScale()) {
+                if (!Objects.equals(meta.getPrecision(), update.getPrecision()) || !Objects.equals(meta.getScale(), update.getScale())) {
                     List<Run> list = buildChangeTypeRun(runtime, meta);
                     if (null != list) {
                         runs.addAll(list);
@@ -605,10 +598,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         Run run = new SimpleRun(runtime);
         runs.add(run);
         StringBuilder builder = run.getBuilder();
-        if (meta instanceof Tag) {
-            Tag tag = (Tag) meta;
-            return buildDropRun(runtime, tag);
-        }
         if (!slice) {
             Table table = meta.getTable(true);
             builder.append("ALTER ").append(keyword(table)).append(" ");
@@ -1188,19 +1177,12 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     public List<Run> buildAlterRun(DataRuntime runtime, PrimaryKey origin, PrimaryKey meta) throws Exception {
         List<Run> runs = new ArrayList<>();
         if (null != meta) {//没有新主键的就不执行了
-            Table table = null;
-            if (null != meta) {
-                table = meta.getTable();
-            } else {
-                table = origin.getTable();
-            }
+            Table table = meta.getTable();
             List<Run> slices = new ArrayList<>();
             if (null != origin) {
                 slices.addAll(buildDropRun(runtime, origin, true));
             }
-            if (null != meta) {
-                slices.addAll(buildAddRun(runtime, meta, true));
-            }
+            slices.addAll(buildAddRun(runtime, meta, true));
             if (!slices.isEmpty()) {
                 Run run = new SimpleRun(runtime);
                 runs.add(run);
@@ -1255,25 +1237,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     public List<Run> buildRenameRun(DataRuntime runtime, PrimaryKey meta) throws Exception {
         return super.buildRenameRun(runtime, meta);
     }
-
-    /* *****************************************************************************************************************
-     * 													index
-     * -----------------------------------------------------------------------------------------------------------------
-     * [调用入口]
-     * boolean add(DataRuntime runtime, Index meta)
-     * boolean alter(DataRuntime runtime, Index meta)
-     * boolean alter(DataRuntime runtime, Table table, Index meta)
-     * boolean drop(DataRuntime runtime, Index meta)
-     * boolean rename(DataRuntime runtime, Index origin, String name)
-     * [命令合成]
-     * List<Run> buildAddRun(DataRuntime runtime, Index meta)
-     * List<Run> buildAlterRun(DataRuntime runtime, Index meta)
-     * List<Run> buildDropRun(DataRuntime runtime, Index meta)
-     * List<Run> buildRenameRun(DataRuntime runtime, Index meta)
-     * [命令合成-子流程]
-     * StringBuilder type(DataRuntime runtime, StringBuilder builder, Index meta)
-     * StringBuilder comment(DataRuntime runtime, StringBuilder builder, Index meta)
-     ******************************************************************************************************************/
 
     /**
      * index[调用入口]<br/>
@@ -1554,9 +1517,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
 
 
             String remark = string(keys, "REMARKS", set, column.getComment());
-            if ("TAG".equals(remark)) {
-                column = (T) new Tag();
-            }
             column.setComment(remark);
             column.setTable(BasicUtil.evl(string(keys, "TABLE_NAME", set, table.getName()), column.getTableName(true)));
             column.setType(integer(keys, "DATA_TYPE", set, column.getType()));
@@ -1652,7 +1612,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             ColumnType columnType = type(column.getTypeName());
             column.setColumnType(columnType);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("column", e);
         }
         return column;
     }
@@ -1669,7 +1629,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
      * @param set     SqlRowSet由spring封装过的结果集ResultSet
      * @param <T>     Column
      * @return LinkedHashMap
-     * @throws Exception
      */
     @Override
     public <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, boolean create, LinkedHashMap<String, T> columns, Table table, SqlRowSet set) throws Exception {
@@ -1799,7 +1758,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         //返回每个SQL的影响行数
         jdbc.batchUpdate(sql,
                 new BatchPreparedStatementSetter() {
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
                         //i从0开始 参数下标从1开始
                         for (int p = 1; p <= vol; p++) {
                             ps.setObject(p, values.get(vol * i + p - 1));
@@ -1815,7 +1774,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
 
 
     @Override
-    public <T extends BaseMetadata> void checkSchema(DataRuntime runtime, T meta) {
+    public <T extends BaseMetadata<T>> void checkSchema(DataRuntime runtime, T meta) {
         if (null != meta) {
             Connection con = null;
             try {
@@ -1843,31 +1802,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                 }
             }
         }
-    }
-
-    @Override
-    public LinkedHashMap<String, Catalog> catalogs(DataRuntime runtime, String random, String name) {
-        return null;
-    }
-
-    @Override
-    public List<Catalog> catalogs(DataRuntime runtime, String random, boolean greedy, String name) {
-        return null;
-    }
-
-    @Override
-    public List<Run> buildQueryCatalogRun(DataRuntime runtime, boolean greedy, String name) throws Exception {
-        return null;
-    }
-
-    @Override
-    public LinkedHashMap<String, Catalog> catalogs(DataRuntime runtime, boolean create, LinkedHashMap<String, Catalog> catalogs) throws Exception {
-        return null;
-    }
-
-    @Override
-    public List<Catalog> catalogs(DataRuntime runtime, boolean create, List<Catalog> catalogs) throws Exception {
-        return null;
     }
 
     public <T extends Column> T column(Catalog catalog, Schema schema, String table, String name, List<T> columns) {
@@ -1942,67 +1876,65 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
      ******************************************************************************************************************/
 
 
-    protected String concatFun(DataRuntime runtime, String... args) {
-        String result = "";
+    protected String concatFun(String... args) {
+        StringBuilder result = new StringBuilder();
         if (null != args && args.length > 0) {
-            result = "concat(";
+            result = new StringBuilder("concat(");
             int size = args.length;
             for (int i = 0; i < size; i++) {
                 String arg = args[i];
                 if (i > 0) {
-                    result += ",";
+                    result.append(",");
                 }
-                result += arg;
+                result.append(arg);
             }
-            result += ")";
+            result.append(")");
         }
-        return result;
+        return result.toString();
     }
 
-    protected String concatOr(DataRuntime runtime, String... args) {
-        String result = "";
-        if (null != args && args.length > 0) {
-            int size = args.length;
-            for (int i = 0; i < size; i++) {
-                String arg = args[i];
-                if (i > 0) {
-                    result += " || ";
-                }
-                result += arg;
-            }
-        }
-        return result;
-    }
-
-    protected String concatAdd(DataRuntime runtime, String... args) {
-        String result = "";
+    protected String concatOr(String... args) {
+        StringBuilder result = new StringBuilder();
         if (null != args && args.length > 0) {
             int size = args.length;
             for (int i = 0; i < size; i++) {
                 String arg = args[i];
                 if (i > 0) {
-                    result += " + ";
+                    result.append(" || ");
                 }
-                result += arg;
+                result.append(arg);
             }
         }
-        return result;
+        return result.toString();
     }
 
-    protected String concatAnd(DataRuntime runtime, String... args) {
-        String result = "";
+    protected String concatAdd(String... args) {
+        StringBuilder result = new StringBuilder();
         if (null != args && args.length > 0) {
             int size = args.length;
             for (int i = 0; i < size; i++) {
                 String arg = args[i];
                 if (i > 0) {
-                    result += " & ";
+                    result.append(" + ");
                 }
-                result += arg;
+                result.append(arg);
             }
         }
-        return result;
+        return result.toString();
     }
 
-
+    protected String concatAnd(String... args) {
+        StringBuilder result = new StringBuilder();
+        if (null != args && args.length > 0) {
+            int size = args.length;
+            for (int i = 0; i < size; i++) {
+                String arg = args[i];
+                if (i > 0) {
+                    result.append(" & ");
+                }
+                result.append(arg);
+            }
+        }
+        return result.toString();
+    }
 }

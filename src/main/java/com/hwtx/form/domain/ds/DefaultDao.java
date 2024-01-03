@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,36 +35,13 @@ public class DefaultDao {
         return runtime.getAdapter().alter(runtime, table, column);
     }
 
-    public LinkedHashMap<String, Catalog> catalogs(DataRuntime runtime, String random, String name) {
+    public <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema) {
         if (null == runtime) {
             runtime = runtime();
         }
-        return runtime.getAdapter().catalogs(runtime, random, name);
-    }
-
-
-    public List<Catalog> catalogs(DataRuntime runtime, String random, boolean greedy, String name) {
-        if (null == runtime) {
-            runtime = runtime();
-        }
-        return runtime.getAdapter().catalogs(runtime, random, greedy, name);
-    }
-
-    public <T extends Column> List<T> columns(DataRuntime runtime, String random, boolean greedy, Catalog catalog, Schema schema) {
-        if (null == runtime) {
-            runtime = runtime();
-        }
-        return runtime.getAdapter().columns(runtime, random, greedy, catalog, schema);
+        return runtime.getAdapter().columns(runtime, catalog, schema);
 
     }
-
-    /* *****************************************************************************************************************
-     * 													primary
-     * -----------------------------------------------------------------------------------------------------------------
-     * PrimaryKey primary(Table table)
-     * PrimaryKey primary(String table)
-     * PrimaryKey primary(Catalog catalog, Schema schema, String table)
-     ******************************************************************************************************************/
 
     public Map<String, Index> indexs(Table table) {
         return runtime.getAdapter().indexs(runtime(), table);
@@ -115,10 +91,12 @@ public class DefaultDao {
         DataRuntime runtime = runtime();
         return runtime.getAdapter().drop(runtime, meta);
     }
+
     public boolean alter(Table table) throws Exception {
         DataRuntime runtime = runtime();
         return runtime.getAdapter().alter(runtime, table);
     }
+
     public boolean drop(Index meta) throws Exception {
         DataRuntime runtime = runtime();
         return runtime.getAdapter().drop(runtime, meta);

@@ -154,24 +154,19 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
      * 查询所有表的列
      *
      * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param random  用来标记同一组命令
-     * @param greedy  贪婪模式 true:如果不填写catalog或schema则查询全部 false:只在当前catalog和schema中查询
      * @param catalog catalog
      * @param schema  schema
      * @param table   查询所有表时 输入null
      * @param <T>     Column
      * @return List
      */
-    public <T extends Column> List<T> columns(DataRuntime runtime, String random, boolean greedy, Catalog catalog, Schema schema, String table) {
+    public <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema, String table) {
         List<T> columns = new ArrayList<>();
         long fr = System.currentTimeMillis();
-        if (null == random) {
-            random = random(runtime);
-        }
         Table tab = new Table(table);
         tab.setCatalog(catalog);
         tab.setSchema(schema);
-        if (BasicUtil.isEmpty(catalog) && BasicUtil.isEmpty(schema) && !greedy) {
+        if (BasicUtil.isEmpty(catalog) && BasicUtil.isEmpty(schema)) {
             checkSchema(runtime, tab);
         }
         //根据系统表查询
@@ -186,7 +181,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("根据系统表查询", e);
         }
         return columns;
     }
@@ -318,26 +313,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         }
         return null;
     }
-    /* *****************************************************************************************************************
-     *
-     * 													DDL
-     *
-     * =================================================================================================================
-     * database			: 数据库
-     * table			: 表
-     * master table		: 主表
-     * partition table	: 分区表
-     * column			: 列
-     * tag				: 标签
-     * primary key      : 主键
-     * foreign key		: 外键
-     * index			: 索引
-     * constraint		: 约束
-     * trigger		    : 触发器
-     * procedure        : 存储过程
-     * function         : 函数
-     ******************************************************************************************************************/
-
 
     /**
      * table[调用入口]<br/>
@@ -1491,7 +1466,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
      * @return StringBuilder
      */
     @Override
-    public StringBuilder name(DataRuntime runtime, StringBuilder builder, BaseMetadata meta) {
+    public StringBuilder name(DataRuntime runtime, StringBuilder builder, BaseMetadata<?> meta) {
         Catalog catalog = meta.getCatalog();
         Schema schema = meta.getSchema();
         String name = meta.getName();
@@ -1547,9 +1522,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
             String type = column.getTypeName();
             if (null != type) {
                 type = type.toLowerCase();
-                if (type.startsWith("int") || type.contains("float") || type.contains("double") || type.contains("short") || type.contains("long") || type.contains("decimal") || type.contains("numeric") || type.contains("timestamp")) {
-                    return true;
-                }
+                return type.startsWith("int") || type.contains("float") || type.contains("double") || type.contains("short") || type.contains("long") || type.contains("decimal") || type.contains("numeric") || type.contains("timestamp");
             }
         }
         return false;
@@ -1681,7 +1654,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         if (null != columnType) {//根据列类型定位writer
             writer = writer(columnType);
         }
-        if (null == writer && null != value) {//根据值类型定位writer
+        if (null == writer) {//根据值类型定位writer
             writer = writer(value.getClass());
         }
         if (null != writer) {
@@ -1698,7 +1671,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         }
         //根据值类型
         if (!placeholder) {
-            if (BasicUtil.isNumber(value) || "NULL".equals(value)) {
+            if (BasicUtil.isNumber(value)) {
                 result = value;
             } else {
                 result = "'" + value + "'";
@@ -1719,9 +1692,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
 
 
     protected String random(DataRuntime runtime) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[SQL:").append(System.currentTimeMillis()).append("-").append(BasicUtil.getRandomNumberString(8)).append("][thread:").append(Thread.currentThread().getId()).append("][ds:").append(runtime.datasource()).append("]");
-        return builder.toString();
+        return "[SQL:" + System.currentTimeMillis() + "-" + BasicUtil.getRandomNumberString(8) + "][thread:" + Thread.currentThread().getId() + "][ds:" + runtime.datasource() + "]";
     }
 
     //A.ID,A.COOE,A.NAME
@@ -1779,7 +1750,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         return SQLUtil.delimiter(builder, src, getDelimiterFr(), getDelimiterTo());
     }
 
-    public StringBuilder delimiter(StringBuilder builder, BaseMetadata src) {
+    public StringBuilder delimiter(StringBuilder builder, BaseMetadata<?> src) {
         if (null != src) {
             String name = src.getName();
             if (BasicUtil.isNotEmpty(name)) {
@@ -1789,7 +1760,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         return builder;
     }
 
-    protected <T extends BaseMetadata> void fillSchema(T source, T target) {
+    protected <T extends BaseMetadata<?>> void fillSchema(T source, T target) {
         Catalog catalog = source.getCatalog();
         Schema schema = source.getSchema();
         if (BasicUtil.isNotEmpty(catalog)) {

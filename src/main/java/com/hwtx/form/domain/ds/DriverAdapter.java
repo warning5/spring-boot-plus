@@ -4,22 +4,13 @@ import com.hwtx.form.domain.ds.metadata.*;
 
 import java.util.*;
 
-/**
- * DriverAdapter主要用来构造和执行不同数据库的命令,一般会分成3步,以insert为例<br/>
- * 1.insert[调用入口]提供为上一步调用的方法,方法内部再调用[命令合成]生成具体命令，最后调用[命令执行]执行命令<br/>
- * 2.insert[命令合成]根据不同的数据库生成具体的insert命令<br/>
- * 3.insert[命令执行]执行[命令合成]生成的命令<br/>
- * 其中[调用入口],[命令执行]大部分通用，重点是[命令合成]需要由每个数据库的适配器各自生成<br/>
- * [命令执行]过程注意数据库是否支持占位符，是否支持返回自增值，是否支持批量量插入<br/>
- * 以上3步在子类中要全部实现，如果不实现，需要输出日志或调用super方法(用于异常堆栈输出)<br/>
- */
 public interface DriverAdapter {
 
     boolean exists(DataRuntime runtime, Table table);
 
     boolean alter(DataRuntime runtime, Table table, Column meta) throws Exception;
 
-    default boolean execute(DataRuntime runtime, BaseMetadata meta, List<Run> runs) {
+    default boolean execute(DataRuntime runtime, BaseMetadata<?> meta, List<Run> runs) {
         boolean result = true;
         for (Run run : runs) {
             result = update(runtime, run) >= 0 && result;
@@ -140,9 +131,9 @@ public interface DriverAdapter {
      * @param meta    BaseMetadata
      * @param <T>     BaseMetadata
      */
-    <T extends BaseMetadata> void checkSchema(DataRuntime runtime, T meta);
+    <T extends BaseMetadata<T>> void checkSchema(DataRuntime runtime, T meta);
 
-    default <T extends BaseMetadata> void checkSchema(T meta, String catalog, String schema) {
+    default <T extends BaseMetadata<T>> void checkSchema(T meta, String catalog, String schema) {
         if (BasicUtil.isEmpty(meta.getCatalogName())) {
             meta.setCatalog(catalog);
         }
@@ -161,69 +152,6 @@ public interface DriverAdapter {
     default String[] checkSchema(String catalog, String schema) {
         return new String[]{schema, null};
     }
-    /* *****************************************************************************************************************
-     * 													catalog
-     ******************************************************************************************************************/
-
-    /**
-     * catalog[调用入口]
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param random  用来标记同一组命令
-     * @param name    名称统配符或正则
-     * @return LinkedHashMap
-     */
-    LinkedHashMap<String, Catalog> catalogs(DataRuntime runtime, String random, String name);
-
-    List<Catalog> catalogs(DataRuntime runtime, String random, boolean greedy, String name);
-
-    default Catalog catalog(DataRuntime runtime, String random, String name) {
-        List<Catalog> catalogs = catalogs(runtime, random, false, name);
-        if (!catalogs.isEmpty()) {
-            return catalogs.get(0);
-        }
-        return null;
-    }
-
-    /**
-     * catalog[命令合成]<br/>
-     * 查询所有数据库
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param name    名称统配符或正则
-     * @param greedy  贪婪模式 true:查询权限范围内尽可能多的数据
-     * @return sqls
-     * @throws Exception 异常
-     */
-    List<Run> buildQueryCatalogRun(DataRuntime runtime, boolean greedy, String name) throws Exception;
-
-    default List<Run> buildQueryCatalogRun(DataRuntime runtime) throws Exception {
-        return buildQueryCatalogRun(runtime, false, null);
-    }
-
-    /**
-     * catalog[结果集封装]<br/>
-     * 根据驱动内置接口补充 catalog
-     *
-     * @param runtime  运行环境主要包含驱动适配器 数据源或客户端
-     * @param create   上一步没有查到的,这一步是否需要新创建
-     * @param catalogs 上一步查询结果
-     * @return databases
-     * @throws Exception 异常
-     */
-    LinkedHashMap<String, Catalog> catalogs(DataRuntime runtime, boolean create, LinkedHashMap<String, Catalog> catalogs) throws Exception;
-
-    /**
-     * catalog[结果集封装]<br/>
-     * 根据驱动内置接口补充 catalog
-     *
-     * @param runtime  运行环境主要包含驱动适配器 数据源或客户端
-     * @param create   上一步没有查到的,这一步是否需要新创建
-     * @param catalogs 上一步查询结果
-     * @return databases
-     * @throws Exception 异常
-     */
-    List<Catalog> catalogs(DataRuntime runtime, boolean create, List<Catalog> catalogs) throws Exception;
 
     /**
      * schema[命令合成]<br/>
@@ -301,18 +229,16 @@ public interface DriverAdapter {
      * 查询所有表的列
      *
      * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param random  用来标记同一组命令
-     * @param greedy  贪婪模式 true:如果不填写catalog或schema则查询全部 false:只在当前catalog和schema中查询
      * @param catalog catalog
      * @param schema  schema
      * @param table   查询所有表时 输入null
      * @param <T>     Column
      * @return List
      */
-    <T extends Column> List<T> columns(DataRuntime runtime, String random, boolean greedy, Catalog catalog, Schema schema, String table);
+    <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema, String table);
 
-    default <T extends Column> List<T> columns(DataRuntime runtime, String random, boolean greedy, Catalog catalog, Schema schema) {
-        return columns(runtime, random, greedy, catalog, schema, null);
+    default <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema) {
+        return columns(runtime, catalog, schema, null);
     }
 
     /**
@@ -1019,7 +945,7 @@ public interface DriverAdapter {
      * 													common
      *
      ******************************************************************************************************************/
-    StringBuilder name(DataRuntime runtime, StringBuilder builder, BaseMetadata table);
+    StringBuilder name(DataRuntime runtime, StringBuilder builder, BaseMetadata<?> table);
 
     /**
      * 通过占位符写入数据库前转换成数据库可接受的Java数据类型<br/>

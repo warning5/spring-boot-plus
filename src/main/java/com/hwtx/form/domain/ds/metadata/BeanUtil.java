@@ -20,22 +20,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 
-import java.io.*;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class BeanUtil {
@@ -73,144 +64,12 @@ public class BeanUtil {
 
     }
 
-
     private static ObjectMapper newObjectMapper(JsonInclude.Include include) {
         ObjectMapper result = new ObjectMapper();
         result.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         result.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         result.setSerializationInclusion(include);
         return result;
-    }
-
-    public static Object puarseFieldValue(Object value) {
-        Object v = value;
-        return v;
-    }
-
-    public static Double[] double2Double(double[] array) {
-        if (null == array) {
-            return null;
-        }
-        Double[] result = new Double[array.length];
-        int idx = 0;
-        for (double item : array) {
-            result[idx++] = item;
-        }
-        return result;
-    }
-
-    public static double[] Double2double(Double[] array, double def) {
-        if (null == array) {
-            return null;
-        }
-        double[] result = new double[array.length];
-        int idx = 0;
-        for (Double item : array) {
-            if (null == item) {
-                item = def;
-            }
-            result[idx++] = item;
-        }
-        return result;
-    }
-
-    public static Long[] long2Long(long[] array) {
-        if (null == array) {
-            return null;
-        }
-        Long[] result = new Long[array.length];
-        int idx = 0;
-        for (long item : array) {
-            result[idx++] = item;
-        }
-        return result;
-    }
-
-    public static long[] Long2long(Long[] array, long def) {
-        if (null == array) {
-            return null;
-        }
-        long[] result = new long[array.length];
-        int idx = 0;
-        for (Long item : array) {
-            if (null == item) {
-                item = def;
-            }
-            result[idx++] = item;
-        }
-        return result;
-    }
-
-    public static Integer[] int2Integer(int[] array) {
-        if (null == array) {
-            return null;
-        }
-        Integer[] result = new Integer[array.length];
-        int idx = 0;
-        for (int item : array) {
-            result[idx++] = item;
-        }
-        return result;
-    }
-
-    public static int[] Integer2int(Integer[] array, int def) {
-        if (null == array) {
-            return null;
-        }
-        int[] result = new int[array.length];
-        int idx = 0;
-        for (Integer item : array) {
-            if (null == item) {
-                item = def;
-            }
-            result[idx++] = item;
-        }
-        return result;
-    }
-
-    public static Float[] float2Float(float[] array) {
-        if (null == array) {
-            return null;
-        }
-        Float[] result = new Float[array.length];
-        int idx = 0;
-        for (float item : array) {
-            result[idx++] = item;
-        }
-        return result;
-    }
-
-    public static float[] Float2float(Float[] array, float def) {
-        if (null == array) {
-            return null;
-        }
-        float[] result = new float[array.length];
-        int idx = 0;
-        for (Float item : array) {
-            if (null == item) {
-                item = def;
-            }
-            result[idx++] = item;
-        }
-        return result;
-    }
-
-    public static byte[] char2bytes(char[] chars) {
-        Charset charset = Charset.forName("ISO-8859-1");
-        CharBuffer charBuffer = CharBuffer.allocate(chars.length);
-        charBuffer.put(chars);
-        charBuffer.flip();
-        ByteBuffer byteBuffer = charset.encode(charBuffer);
-        return byteBuffer.array();
-    }
-
-    public static char[] byte2char(byte[] bytes) {
-        Charset charset = Charset.forName("ISO-8859-1");
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
-        byteBuffer.put(bytes);
-        byteBuffer.flip();
-        CharBuffer charBuffer = charset.decode(byteBuffer);
-        return charBuffer.array();
     }
 
     /**
@@ -278,69 +137,6 @@ public class BeanUtil {
         return list;
     }
 
-    /**
-     * 按key升序拼接
-     *
-     * @param map         数据源
-     * @param join        key, value之间的拼接符(默认=)
-     * @param separator   separator 多个kv的分隔符(默认&amp;)
-     * @param ignoreEmpty 是否忽略空值
-     * @param order       是否排序
-     * @return String(a = 1 & amp ; b = 2 & amp ; b = 3)
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static String map2string(Map map, String join, String separator, boolean ignoreEmpty, boolean order) {
-        StringBuilder result = new StringBuilder();
-        Set es = null;
-        if (order) {
-            SortedMap<String, Object> wrap = new TreeMap<String, Object>(map);
-            es = wrap.entrySet();
-        } else {
-            es = map.entrySet();
-        }
-        Iterator it = es.iterator();
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String k = (String) entry.getKey();
-            Object v = entry.getValue();
-            if (ignoreEmpty && BasicUtil.isEmpty(v)) {
-                continue;
-            }
-            if (v instanceof Collection) {
-                List list = new ArrayList();
-                list.addAll((Collection) v);
-                Collections.sort(list);
-                for (Object item : list) {
-                    if (ignoreEmpty && BasicUtil.isEmpty(item)) {
-                        continue;
-                    }
-                    if (result.length() > 0) {
-                        result.append(separator);
-                    }
-                    result.append(k).append(join).append(item);
-                }
-            } else if (v instanceof String[]) {
-                String vals[] = (String[]) v;
-                Arrays.sort(vals);
-                for (String item : vals) {
-                    if (ignoreEmpty && BasicUtil.isEmpty(item)) {
-                        continue;
-                    }
-                    if (result.length() > 0) {
-                        result.append(separator);
-                    }
-                    result.append(k).append(join).append(item);
-                }
-            } else {
-                if (result.length() > 0) {
-                    result.append(separator);
-                }
-                result.append(k).append(join).append(v);
-            }
-        }
-        return result.toString();
-    }
-
     public static String object2json(Object obj, JsonInclude.Include include) {
         if (null != obj) {
             //json类型直接返回
@@ -353,7 +149,7 @@ public class BeanUtil {
                 }
                 return JSON_MAPPER.writeValueAsString(obj);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                log.error("", e);
             }
         }
         return null;
@@ -361,83 +157,6 @@ public class BeanUtil {
 
     public static String object2json(Object obj) {
         return object2json(obj, null);
-    }
-
-    /**
-     * 参数转map
-     * 参数格式a=1&amp;b=2&amp;b=3
-     * 如果是多个值, 以String的List形式保存
-     * 如果是url将根据问号分割
-     *
-     * @param url     参数或url
-     * @param empty   结果中是否包含空值, 所有空值以""形式保存
-     * @param decode  是否需要解码
-     * @param charset 解码编码
-     * @return Map
-     */
-    public static Map<String, Object> param2map(String url, boolean empty, boolean decode, String charset) {
-        Map<String, Object> params = new HashMap<String, Object>();
-        if (null != url) {
-            int index = url.indexOf("?");
-            if (index != -1) {
-                url = url.substring(index);
-            }
-            String[] kvs = url.split("&");
-            for (String kv : kvs) {
-                String k = null;
-                String v = null;
-
-                int idx = kv.indexOf("=");
-                if (idx != -1) {
-                    k = kv.substring(0, idx);
-                    v = kv.substring(idx + 1);
-                }
-                if ("null".equals(v)) {
-                    v = "";
-                } else if ("NULL".equals(v)) {
-                    v = null;
-                }
-                if (BasicUtil.isEmpty(v) && !empty) {
-                    continue;
-                }
-                if (decode) {
-                    v = urlDecode(v, charset);
-                }
-                if (params.containsKey(k)) {
-                    Object olds = params.get(k);
-                    List<String> vs = new ArrayList<>();
-                    if (null == olds) {
-                        vs.add(null);
-                    } else if (olds instanceof String) {
-                        vs.add(olds.toString());
-                    } else if (olds instanceof ArrayList) {
-                        vs = (ArrayList) olds;
-                    }
-                    vs.add(v);
-                    params.put(k, vs);
-                } else {
-                    params.put(k, v);
-                }
-
-            }
-        }
-        return params;
-    }
-
-    public static String urlDecode(String src, String charset) {
-        String result = null;
-        if (null != src) {
-            try {
-                if (null == charset) {
-                    result = URLDecoder.decode(src);
-                } else {
-                    result = URLDecoder.decode(src, charset);
-                }
-            } catch (Exception e) {
-                result = src;
-            }
-        }
-        return result;
     }
 
     /**
@@ -863,22 +582,6 @@ public class BeanUtil {
         return concat(list, false);
     }
 
-    public static List wrap(Collection list, String wrap) {
-        List result = new ArrayList<>();
-        for (Object obj : list) {
-            if (null == obj) {
-                result.add(null);
-            } else {
-                if (BasicUtil.isNumber(obj)) {
-                    result.add(obj);
-                } else {
-                    result.add(wrap + obj + wrap);
-                }
-            }
-        }
-        return result;
-    }
-
     public static List<String> toUpperCase(List<String> list) {
         return toUpperCase(list, false);
     }
@@ -957,38 +660,6 @@ public class BeanUtil {
         return con;
     }
 
-    /**
-     * 需要保证数据类型一致
-     *
-     * @param list list
-     * @param <T>  T
-     * @return array
-     */
-    public static <T> T[] list2array(List<T> list) {
-        if (null == list || list.isEmpty()) {
-            return null;
-        }
-        T[] result = (T[]) Array.newInstance(list.get(0).getClass(), list.size());
-        int index = 0;
-        for (T item : list) {
-            result[index++] = item;
-        }
-        return result;
-    }
-
-    /**
-     * 与toString不同的是 中间没有空格与引号[1, 2, 3]而不是[1, 2, 3]
-     *
-     * @param list List
-     * @return String
-     */
-    public static String list2string(List<?> list) {
-        return "[" + concat(list) + "]";
-    }
-
-    public static <T> String array2string(T[] array) {
-        return "[" + concat(array) + "]";
-    }
 
     /**
      * 数组转list
@@ -1058,568 +729,6 @@ public class BeanUtil {
     }
 
     /**
-     * 截取数组
-     *
-     * @param array 原数组
-     * @param fr    开始位置
-     * @param to    结束位置
-     * @param <T>   数据类型
-     * @return 新数组
-     */
-    public static <T> T[] cut(T[] array, int fr, int to) {
-        if (null == array || array.length == 0) {
-            return array;
-        }
-        T[] result = (T[]) Array.newInstance(array[0].getClass(), to - fr + 1);
-        for (int i = fr; i <= to; i++) {
-            result[i - fr] = array[i];
-        }
-        return result;
-    }
-
-    public static byte[] cut(byte[] array, int fr, int to) {
-        if (null == array || array.length == 0) {
-            return array;
-        }
-        byte[] result = new byte[to - fr + 1];
-        for (int i = fr; i <= to; i++) {
-            result[i - fr] = array[i];
-        }
-        return result;
-    }
-
-    public static short[] cut(short[] array, int fr, int to) {
-        if (null == array || array.length == 0) {
-            return array;
-        }
-        short[] result = new short[to - fr + 1];
-        for (int i = fr; i <= to; i++) {
-            result[i - fr] = array[i];
-        }
-        return result;
-    }
-
-    public static int[] cut(int[] array, int fr, int to) {
-        if (null == array || array.length == 0) {
-            return array;
-        }
-        int[] result = new int[to - fr + 1];
-        for (int i = fr; i <= to; i++) {
-            result[i - fr] = array[i];
-        }
-        return result;
-    }
-
-    /**
-     * 左补齐
-     *
-     * @param bytes bytes
-     * @param len   len
-     * @return bytes
-     */
-    public static byte[] fill(byte[] bytes, int len) {
-        byte[] result = new byte[len];
-        for (int i = 0; i < bytes.length && i < len; i++) {
-            result[len + i - bytes.length] = bytes[i];
-        }
-        return result;
-    }
-
-    /**
-     * 删除空值
-     *
-     * @param map       map
-     * @param recursion 是否递归检测集合map类型值的长度
-     */
-    public static void clearEmpty(Map<String, Object> map, boolean recursion) {
-        if (null == map) {
-            return;
-        }
-        List<String> keys = BasicUtil.getMapKeys(map);
-        for (String key : keys) {
-            Object value = map.get(key);
-            if (BasicUtil.isEmpty(recursion, value)) {
-                map.remove(key);
-            }
-        }
-    }
-
-    public static void clearEmpty(Map<String, Object> map) {
-        clearEmpty(map, true);
-    }
-
-    /**
-     * 删除空值
-     *
-     * @param list      list
-     * @param recursion 是否递归检测集合map类型值的长度
-     */
-    public static void clearEmpty(List<Object> list, boolean recursion) {
-        if (null == list) {
-            return;
-        }
-        int size = list.size();
-        for (int i = size - 1; i >= 0; i--) {
-            if (BasicUtil.isEmpty(recursion, list.get(i))) {
-                list.remove(i);
-            }
-        }
-    }
-
-    public static void clearEmpty(List<Object> list) {
-        clearEmpty(list, true);
-    }
-
-    /**
-     * 多个数组合并成一个数组(二维数组合成一维数组)
-     *
-     * @param <T>   T
-     * @param first first
-     * @param rest  rest
-     * @return T
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> T[] union(T[] first, T[]... rest) {
-        int len = first.length;
-        for (T[] array : rest) {
-            len += array.length;
-        }
-        T[] result = Arrays.copyOf(first, len);
-        int offset = first.length;
-        for (T[] array : rest) {
-            System.arraycopy(array, 0, result, offset, array.length);
-            offset += array.length;
-        }
-        return result;
-    }
-
-
-    /**
-     * 集合中与value差值最小的成员的下标
-     *
-     * @param array array
-     * @param value value
-     * @return int
-     */
-    public static int closest(short[] array, short value) {
-        int index = 0;
-        int dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            int abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(Short[] array, short value) {
-        int index = 0;
-        int dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            int abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(List<Short> array, short value) {
-        int index = 0;
-        int dif = -1;
-        int len = array.size();
-        for (int i = 0; i < len; i++) {
-            if (array.get(i) == value) {
-                index = i;
-                break;
-            }
-            int abs = Math.abs(array.get(i) - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(int[] array, int value) {
-        int index = 0;
-        int dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            int abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(Integer[] array, int value) {
-        int index = 0;
-        int dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            int abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(List<Integer> array, int value) {
-        int index = 0;
-        int dif = -1;
-        int len = array.size();
-        for (int i = 0; i < len; i++) {
-            if (array.get(i) == value) {
-                index = i;
-                break;
-            }
-            int abs = Math.abs(array.get(i) - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(long[] array, long value) {
-        int index = 0;
-        long dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            long abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(Long[] array, long value) {
-        int index = 0;
-        long dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            long abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(List<Long> array, long value) {
-        int index = 0;
-        long dif = -1;
-        int len = array.size();
-        for (int i = 0; i < len; i++) {
-            if (array.get(i) == value) {
-                index = i;
-                break;
-            }
-            long abs = Math.abs(array.get(i) - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(float[] array, float value) {
-        int index = 0;
-        float dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            float abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(Float[] array, float value) {
-        int index = 0;
-        float dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            float abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-
-        }
-        return index;
-    }
-
-    public static int closest(List<Float> array, float value) {
-        int index = 0;
-        float dif = -1;
-        int len = array.size();
-        for (int i = 0; i < len; i++) {
-            if (array.get(i) == value) {
-                index = i;
-                break;
-            }
-            float abs = Math.abs(array.get(i) - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(double[] array, double value) {
-        int index = 0;
-        double dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            double abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(Double[] array, double value) {
-        int index = 0;
-        double dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-            double abs = Math.abs(array[i] - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-
-        }
-        return index;
-    }
-
-    public static int closest(List<Double> array, double value) {
-        int index = 0;
-        double dif = -1;
-        int len = array.size();
-        for (int i = 0; i < len; i++) {
-            if (array.get(i) == value) {
-                index = i;
-                break;
-            }
-            double abs = Math.abs(array.get(i) - value);
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(BigDecimal[] array, BigDecimal value) {
-        int index = 0;
-        double dif = -1;
-        int len = array.length;
-        for (int i = 0; i < len; i++) {
-            double abs = Math.abs(array[i].subtract(value).doubleValue());
-            if (abs == 0) {
-                index = i;
-                break;
-            }
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    public static int closest(List<BigDecimal> array, BigDecimal value) {
-        int index = 0;
-        double dif = -1;
-        int len = array.size();
-        for (int i = 0; i < len; i++) {
-            double abs = Math.abs(array.get(i).subtract(value).doubleValue());
-            if (abs == 0) {
-                index = i;
-                break;
-            }
-            if (dif == -1 || dif > abs) {
-                dif = abs;
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    /**
-     * 集合截取
-     *
-     * @param <T>   t
-     * @param list  list
-     * @param begin begin
-     * @param end   end
-     * @return List
-     */
-    public static <T> List<T> cuts(Collection<T> list, int begin, int end) {
-        List<T> result = new ArrayList<T>();
-        if (null != list) {
-            if (begin <= 0) {
-                begin = 0;
-            }
-            if (end < 0 || end >= list.size()) {
-                end = list.size() - 1;
-            }
-        }
-        int idx = 0;
-        for (T obj : list) {
-            if (idx >= begin && idx <= end) {
-                result.add(obj);
-            }
-            idx++;
-            if (idx > end) {
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 驼峰转下划线
-     * userName : user_name
-     *
-     * @param str src
-     * @return String
-     */
-    public static String camel_(String str) {
-        if (null == str || str.contains("_")) {
-            return str;
-        }
-        Matcher matcher = Pattern.compile("[A-Z]").matcher(str);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            String g = matcher.group();
-            matcher.appendReplacement(sb, "_" + g.toLowerCase());
-        }
-        matcher.appendTail(sb);
-        if (sb.charAt(0) == '_') {
-            sb.delete(0, 1);
-        }
-        return sb.toString();
-    }
-
-    /**
-     * 转驼峰
-     *
-     * @param key  src
-     * @param hold 是否保留分隔符
-     * @return String
-     */
-    public static String camel(String key, boolean hold) {
-        if (!key.contains("-") && !key.contains("_")) {
-            return key;
-        }
-        String[] ks = key.split("_|-");
-        String sKey = null;
-        for (String k : ks) {
-            if (null == sKey) {
-                sKey = k.toLowerCase();
-            } else {
-                if (hold) {
-                    sKey += "_";
-                }
-                sKey += CharUtil.toUpperCaseHeader(k.toLowerCase());
-            }
-        }
-        return sKey;
-    }
-
-
-    public static String camel(String key) {
-        return camel(key, false);
-    }
-
-    public static String Camel(String key, boolean hold) {
-        if (!key.contains("-") && !key.contains("_")) {
-            return key;
-        }
-        String[] ks = key.split("_|-");
-        String sKey = null;
-        for (String k : ks) {
-            if (null == sKey) {
-                sKey = CharUtil.toUpperCaseHeader(k.toLowerCase());
-            } else {
-                if (hold) {
-                    sKey += "_";
-                }
-                sKey += CharUtil.toUpperCaseHeader(k.toLowerCase());
-            }
-        }
-        return sKey;
-    }
-
-    public static String Camel(String key) {
-        return Camel(key, false);
-    }
-
-    /**
      * 解析 key:vlue形式参数age:20
      * 返回数组["age","20"]
      * 如果值为空返回["age",""]
@@ -1655,18 +764,6 @@ public class BeanUtil {
         result[0] = key1;
         result[1] = key2;
         return result;
-    }
-
-    public static boolean isJson(Object json) {
-        if (null == json) {
-            return false;
-        }
-        try {
-            JSON_MAPPER.readTree(json.toString());
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
     }
 
     public static Object value(JsonNode json) {
@@ -1761,62 +858,6 @@ public class BeanUtil {
         setFieldsValue(obj, map, true);
     }
 
-    public static byte[] serialize(Object value) {
-        byte[] rv = new byte[0];
-        if (value == null) {
-            return rv;
-        }
-        ByteArrayOutputStream bos = null;
-        ObjectOutputStream os = null;
-        try {
-            bos = new ByteArrayOutputStream();
-            os = new ObjectOutputStream(bos);
-            os.writeObject(value);
-            os.close();
-            bos.close();
-            rv = bos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (os != null) os.close();
-                if (bos != null) bos.close();
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-        return rv;
-    }
-
-    public static Object deserialize(byte[] in) {
-        Object rv = null;
-        ByteArrayInputStream bis = null;
-        ObjectInputStream is = null;
-        try {
-            if (in != null) {
-                bis = new ByteArrayInputStream(in);
-                is = new ObjectInputStream(bis);
-                rv = is.readObject();
-                is.close();
-                bis.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (is != null) is.close();
-                if (bis != null) bis.close();
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-        return rv;
-    }
-
-    public static <T> Collection array2collection(Object array) {
-        Collection<T> list = new ArrayList<>();
-        return list;
-    }
 
     public static <T> List<T> array2list(T[]... arrays) {
         List<T> list = new ArrayList<T>();
@@ -1833,26 +874,6 @@ public class BeanUtil {
                     }
                 }
             }
-        }
-        return list;
-    }
-
-    public static List object2list(Object obj) {
-        List list = null;
-        if (null == obj) {
-            return new ArrayList();
-        }
-        if (obj instanceof List) {
-            return (List) obj;
-        }
-        list = new ArrayList();
-        if (obj instanceof Object[]) {
-            Object[] objs = (Object[]) obj;
-            for (Object item : objs) {
-                list.add(item);
-            }
-        } else if (obj instanceof Collection) {
-            list.addAll((Collection) obj);
         }
         return list;
     }
@@ -1892,76 +913,20 @@ public class BeanUtil {
         List<List<T>> store = new ArrayList<List<T>>();
         for (int i = 1; i < lists.size(); i++) {
             List<T> r2 = lists.get(i);
-            for (int j = 0; j < result.size(); j++) {
-                List<T> rns = result.get(j);
-                for (int k = 0; k < r2.size(); k++) {
+            for (List<T> rns : result) {
+                for (T t : r2) {
                     List<T> mid = new ArrayList<T>();
                     mid.addAll(rns);
-                    mid.add(r2.get(k));
+                    mid.add(t);
                     store.add(mid);
                 }
             }
-            result = new ArrayList<List<T>>();
+            result = new ArrayList<>();
             result.addAll(store);
-            store = new ArrayList<List<T>>();
+            store = new ArrayList<>();
         }
         return result;
     }
-
-    public static <T> List<List<T>> descartes(List<T>... lists) {
-        return descartes(array2list(lists));
-    }
-
-    /**
-     * 合并成新数组
-     *
-     * @param array 第一个数组
-     * @param items 其他数组
-     * @param <T>   数据类型
-     * @return 合并后数组
-     */
-    public static <T> T[] merge(T[] array, T[]... items) {
-        T[] result = null;
-        int len = array.length;
-        Class clazz = null;
-        if (null != items) {
-            for (T[] item : items) {
-                if (null != item) {
-                    len += array.length;
-                    if (null == array && null == clazz) {
-                        for (T obj : item) {
-                            if (null != obj) {
-                                clazz = obj.getClass();
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (null != array) {
-            result = Arrays.copyOf(array, len);
-        } else {
-            if (null != clazz) {
-                result = (T[]) Array.newInstance(clazz, len);
-            } else {
-                return null;
-            }
-        }
-
-
-        int offset = array.length;
-        if (null != items) {
-            for (T[] item : items) {
-                if (null != item) {
-                    System.arraycopy(item, 0, result, offset, item.length);
-                    offset += item.length;
-                }
-            }
-        }
-        return result;
-    }
-
 
     /**
      * maps合并成新map
@@ -2028,75 +993,6 @@ public class BeanUtil {
         return result;
     }
 
-    public static <T> List<T> merge(List<T> list, T... items) {
-        List<T> result = new ArrayList<>();
-        if (null != list) {
-            result.addAll(list);
-        }
-        if (null != items) {
-            for (T item : items) {
-                result.add(item);
-            }
-        }
-        return result;
-    }
-
-
-    /**
-     * items拼接到list中
-     *
-     * @param list  list
-     * @param items items
-     * @param <T>   T
-     * @return list
-     */
-    public static <T> List<T> join(List<T> list, T... items) {
-        if (null == list) {
-            list = new ArrayList<>();
-        }
-        if (null != items) {
-            for (T item : items) {
-                list.add(item);
-            }
-        }
-        return list;
-    }
-
-    public static <T> Collection<T> join(Collection<T> list, T... items) {
-        if (null == list) {
-            list = new ArrayList<>();
-        }
-        if (null != items) {
-            for (T item : items) {
-                list.add(item);
-            }
-        }
-        return list;
-    }
-
-    /**
-     * 添加集合,并去重(不区分大小写)
-     *
-     * @param list     list
-     * @param appends  appends
-     * @param distinct 去重
-     */
-    public static <T> void join(boolean distinct, Collection<T> list, Collection<T> appends) {
-        for (T append : appends) {
-            if (!distinct || !contains(list, append)) {
-                list.add(append);
-            }
-        }
-    }
-
-    public static <T> void join(boolean distinct, Collection<T> list, T... appends) {
-        for (T append : appends) {
-            if (!distinct || !contains(list, append)) {
-                list.add(append);
-            }
-        }
-    }
-
     /**
      * list中是否包含item 不区分大小写
      *
@@ -2146,66 +1042,6 @@ public class BeanUtil {
         return copy(into, copy, getMapKeys(copy));
     }
 
-    private static String concatValue(Map<String, Object> row, String split) {
-        StringBuilder builder = new StringBuilder();
-        List<String> keys = getMapKeys(row);
-        for (String key : keys) {
-            if (builder.length() > 0) {
-                builder.append(split);
-            }
-            builder.append(row.get(key));
-        }
-        return builder.toString();
-    }
-
-    public static <T> List<Map<String, Object>> pivot(Collection<T> datas, List<String> pks, List<String> classKeys, String... valueKeys) {
-        List<String> list = new ArrayList<>();
-        if (null != valueKeys) {
-            for (String item : valueKeys) {
-                list.add(item);
-            }
-        }
-        return pivot(datas, pks, classKeys, valueKeys);
-    }
-
-    private static String[] kvs(Map<String, Object> row) {
-        List<String> keys = getMapKeys(row);
-        int size = keys.size();
-        String[] kvs = new String[size * 2];
-        for (int i = 0; i < size; i++) {
-            String k = keys.get(i);
-            String value = null;
-            Object v = row.get(k);
-            if (null != v) {
-                value = v.toString();
-            }
-            kvs[i * 2] = k;
-            kvs[i * 2 + 1] = value;
-        }
-        return kvs;
-    }
-
-    /**
-     * distinct 不区分大小写
-     *
-     * @param list List
-     * @return List
-     */
-    public static List<String> distinct(Collection<String> list) {
-        List<String> result = new ArrayList<>();
-        List<String> check = new ArrayList<>();
-        if (null != list) {
-            for (String item : list) {
-                String upper = item.toUpperCase();
-                if (!check.contains(upper)) {
-                    result.add(item);
-                    check.add(upper);
-                }
-            }
-        }
-        return result;
-    }
-
     /**
      * removeAll 不区分大小写
      *
@@ -2225,11 +1061,6 @@ public class BeanUtil {
             src.removeAll(check);
         }
         return src;
-    }
-
-
-    public static List<String> removeAll(List<String> src, String... remove) {
-        return removeAll(src, array2list(remove));
     }
 
     public static <T> List<T> copy(Collection<T> list) {

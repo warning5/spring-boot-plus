@@ -106,12 +106,10 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
     @Override
     public List<Run> buildQueryColumnRun(DataRuntime runtime, Table table, boolean metadata) throws Exception {
         List<Run> runs = new ArrayList<>();
-        Catalog catalog = null;
         Schema schema = null;
         String name = null;
         if (null != table) {
             name = table.getName();
-            catalog = table.getCatalog();
             schema = table.getSchema();
         }
         Run run = new SimpleRun(runtime);
@@ -119,6 +117,7 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
         StringBuilder builder = run.getBuilder();
         if (metadata) {
             builder.append("SELECT * FROM ");
+            assert table != null;
             name(runtime, builder, table);
             builder.append(" WHERE 1=0");
         } else {
@@ -770,7 +769,7 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
      */
     @Override
     public String concat(DataRuntime runtime, String... args) {
-        return super.concatFun(runtime, args);
+        return super.concatFun(args);
     }
 
     /**
