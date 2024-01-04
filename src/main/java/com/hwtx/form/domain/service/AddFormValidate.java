@@ -1,7 +1,7 @@
 package com.hwtx.form.domain.service;
 
 import com.hwtx.form.annotation.FormValidation;
-import com.hwtx.form.domain.FormDef;
+import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.FormValidate;
 
 import java.util.Objects;

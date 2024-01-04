@@ -1,6 +1,6 @@
 package com.hwtx.form.domain;
 
-import com.hwtx.form.domain.ds.DefaultDao;
+import com.hwtx.form.domain.ds.DatasourceDao;
 import com.hwtx.form.domain.ds.JDBCAdapter;
 import com.hwtx.form.domain.ds.metadata.Column;
 import com.hwtx.form.domain.ds.metadata.Index;
@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 public class FormListService {
 
     @Resource
-    DefaultDao dao;
+    DatasourceDao dao;
 
     public void add() {
         String tableName = "test";

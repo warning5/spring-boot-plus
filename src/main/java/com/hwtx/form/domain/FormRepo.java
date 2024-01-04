@@ -1,6 +1,7 @@
 package com.hwtx.form.domain;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormDefDto;
 import com.hwtx.form.domain.query.FormDefAppQuery;
 import com.hwtx.form.domain.vo.FormDefAppVo;

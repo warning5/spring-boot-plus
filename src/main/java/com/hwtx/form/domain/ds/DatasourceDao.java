@@ -11,10 +11,10 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class DefaultDao {
+public class DatasourceDao {
     private final DataRuntime runtime;
 
-    DefaultDao(JdbcTemplate jdbcTemplate) {
+    DatasourceDao(JdbcTemplate jdbcTemplate) {
         runtime = new DataRuntime(jdbcTemplate, new MySQLGenusAdapter());
     }
 

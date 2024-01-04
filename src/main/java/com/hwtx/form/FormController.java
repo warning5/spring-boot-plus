@@ -22,6 +22,16 @@ public class FormController {
     @Resource
     private FormService formService;
 
+    @GetMapping("/gen/{formId}")
+    @Operation(summary = "处理表单变化")
+    public Api2Result gen(@PathVariable Long formId) throws Exception {
+        if (formId == null) {
+            return Api2Result.fail(ApiCode.FAIL, "表单ID不能为空");
+        }
+        formService.handleForm(formId);
+        return Api2Result.result(ApiCode.SUCCESS, "处理成功", "");
+    }
+
     @GetMapping("/load/{formId}")
     @Operation(summary = "获取表单定义")
     public String load(@PathVariable Long formId) throws Exception {

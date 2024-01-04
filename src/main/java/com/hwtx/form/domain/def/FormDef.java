@@ -1,9 +1,10 @@
-package com.hwtx.form.domain;
+package com.hwtx.form.domain.def;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.hwtx.form.Util;
+import com.hwtx.form.domain.FormValidate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,14 +31,13 @@ public class FormDef {
     private boolean wrapWithPanel;
     private String name;
     private String api;
-    private List<Body> body;
+    private List<Item> item;
 
     Map<String, List<ValidateAction>> fieldValidationAction = Maps.newHashMap();
     Map<String, List<FormValidate>> customerFormValidations = Maps.newHashMap();
     static final String validatePrefix = "validate.";
     static final String validateActionSuffix = "Predicate";
     static final String predicateClassPrefix = FormDef.class.getName() + "$";
-
 
     @Getter
     @Builder
@@ -49,13 +49,14 @@ public class FormDef {
     }
 
     @Data
-    public static class Body {
+    public static class Item {
         private String type;
         private String name;
         private String label;
         private Boolean required;
         @JSONField(name = "validations")
         private ValidationsDef validationsDef;
+        private Integer precision;
     }
 
     @Getter
@@ -77,7 +78,7 @@ public class FormDef {
 
     @AllArgsConstructor
     static class IsAlphaPredicate implements Predicate<String> {
-        Boolean isAlpha = false;
+        Boolean isAlpha;
 
         @Override
         public boolean test(String s) {
@@ -87,7 +88,7 @@ public class FormDef {
 
     @AllArgsConstructor
     static class MaxLengthPredicate implements Predicate<String> {
-        Integer maxLength = 0;
+        Integer maxLength;
 
         @Override
         public boolean test(String s) {
@@ -97,7 +98,7 @@ public class FormDef {
 
     @AllArgsConstructor
     static class MinLengthPredicate implements Predicate<String> {
-        Integer minLength = 0;
+        Integer minLength;
 
         @Override
         public boolean test(String s) {
@@ -108,13 +109,20 @@ public class FormDef {
     @Data
     public static class ValidationsDef {
         @JSONField(name = "isAlpha")
-        @Getter
         private Boolean isAlpha;
         private Integer minLength;
         private Integer maxLength;
+        @JSONField(name = "isNumeric")
+        private Boolean isNumeric;
+        private Integer maximum;
+        private Integer minimum;
 
         public void setIsAlpha(Boolean isAlpha) {
             this.isAlpha = isAlpha;
+        }
+
+        public void setIsNumeric(Boolean isNumeric) {
+            this.isNumeric = isNumeric;
         }
     }
 
@@ -134,12 +142,12 @@ public class FormDef {
     }
 
     public void init(List<FormDef.CustomerValidation> customerValidations) {
-        if (body != null) {
+        if (item != null) {
             Properties properties = new Properties();
             try {
                 properties.load(getClass().getClassLoader().getResourceAsStream("formValidate.properties"));
-                for (FormDef.Body bodyItem : body) {
-                    if (bodyItem.getValidationsDef() != null) {
+                for (Item itemItem : item) {
+                    if (itemItem.getValidationsDef() != null) {
                         List<ValidateAction> actions = Lists.newArrayList();
                         for (Field declaredField : ValidationsDef.class.getDeclaredFields()) {
                             String fieldName = declaredField.getName();
@@ -151,16 +159,16 @@ public class FormDef {
                             Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(predicateClass);
                             Constructor<?> constructor = clazz.getDeclaredConstructor(declaredField.getType());
                             declaredField.setAccessible(true);
-                            Object defValue = declaredField.get(bodyItem.getValidationsDef());
+                            Object defValue = declaredField.get(itemItem.getValidationsDef());
                             if (defValue != null) {
                                 Object predicateObject = constructor.newInstance(defValue);
                                 actions.add(ValidateAction.builder().msg(msg).predicate((Predicate<String>) predicateObject).build());
                             }
                         }
-                        fieldValidationAction.put(bodyItem.getName(), actions);
+                        fieldValidationAction.put(itemItem.getName(), actions);
                     }
-                    if (bodyItem.getRequired() != null) {
-                        List<ValidateAction> actions = fieldValidationAction.get(bodyItem.getName());
+                    if (itemItem.getRequired() != null) {
+                        List<ValidateAction> actions = fieldValidationAction.get(itemItem.getName());
                         if (actions == null) {
                             actions = Lists.newArrayList();
                         }

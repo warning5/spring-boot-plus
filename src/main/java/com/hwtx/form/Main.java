@@ -2,7 +2,7 @@ package com.hwtx.form;
 
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hwtx.form.domain.FormDef;
+import com.hwtx.form.domain.def.FormDef;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

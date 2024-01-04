@@ -662,6 +662,12 @@ public class Table extends BaseMetadata<Table> implements Serializable {
         return this;
     }
 
+    public Table setDataLength(Long dataLength) {
+        this.dataLength = dataLength;
+        return this;
+    }
+
+
     public String getCollate() {
         if (getmap && null != update) {
             return update.collate;

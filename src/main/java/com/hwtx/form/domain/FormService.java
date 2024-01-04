@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.hwtx.form.annotation.FormValidation;
+import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.persistence.FormValueEntity;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class FormService {
@@ -28,6 +30,15 @@ public class FormService {
 
     @Resource
     ApplicationContext applicationContext;
+    @Resource
+    FormRepo formRepo;
+    @Resource
+    FormValueRepo formValueRepo;
+    @Resource
+    FormAppValueRepo formAppValueRepo;
+    @Resource
+    FormListService service;
+
     private final List<FormDef.CustomerValidation> customerValidations = Lists.newArrayList();
 
     @PostConstruct
@@ -47,17 +58,7 @@ public class FormService {
         });
     }
 
-    @Resource
-    FormRepo formRepo;
-    @Resource
-    FormValueRepo formValueRepo;
-    @Resource
-    FormAppValueRepo formAppValueRepo;
-    @Resource
-    FormListService service;
-
     private static final Cache<Long, FormDef> formCache = CacheBuilder.newBuilder()
-            // 供应商数量目前不超过2W, 占用内存可控, 暂不设置过期设置预期最大值
             .maximumSize(50000)
             .expireAfterAccess(1, TimeUnit.DAYS)
             .recordStats()
@@ -139,5 +140,16 @@ public class FormService {
         formValue.setK1(formValueQuery.getUser());
         formValue.setStatus(false);
         formValueRepo.updateFormValue(formValue);
+    }
+
+    public void handleForm(Long formId) throws Exception {
+        FormDef formDef = formRepo.getFormDef(formId);
+        if (formDef == null) {
+            return;
+        }
+        String formName = formDef.getName();
+        List<FormDef.Item> bodies = formDef.getItem().stream().filter(item -> StringUtils.isNotEmpty(item.getName())).collect(Collectors.toList());
+
+
     }
 }

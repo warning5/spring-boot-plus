@@ -1,52 +1,31 @@
 package com.hwtx.form.domain.ds;
 
-import cn.hutool.core.date.DateUtil;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hwtx.form.domain.ds.entity.geometry.*;
-import com.hwtx.form.domain.ds.metadata.BeanUtil;
 import com.hwtx.form.domain.ds.metadata.ColumnType;
 import com.hwtx.form.domain.ds.metadata.DatabaseType;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.sql.Time;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static com.hwtx.form.domain.ds.metadata.DatabaseType.*;
 
 public enum StandardColumnType implements ColumnType {
 
-    /* *****************************************************************************************************************
-     *
-     * 													SQL DATA TYPE
-     *
-     * =================================================================================================================
-     * String
-     * String-format
-     * number-int/long
-     * number-double/float
-     * date
-     * byte[]
-     * byte[]-file
-     * byte[]-geometry
-     *
-     ******************************************************************************************************************/
 
-    /* *****************************************************************************************************************
-     *
-     *                                              String
-     *
-     * ****************************************************************************************************************/
     /**
-     * MYSQL, pg
+     * mysql, pg
      */
-    CHAR("CHAR", new DatabaseType[]{MYSQL, PostgreSQL, Informix, HANA, Derby}, String.class, false, true) {
+    CHAR("CHAR", new DatabaseType[]{MySQL, PostgreSQL, Informix, HANA, Derby}, String.class, false, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             if (null == value) {
                 value = def;
             }
             if (value instanceof String) {
             } else if (value instanceof Date) {
-                value = DateUtil.format((Date) value, "yyyy-MM-dd HH:mm:ss");
+                value = DateUtil.format((Date) value);
             } else {
                 value = value.toString();
             }
@@ -97,25 +76,25 @@ public enum StandardColumnType implements ColumnType {
         }
     }
     /**
-     * MYSQL
+     * mysql
      */
-    , LONGTEXT("LONGTEXT", new DatabaseType[]{MYSQL}, String.class, true, true) {
+    , LONGTEXT("LONGTEXT", new DatabaseType[]{MySQL}, String.class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return CHAR.write(value, def, placeholder);
         }
     }
     /**
-     * MYSQL
+     * mysql
      */
-    , MEDIUMTEXT("MEDIUMTEXT", new DatabaseType[]{MYSQL}, String.class, true, true) {
+    , MEDIUMTEXT("MEDIUMTEXT", new DatabaseType[]{MySQL}, String.class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return CHAR.write(value, def, placeholder);
         }
     }
     /**
-     * MYSQL, pg, sqlite
+     * mysql, pg, sqlite
      */
-    , TEXT("TEXT", new DatabaseType[]{MYSQL, PostgreSQL, SQLite, Informix, IoTDB, KingBase}, String.class, true, true) {
+    , TEXT("TEXT", new DatabaseType[]{MySQL, PostgreSQL, SQLite, Informix, IoTDB, KingBase}, String.class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return CHAR.write(value, def, placeholder);
         }
@@ -129,17 +108,17 @@ public enum StandardColumnType implements ColumnType {
         }
     }
     /**
-     * MYSQL
+     * mysql
      */
-    , TINYTEXT("TINYTEXT", new DatabaseType[]{MYSQL}, String.class, true, true) {
+    , TINYTEXT("TINYTEXT", new DatabaseType[]{MySQL}, String.class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return CHAR.write(value, def, placeholder);
         }
     }
     /**
-     * MYSQL, pg, oracle, Informix(长度不超过 255 )
+     * mysql, pg, oracle, Informix(长度不超过 255 )
      */
-    , VARCHAR("VARCHAR", new DatabaseType[]{MYSQL, PostgreSQL, ORACLE, Informix, HANA, Derby, KingBase}, String.class, false, true) {
+    , VARCHAR("VARCHAR", new DatabaseType[]{MySQL, PostgreSQL, ORACLE, Informix, HANA, Derby, KingBase}, String.class, false, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return CHAR.write(value, def, placeholder);
         }
@@ -190,73 +169,33 @@ public enum StandardColumnType implements ColumnType {
         }
     }
     /**
-     * MYSQL(byte[]), MSSQL
+     * mysql(byte[]), MSSQL
      */
-    , BINARY("BINARY", new DatabaseType[]{MYSQL, MSSQL, HANA, ElasticSearch}, byte[].class, false, true)
+    , BINARY("BINARY", new DatabaseType[]{MySQL, MSSQL, HANA, ElasticSearch}, byte[].class, false, true)
     /**
-     * MYSQL(byte[]), MSSQL
+     * mysql(byte[]), MSSQL
      */
-    , VARBINARY("VARBINARY", new DatabaseType[]{MYSQL, MSSQL, HANA}, byte[].class, false, true)
+    , VARBINARY("VARBINARY", new DatabaseType[]{MySQL, MSSQL, HANA}, byte[].class, false, true)
 
 
-    /* *****************************************************************************************************************
-     *
-     *                                              String-format
-     *
-     * ****************************************************************************************************************/
-
-    /**
-     * MYSQL, pg
-     */
-    , JSON("JSON", new DatabaseType[]{MYSQL, PostgreSQL, KingBase}, String.class, true, true) {
-        @Override
-        public Object convert(Object value, Class target, Object def) {
-            if (null == value) {
-                return def;
-            }
-            Class transfer = transfer();
-            Class compatible = compatible();
-            try {
-                if (null == target) {
-                    JsonNode node = BeanUtil.JSON_MAPPER.readTree(value.toString());
-                    if (node.isArray()) {
-//                        value = DataSet.parseJson(node);
-                    } else {
-//                        value = DataRow.parseJson(node);
-                    }
-                } else {
-                    value = super.convert(value, target, def);
-                }
-            } catch (Exception e) {
-                //不能转成DataSet的List
-                value = super.convert(value, target, def);
-            }
-            return value;
-        }
-    }
-
-    /**
-     * MSSQL
-     */
-    , XML("XML", new DatabaseType[]{MSSQL, KingBase}, String.class, true, true) {}
     /* *****************************************************************************************************************
      *
      *                                              number-int/long
      *
      * ****************************************************************************************************************/
     /**
-     * MYSQL(Boolean), pg(Boolean), MSSQL
+     * mysql(Boolean), pg(Boolean), MSSQL
      */
-    , BIT("BIT", new DatabaseType[]{MYSQL, MSSQL}, Boolean.class, true, true)
+    , BIT("BIT", new DatabaseType[]{MySQL, MSSQL}, Boolean.class, true, true)
     /**
      * pg
      */
     , VARBIT("VARBIT", new DatabaseType[]{PostgreSQL}, Byte[].class, true, true), SHORT("SHORT", new DatabaseType[]{}, Short.class, true, true)
 
     /**
-     * MYSQL, MSSQL, kingbase
+     * mysql, MSSQL, kingbase
      */
-    , INT("INT", new DatabaseType[]{MYSQL, MSSQL, Informix, Derby}, Integer.class, true, true)
+    , INT("INT", new DatabaseType[]{MySQL, MSSQL, Informix, Derby}, Integer.class, true, true)
     /**
      * IoTDB
      */
@@ -310,25 +249,25 @@ public enum StandardColumnType implements ColumnType {
      */
     , INT8("INT8", new DatabaseType[]{PostgreSQL, Informix}, Long.class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , BIGINT("BIGINT", new DatabaseType[]{MYSQL, Informix, HANA, Derby, KingBase}, Long.class, true, true)
+    , BIGINT("BIGINT", new DatabaseType[]{MySQL, Informix, HANA, Derby, KingBase}, Long.class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , MEDIUMINT("MEDIUMINT", new DatabaseType[]{MYSQL}, Integer.class, true, true)
+    , MEDIUMINT("MEDIUMINT", new DatabaseType[]{MySQL}, Integer.class, true, true)
     /**
-     * MYSQL, sqlite
+     * mysql, sqlite
      */
-    , INTEGER("INTEGER", new DatabaseType[]{MYSQL, SQLite, HANA, ElasticSearch, Derby, KingBase}, Integer.class, true, true)
+    , INTEGER("INTEGER", new DatabaseType[]{MySQL, SQLite, HANA, ElasticSearch, Derby, KingBase}, Integer.class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , SMALLINT("SMALLINT", new DatabaseType[]{MYSQL, Informix, HANA, Derby, KingBase}, Integer.class, true, true)
+    , SMALLINT("SMALLINT", new DatabaseType[]{MySQL, Informix, HANA, Derby, KingBase}, Integer.class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , TINYINT("TINYINT", new DatabaseType[]{MYSQL, HANA, KingBase}, Integer.class, true, true) {
+    , TINYINT("TINYINT", new DatabaseType[]{MySQL, HANA, KingBase}, Integer.class, true, true) {
     }
     /**
      * pg
@@ -348,11 +287,30 @@ public enum StandardColumnType implements ColumnType {
      *
      * ****************************************************************************************************************/
 
+    /**
+     * mysql, pg, oracle
+     */
+    , DECIMAL("DECIMAL", new DatabaseType[]{MySQL, PostgreSQL, ORACLE, Informix, HANA, Derby}, BigDecimal.class, false, false) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            if (null == value) {
+                value = def;
+            }
+            BigDecimal result = BasicUtil.parseDecimal(value, null);
+            if (null != def && null == result) {
+                result = BasicUtil.parseDecimal(def, null);
+            }
+            return result;
+        }
+    }, SMALLDECIMAL("SMALLDECIMAL", new DatabaseType[]{HANA}, BigDecimal.class, false, false) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DECIMAL.write(value, def, placeholder);
+        }
+    }
     //
     /**
-     * MYSQL
+     * mysql
      */
-    , DOUBLE("DOUBLE", new DatabaseType[]{MYSQL, Informix, HANA, IoTDB, ElasticSearch, Derby}, Double.class, false, false) {
+    , DOUBLE("DOUBLE", new DatabaseType[]{MySQL, Informix, HANA, IoTDB, ElasticSearch, Derby}, Double.class, false, false) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             if (null == value) {
                 value = def;
@@ -365,13 +323,13 @@ public enum StandardColumnType implements ColumnType {
         }
     }
     /**
-     * MYSQL(p, s)
+     * mysql(p, s)
      * pg:
      * informix(p)
      * oracle(p)
-     * MYSQL, , oracle(BigDecimal)
+     * mysql, , oracle(BigDecimal)
      */
-    , FLOAT_MySQL("FLOAT", new DatabaseType[]{MYSQL}, Float.class, false, false) {
+    , FLOAT_MySQL("FLOAT", new DatabaseType[]{MySQL}, Float.class, false, false) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             if (null == value) {
                 value = def;
@@ -440,11 +398,200 @@ public enum StandardColumnType implements ColumnType {
         }
     }
     /**
-     * MYSQL(Double), sqlite
+     * pg
      */
-    , REAL("REAL", new DatabaseType[]{MYSQL, SQLite, Informix, HANA, Derby, KingBase}, Double.class, false, false) {
+    , MONEY("MONEY", new DatabaseType[]{PostgreSQL, Informix, KingBase}, BigDecimal.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DECIMAL.write(value, def, placeholder);
+        }
+    }
+    /**
+     * MSSQL
+     */
+    , SMALLMONEY("SMALLMONEY", new DatabaseType[]{MSSQL}, BigDecimal.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DECIMAL.write(value, def, placeholder);
+        }
+    }
+    /**
+     * mysql, sqlite
+     */
+    , NUMERIC("NUMERIC", new DatabaseType[]{MySQL, SQLite, Informix, KingBase}, BigDecimal.class, false, false) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DECIMAL.write(value, def, placeholder);
+        }
+    }
+    /**
+     * oracle
+     */
+    , NUMBER("NUMBER", new DatabaseType[]{ORACLE}, BigDecimal.class, false, false) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DECIMAL.write(value, def, placeholder);
+        }
+    }
+    /**
+     * mysql(Double), sqlite
+     */
+    , REAL("REAL", new DatabaseType[]{MySQL, SQLite, Informix, HANA, Derby, KingBase}, Double.class, false, false) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return FLOAT_MySQL.write(value, def, placeholder);
+        }
+    }
+    /* *****************************************************************************************************************
+     *
+     *                                              date
+     *                               write 需要根据数据库类型 由内置函数转换
+     *
+     * ****************************************************************************************************************/
+    /**
+     * mysql, pg
+     */
+    , DATE("DATE", new DatabaseType[]{MySQL, PostgreSQL, Informix, HANA, Derby}, java.sql.Date.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            if (null == value) {
+                value = def;
+            }
+            Date date = DateUtil.parse(value);
+            if (null == date && null != def) {
+                date = DateUtil.parse(def);
+            }
+            if (null != date) {
+                if (placeholder) {
+                    value = new java.sql.Date(date.getTime());
+                } else {
+                    value = "'" + DateUtil.format(date, "yyyy-MM-dd");
+                }
+            }
+            return value;
+        }
+    }
+    /**
+     * mysql(LocalDateTime)
+     */
+    , DATETIME("DATETIME", new DatabaseType[]{MySQL, Informix}, LocalDateTime.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            if (null == value) {
+                value = def;
+            }
+            Date date = DateUtil.parse(value);
+            if (null == date && null != def) {
+                date = DateUtil.parse(def);
+            }
+            if (null != date) {
+                if (placeholder) {
+                    value = new java.sql.Timestamp(date.getTime());
+                } else {
+                    value = "'" + DateUtil.format(date) + "'";
+                }
+            } else {
+                value = null;
+            }
+            return value;
+        }
+    }
+    /**
+     * MSSQL
+     */
+    , DATETIME2("DATETIME2", new DatabaseType[]{MSSQL}, java.sql.Timestamp.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }
+    /**
+     * MSSQL<br/>
+     * 2020-01-01 15:10:10.0000011
+     */
+    , DATETIMEOFFSET("DATETIMEOFFSET", new DatabaseType[]{MSSQL}, java.sql.Timestamp.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }
+    /**
+     * MSSQL
+     */
+    , SMALLDATETIME("SMALLDATETIME", new DatabaseType[]{MSSQL}, java.sql.Timestamp.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }
+    /**
+     * MSSQL
+     */
+    , SQL_DATETIMEOFFSET("SQL_DATETIMEOFFSET", new DatabaseType[]{MSSQL}, java.sql.Timestamp.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }
+    /**
+     * MSSQL
+     */
+    , SECONDDATE("SECONDDATE", new DatabaseType[]{HANA}, java.util.Date.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }
+    /**
+     * mysql, pg
+     */
+    , TIME("TIME", new DatabaseType[]{MySQL, PostgreSQL, HANA, Derby}, java.sql.Time.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            if (null == value) {
+                value = def;
+            }
+            Date date = DateUtil.parse(value);
+            if (null == date && null != def) {
+                date = DateUtil.parse(def);
+            }
+            if (null != date) {
+                if (placeholder) {
+                    value = new Time(date.getTime());
+                } else {
+                    value = "'" + DateUtil.format(date, "HH:mm:ss") + "'";
+                }
+            } else {
+                value = null;
+            }
+            return value;
+        }
+    }
+    /**
+     * pg
+     */
+    , TIMEZ("TIMEZ", new DatabaseType[]{PostgreSQL}, java.sql.Time.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return TIME.write(value, def, placeholder);
+        }
+    }
+    /**
+     * mysql, pg, oracle
+     */
+    , TIMESTAMP("TIMESTAMP", new DatabaseType[]{MySQL, PostgreSQL, ORACLE, HANA, Derby}, java.sql.Timestamp.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }, TIMESTAMP_ZONE("TIMESTAMP", new DatabaseType[]{PostgreSQL}, java.sql.Timestamp.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }, TIMESTAMP_LOCAL_ZONE("TIMESTAMP", new DatabaseType[]{PostgreSQL}, java.sql.Timestamp.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }
+    /**
+     * timestamp with time zone
+     */
+    , TIMESTAMPTZ("TIMESTAMPTZ", new DatabaseType[]{PostgreSQL}, java.sql.Timestamp.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATETIME.write(value, def, placeholder);
+        }
+    }
+    /**
+     * mysql
+     */
+    , YEAR("YEAR", new DatabaseType[]{MySQL}, java.sql.Date.class, true, true) {
+        public Object write(Object value, Object def, boolean array, boolean placeholder) {
+            return DATE.write(value, def, placeholder);
         }
     }
     /* *****************************************************************************************************************
@@ -453,9 +600,9 @@ public enum StandardColumnType implements ColumnType {
      *
      * ****************************************************************************************************************/
     /**
-     * MYSQL(byte[]), , oracle, sqlite
+     * mysql(byte[]), , oracle, sqlite
      */
-    , BLOB("BLOB", new DatabaseType[]{MYSQL, ORACLE, SQLite, Informix, HANA, Derby, KingBase}, byte[].class, true, true) {
+    , BLOB("BLOB", new DatabaseType[]{MySQL, ORACLE, SQLite, Informix, HANA, Derby, KingBase}, byte[].class, true, true) {
         public Object read(Object value, Object def, Class clazz) {
             if (clazz == byte[].class) {
 
@@ -489,33 +636,33 @@ public enum StandardColumnType implements ColumnType {
         }
     }
     /**
-     * MYSQL
+     * mysql
      */
-    , LONGBLOB("LONGBLOB", new DatabaseType[]{MYSQL}, byte[].class, true, true) {
+    , LONGBLOB("LONGBLOB", new DatabaseType[]{MySQL}, byte[].class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return BLOB.write(value, def, placeholder);
         }
     }
     /**
-     * MYSQL
+     * mysql
      */
-    , MEDIUMBLOB("MEDIUMBLOB", new DatabaseType[]{MYSQL}, byte[].class, true, true) {
+    , MEDIUMBLOB("MEDIUMBLOB", new DatabaseType[]{MySQL}, byte[].class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return BLOB.write(value, def, placeholder);
         }
     }
     /**
-     * MYSQL
+     * mysql
      */
-    , TINYBLOB("TINYBLOB", new DatabaseType[]{MYSQL}, byte[].class, true, true) {
+    , TINYBLOB("TINYBLOB", new DatabaseType[]{MySQL}, byte[].class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return BLOB.write(value, def, placeholder);
         }
     }
     /**
-     * MYSQL
+     * mysql
      */
-    , MULTILINESTRING("MULTILINESTRING", new DatabaseType[]{MYSQL}, byte[].class, true, true)
+    , MULTILINESTRING("MULTILINESTRING", new DatabaseType[]{MySQL}, byte[].class, true, true)
     /**
      * pg
      */
@@ -547,16 +694,9 @@ public enum StandardColumnType implements ColumnType {
      *
      * ****************************************************************************************************************/
     /**
-     * MYSQL, pg
+     * mysql, pg
      */
-    , POINT("POINT", new DatabaseType[]{MYSQL, PostgreSQL, KingBase}, Point.class, byte[].class, true, true) {
-        public Object read(Object value, Object def, Class clazz) {
-            if (null == value) {
-                return value;
-            }
-            return value;
-        }
-
+    , POINT("POINT", new DatabaseType[]{MySQL, PostgreSQL, KingBase}, Point.class, byte[].class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             if (null == value) {
                 value = def;
@@ -566,31 +706,31 @@ public enum StandardColumnType implements ColumnType {
             }
             return value;
         }
-    }, ST_POINT("ST_POINT", new DatabaseType[]{MYSQL, PostgreSQL}, Point.class, byte[].class, true, true) {
+    }, ST_POINT("ST_POINT", new DatabaseType[]{MySQL, PostgreSQL}, Point.class, byte[].class, true, true) {
         public Object write(Object value, Object def, boolean array, boolean placeholder) {
             return POINT.write(value, def, placeholder);
         }
     }, GEOGRAPHY_POINT("GEOGRAPHY_POINT", new DatabaseType[]{VoltDB}, Point.class, byte[].class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , MULTIPOLYGON("MULTIPOLYGON", new DatabaseType[]{MYSQL}, MultiPolygon.class, byte[].class, true, true)
+    , MULTIPOLYGON("MULTIPOLYGON", new DatabaseType[]{MySQL}, MultiPolygon.class, byte[].class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , MULTIPOINT("MULTIPOINT", new DatabaseType[]{MYSQL}, MultiPoint.class, byte[].class, true, true)
+    , MULTIPOINT("MULTIPOINT", new DatabaseType[]{MySQL}, MultiPoint.class, byte[].class, true, true)
     /**
-     * MYSQL, pg
+     * mysql, pg
      */
-    , POLYGON("POLYGON", new DatabaseType[]{MYSQL, PostgreSQL, KingBase}, Polygon.class, byte[].class, true, true)
+    , POLYGON("POLYGON", new DatabaseType[]{MySQL, PostgreSQL, KingBase}, Polygon.class, byte[].class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , GEOMETRY("GEOMETRY", new DatabaseType[]{MYSQL}, byte[].class, true, true), ST_GEOMETRY("ST_GEOMETRY", new DatabaseType[]{HANA}, byte[].class, true, true)
+    , GEOMETRY("GEOMETRY", new DatabaseType[]{MySQL}, byte[].class, true, true), ST_GEOMETRY("ST_GEOMETRY", new DatabaseType[]{HANA}, byte[].class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , GEOMETRYCOLLECTION("GEOMETRYCOLLECTION", new DatabaseType[]{MYSQL}, byte[].class, true, true)
+    , GEOMETRYCOLLECTION("GEOMETRYCOLLECTION", new DatabaseType[]{MySQL}, byte[].class, true, true)
     /**
      * MSSQL
      */
@@ -600,9 +740,9 @@ public enum StandardColumnType implements ColumnType {
      */
     , LINE("LINE", new DatabaseType[]{PostgreSQL, KingBase}, LineString.class, byte[].class, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , LINESTRING("LINESTRING", new DatabaseType[]{MYSQL}, LineString.class, byte[].class, true, true)
+    , LINESTRING("LINESTRING", new DatabaseType[]{MySQL}, LineString.class, byte[].class, true, true)
     /**
      * pg
      */
@@ -640,9 +780,9 @@ public enum StandardColumnType implements ColumnType {
      * ****************************************************************************************************************/
 
     /**
-     * MYSQL
+     * mysql
      */
-    , ENUM("ENUM", new DatabaseType[]{MYSQL}, String.class, true, true)
+    , ENUM("ENUM", new DatabaseType[]{MySQL}, String.class, true, true)
     /**
      * pg
      */
@@ -656,9 +796,9 @@ public enum StandardColumnType implements ColumnType {
      */
     , ROWID("ROWID", new DatabaseType[]{ORACLE}, null, true, true)
     /**
-     * MYSQL
+     * mysql
      */
-    , SET("SET", new DatabaseType[]{MYSQL}, String.class, true, true)
+    , SET("SET", new DatabaseType[]{MySQL}, String.class, true, true)
     /**
      * pg
      */
@@ -675,11 +815,6 @@ public enum StandardColumnType implements ColumnType {
      * pg
      */
     , PG_SNAPSHOT("PG_SNAPSHOT", new DatabaseType[]{PostgreSQL}, null, true, true)
-    /**
-     * pg
-     * 弃用 换成pg_snapshot
-     */
-    , TXID_SNAPSHOT("TXID_SNAPSHOT", new DatabaseType[]{PostgreSQL, KingBase}, null, true, true)
     /**
      * oracle
      */

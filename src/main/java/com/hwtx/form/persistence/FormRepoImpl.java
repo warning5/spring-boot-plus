@@ -2,7 +2,7 @@ package com.hwtx.form.persistence;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hwtx.form.domain.FormDef;
+import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.FormRepo;
 import com.hwtx.form.domain.dto.FormDefDto;
 import com.hwtx.form.domain.query.FormDefAppQuery;
