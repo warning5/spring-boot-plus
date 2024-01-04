@@ -225,23 +225,6 @@ public interface DriverAdapter {
     List<Run> buildQueryTableCommentRun(DataRuntime runtime, Catalog catalog, Schema schema, String pattern, String types) throws Exception;
 
     /**
-     * column[调用入口](方法1)<br/>
-     * 查询所有表的列
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param catalog catalog
-     * @param schema  schema
-     * @param table   查询所有表时 输入null
-     * @param <T>     Column
-     * @return List
-     */
-    <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema, String table);
-
-    default <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema) {
-        return columns(runtime, catalog, schema, null);
-    }
-
-    /**
      * column[调用入口](方法3)<br/>
      * DatabaseMetaData
      *

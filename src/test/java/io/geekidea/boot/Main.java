@@ -1,4 +1,4 @@
-package com.hwtx.form;
+package io.geekidea.boot;
 
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;

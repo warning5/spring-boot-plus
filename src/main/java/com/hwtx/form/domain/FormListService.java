@@ -36,32 +36,32 @@ public class FormListService {
                 throw new RuntimeException(e);
             }
         }
-//        Table update = new Table(tableName);
-//
-//        Column column = new Column();
-//        column.setName("ext");
-//        column.nullable(false);
-//        column.setDefaultValue("123");
-//        column.setTypeName("varchar(20)");
+        Table update = new Table(tableName);
 
-//        try {
-//            dao.alter(update, column);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
+        Column column = new Column();
+        column.setName("ext");
+        column.nullable(false);
+        column.setDefaultValue("123");
+        column.setTypeName("varchar(20)");
 
-//        Column modify = new Column();
-//        modify.setName("ext");
-//        modify.setDefaultValue("AS");
-//        modify.setTypeName("varchar(100)");
-//        modify.setComment("测试");
-//
-//        column.setUpdate(modify, false, false);
-//        try {
-//            dao.alter(update, column);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            dao.alter(update, column);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Column modify = new Column();
+        modify.setName("ext");
+        modify.setDefaultValue("AS");
+        modify.setTypeName("varchar(100)");
+        modify.setComment("测试");
+
+        column.setUpdate(modify, false, false);
+        try {
+            dao.alter(update, column);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 //
         Table autoCreate = new Table("auto_create");
 //        autoCreate.setComment("自动创建");

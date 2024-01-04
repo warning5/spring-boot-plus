@@ -35,11 +35,8 @@ public class DatasourceDao {
         return runtime.getAdapter().alter(runtime, table, column);
     }
 
-    public <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema) {
-        if (null == runtime) {
-            runtime = runtime();
-        }
-        return runtime.getAdapter().columns(runtime, catalog, schema);
+    public Map<String, Column> columns(Table table) throws Exception {
+        return runtime.getAdapter().columns(runtime, table, null);
 
     }
 

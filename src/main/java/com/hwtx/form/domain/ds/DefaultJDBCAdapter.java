@@ -75,22 +75,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     }
 
     /**
-     * column[调用入口]<br/>
-     * 查询所有表的列
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param catalog catalog
-     * @param schema  schema
-     * @param table   查询所有表时 输入null
-     * @param <T>     Column
-     * @return List
-     */
-    @Override
-    public <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema, String table) {
-        return super.columns(runtime, catalog, schema, table);
-    }
-
-    /**
      * column[命令合成]<br/>
      * 查询表上的列
      *

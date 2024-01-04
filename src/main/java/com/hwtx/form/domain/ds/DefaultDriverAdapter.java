@@ -150,43 +150,6 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
     }
 
     /**
-     * column[调用入口]<br/>
-     * 查询所有表的列
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param catalog catalog
-     * @param schema  schema
-     * @param table   查询所有表时 输入null
-     * @param <T>     Column
-     * @return List
-     */
-    public <T extends Column> List<T> columns(DataRuntime runtime, Catalog catalog, Schema schema, String table) {
-        List<T> columns = new ArrayList<>();
-        long fr = System.currentTimeMillis();
-        Table tab = new Table(table);
-        tab.setCatalog(catalog);
-        tab.setSchema(schema);
-        if (BasicUtil.isEmpty(catalog) && BasicUtil.isEmpty(schema)) {
-            checkSchema(runtime, tab);
-        }
-        //根据系统表查询
-        try {
-            List<Run> runs = buildQueryColumnRun(runtime, tab, false);
-            if (null != runs) {
-                int idx = 0;
-                for (Run run : runs) {
-//                    DataSet set = select(runtime, random, true, (String) null, new DefaultConfigStore().keyCase(KeyAdapter.KEY_CASE.PUT_UPPER), run);
-//                    columns = columns(runtime, idx, true, tab, columns, set);
-                    idx++;
-                }
-            }
-        } catch (Exception e) {
-            log.error("根据系统表查询", e);
-        }
-        return columns;
-    }
-
-    /**
      * column[命令合成]<br/>
      * 查询表上的列
      *
