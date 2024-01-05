@@ -1078,6 +1078,11 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         return builder;
     }
 
+    @Override
+    public PrimaryKey primary(DataRuntime runtime, Table table) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * column[命令合成-子流程]<br/>
      * 列定义:递增列

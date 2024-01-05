@@ -1,13 +1,10 @@
 package com.hwtx.form.domain.ds;
 
 import com.hwtx.form.domain.ds.metadata.Column;
-import com.hwtx.form.domain.ds.metadata.Table;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.LinkedHashMap;
 
 public interface JDBCAdapter extends DriverAdapter {
 
@@ -35,21 +32,6 @@ public interface JDBCAdapter extends DriverAdapter {
      */
     Column column(DataRuntime runtime, Column column, ResultSet rs);
 
-
-    /**
-     * column[结果集封装](方法4)<br/>
-     * 解析查询结果metadata(0=1)
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param columns columns
-     * @param table   表
-     * @param set     SqlRowSet由spring封装过的结果集ResultSet
-     * @param <T>     Column
-     * @return LinkedHashMap
-     * @throws Exception
-     */
-    <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, boolean create, LinkedHashMap<String, T> columns, Table table, SqlRowSet set) throws Exception;
 
     /**
      * column[结果集封装-子流程](方法4)<br/>

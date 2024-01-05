@@ -50,27 +50,27 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
 
     protected void init(Table table, ResultSet set, Map<String, Integer> keys) {
         try {
-            table.setType(com.hwtx.form.util.BasicUtil.evl(string(keys, "TABLE_TYPE", set), table.getType()));
+            table.setType(BasicUtil.evl(string(keys, "TABLE_TYPE", set), table.getType()));
         } catch (Exception e) {
         }
         try {
-            table.setComment(com.hwtx.form.util.BasicUtil.evl(string(keys, "REMARKS", set), table.getComment()));
+            table.setComment(BasicUtil.evl(string(keys, "REMARKS", set), table.getComment()));
         } catch (Exception e) {
         }
         try {
-            table.setTypeCat(com.hwtx.form.util.BasicUtil.evl(string(keys, "TYPE_CAT", set), table.getTypeCat()));
+            table.setTypeCat(BasicUtil.evl(string(keys, "TYPE_CAT", set), table.getTypeCat()));
         } catch (Exception e) {
         }
         try {
-            table.setTypeName(com.hwtx.form.util.BasicUtil.evl(string(keys, "TYPE_NAME", set), table.getTypeName()));
+            table.setTypeName(BasicUtil.evl(string(keys, "TYPE_NAME", set), table.getTypeName()));
         } catch (Exception e) {
         }
         try {
-            table.setSelfReferencingColumn(com.hwtx.form.util.BasicUtil.evl(string(keys, "SELF_REFERENCING_COL_NAME", set), table.getSelfReferencingColumn()));
+            table.setSelfReferencingColumn(BasicUtil.evl(string(keys, "SELF_REFERENCING_COL_NAME", set), table.getSelfReferencingColumn()));
         } catch (Exception e) {
         }
         try {
-            table.setRefGeneration(com.hwtx.form.util.BasicUtil.evl(string(keys, "REF_GENERATION", set), table.getRefGeneration()));
+            table.setRefGeneration(BasicUtil.evl(string(keys, "REF_GENERATION", set), table.getRefGeneration()));
         } catch (Exception e) {
         }
 
@@ -195,10 +195,10 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                     index.setName(string(keys, "INDEX_NAME", set));
                     //index.setType(integer(keys, "TYPE", set, null));
                     index.setUnique(!bool(keys, "NON_UNIQUE", set, false));
-                    String catalog = com.hwtx.form.util.BasicUtil.evl(string(keys, "TABLE_CATALOG", set), string(keys, "TABLE_CAT", set));
-                    String schema = com.hwtx.form.util.BasicUtil.evl(string(keys, "TABLE_SCHEMA", set), string(keys, "TABLE_SCHEM", set));
+                    String catalog = BasicUtil.evl(string(keys, "TABLE_CATALOG", set), string(keys, "TABLE_CAT", set));
+                    String schema = BasicUtil.evl(string(keys, "TABLE_SCHEMA", set), string(keys, "TABLE_SCHEM", set));
                     checkSchema(index, catalog, schema);
-                    if (!com.hwtx.form.util.BasicUtil.equals(table.getCatalogName(), index.getCatalogName()) || !com.hwtx.form.util.BasicUtil.equals(table.getSchemaName(), index.getSchemaName())) {
+                    if (!BasicUtil.equals(table.getCatalogName(), index.getCatalogName()) || !BasicUtil.equals(table.getSchemaName(), index.getSchemaName())) {
                         continue;
                     }
                     index.setTable(string(keys, "TABLE_NAME", set));
@@ -243,7 +243,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     public long update(DataRuntime runtime, Run run) {
         long result;
         String sql = run.getFinalUpdate();
-        if (com.hwtx.form.util.BasicUtil.isEmpty(sql)) {
+        if (BasicUtil.isEmpty(sql)) {
             log.warn("无法获取待执行sql");
             return -1;
         }
@@ -370,20 +370,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         return runs;
     }
 
-    /**
-     * table[命令合成-子流程]<br/>
-     * 修改备注
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    表
-     * @return sql
-     * @throws Exception 异常
-     */
-    @Override
-    public List<Run> buildChangeCommentRun(DataRuntime runtime, Table meta) throws Exception {
-        return super.buildChangeCommentRun(runtime, meta);
-    }
-
 
     /**
      * table[命令合成-子流程]<br/>
@@ -412,7 +398,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                 }
                 delimiter(builder, pk.getName());
                 String order = pk.getOrder();
-                if (com.hwtx.form.util.BasicUtil.isNotEmpty(order)) {
+                if (BasicUtil.isNotEmpty(order)) {
                     builder.append(" ").append(order);
                 }
                 first = false;
@@ -421,37 +407,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         }
         return builder;
     }
-
-
-    /**
-     * column[调用入口]<br/>
-     * 删除列,执行的SQL通过meta.ddls()返回
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    列
-     * @return boolean 是否执行成功
-     * @throws Exception DDL异常
-     */
-    @Override
-    public boolean drop(DataRuntime runtime, Column meta) throws Exception {
-        return super.drop(runtime, meta);
-    }
-
-    /**
-     * column[调用入口]<br/>
-     * 重命名列,执行的SQL通过meta.ddls()返回
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param origin  列
-     * @param name    新名称
-     * @return boolean 是否执行成功
-     * @throws Exception DDL异常
-     */
-    @Override
-    public boolean rename(DataRuntime runtime, Column origin, String name) throws Exception {
-        return super.rename(runtime, origin, name);
-    }
-
 
     /**
      * column[命令合成]<br/>
@@ -486,11 +441,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     }
 
     @Override
-    public List<Run> buildAddRun(DataRuntime runtime, Column meta) throws Exception {
-        return super.buildAddRun(runtime, meta);
-    }
-
-    @Override
     public List<Run> buildAlterRun(DataRuntime runtime, Column meta) throws Exception {
         List<Run> runs = new ArrayList<>();
         Column update = meta.getUpdate();
@@ -501,14 +451,14 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             // 修改列名
             String name = meta.getName();
             String uname = update.getName();
-            if (!com.hwtx.form.util.BasicUtil.equalsIgnoreCase(name, uname) && !uname.endsWith("_TMP_UPDATE_TYPE")) {
+            if (!BasicUtil.equalsIgnoreCase(name, uname) && !uname.endsWith("_TMP_UPDATE_TYPE")) {
                 runs.addAll(buildRenameRun(runtime, meta));
             }
             // 修改数据类型
             String type = type(runtime, null, meta).toString();
             String utype = type(runtime, null, update).toString();
             boolean exe = false;
-            if (!com.hwtx.form.util.BasicUtil.equalsIgnoreCase(type, utype)) {
+            if (!BasicUtil.equalsIgnoreCase(type, utype)) {
                 List<Run> list = buildChangeTypeRun(runtime, meta);
                 if (null != list) {
                     runs.addAll(list);
@@ -527,7 +477,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             // 修改默认值
             Object def = meta.getDefaultValue();
             Object udef = update.getDefaultValue();
-            if (!com.hwtx.form.util.BasicUtil.equalsIgnoreCase(def, udef)) {
+            if (!BasicUtil.equalsIgnoreCase(def, udef)) {
                 List<Run> defs = buildChangeDefaultRun(runtime, meta);
                 if (null != defs) {
                     runs.addAll(defs);
@@ -545,7 +495,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             // 修改备注
             String comment = meta.getComment();
             String ucomment = update.getComment();
-            if (!com.hwtx.form.util.BasicUtil.equalsIgnoreCase(comment, ucomment)) {
+            if (!BasicUtil.equalsIgnoreCase(comment, ucomment)) {
                 List<Run> cmts = buildChangeCommentRun(runtime, meta);
                 if (null != cmts) {
                     runs.addAll(cmts);
@@ -580,11 +530,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         return runs;
     }
 
-    @Override
-    public List<Run> buildDropRun(DataRuntime runtime, Column meta) throws Exception {
-        return super.buildDropRun(runtime, meta);
-    }
-
     /**
      * column[命令合成]<br/>
      * 修改列名<br/>
@@ -611,32 +556,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         return runs;
     }
 
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 修改数据类型<br/>
-     * 一般不直接调用,如果需要由buildAlterRun内部统一调用
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    列
-     * @return String
-     */
-    @Override
-    public List<Run> buildChangeTypeRun(DataRuntime runtime, Column meta) throws Exception {
-        return super.buildChangeTypeRun(runtime, meta);
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 修改表的关键字
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @return String
-     */
-    @Override
-    public String alterColumnKeyword(DataRuntime runtime) {
-        return super.alterColumnKeyword(runtime);
-    }
 
     /**
      * column[命令合成-子流程]<br/>
@@ -671,77 +590,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         return builder;
     }
 
-    /**
-     * column[命令合成-子流程]<br/>
-     * 修改默认值
-     * 一般不直接调用,如果需要由buildAlterRun内部统一调用
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    列
-     * @return String
-     */
-    @Override
-    public List<Run> buildChangeDefaultRun(DataRuntime runtime, Column meta) throws Exception {
-        return super.buildChangeDefaultRun(runtime, meta);
-    }
-
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 修改非空限制
-     * 一般不直接调用,如果需要由buildAlterRun内部统一调用
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    列
-     * @return String
-     */
-    @Override
-    public List<Run> buildChangeNullableRun(DataRuntime runtime, Column meta) throws Exception {
-        return super.buildChangeNullableRun(runtime, meta);
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 修改备注
-     * 一般不直接调用,如果需要由buildAlterRun内部统一调用
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    列
-     * @return String
-     */
-    @Override
-    public List<Run> buildChangeCommentRun(DataRuntime runtime, Column meta) throws Exception {
-        return super.buildChangeCommentRun(runtime, meta);
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 添加列备注(表创建完成后调用,创建过程能添加备注的不需要实现)
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    列
-     * @return sql
-     * @throws Exception 异常
-     */
-    @Override
-    public List<Run> buildAppendCommentRun(DataRuntime runtime, Column meta) throws Exception {
-        return super.buildAppendCommentRun(runtime, meta);
-    }
-
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 取消自增
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    列
-     * @return sql
-     * @throws Exception 异常
-     */
-    @Override
-    public List<Run> buildDropAutoIncrement(DataRuntime runtime, Column meta) throws Exception {
-        return super.buildDropAutoIncrement(runtime, meta);
-    }
 
     /**
      * column[命令合成-子流程]<br/>
@@ -773,21 +621,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         // 备注
         comment(runtime, builder, meta);
         return builder;
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 列定义:创建或删除列之前  检测表是否存在
-     * IF NOT EXISTS
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param builder builder
-     * @param exists  exists
-     * @return StringBuilder
-     */
-    @Override
-    public StringBuilder checkColumnExists(DataRuntime runtime, StringBuilder builder, boolean exists) {
-        return super.checkColumnExists(runtime, builder, exists);
     }
 
     /**
@@ -924,32 +757,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
 
     /**
      * column[命令合成-子流程]<br/>
-     * 列定义:是否忽略长度
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param type    列数据类型
-     * @return Boolean 检测不到时返回null
-     */
-    @Override
-    public Boolean checkIgnorePrecision(DataRuntime runtime, String type) {
-        return super.checkIgnorePrecision(runtime, type);
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 列定义:是否忽略精度
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param type    列数据类型
-     * @return Boolean 检测不到时返回null
-     */
-    @Override
-    public Boolean checkIgnoreScale(DataRuntime runtime, String type) {
-        return super.checkIgnoreScale(runtime, type);
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
      * 列定义:非空
      *
      * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
@@ -969,20 +776,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             }
         }
         return builder;
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 列定义:编码
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param builder builder
-     * @param meta    列
-     * @return StringBuilder
-     */
-    @Override
-    public StringBuilder charset(DataRuntime runtime, StringBuilder builder, Column meta) {
-        return super.charset(runtime, builder, meta);
     }
 
     /**
@@ -1014,125 +807,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             }
         }
         return builder;
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 列定义:定义列的主键标识(注意不要跟表定义中的主键重复)
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param builder builder
-     * @param meta    列
-     * @return StringBuilder
-     */
-    @Override
-    public StringBuilder primary(DataRuntime runtime, StringBuilder builder, Column meta) {
-        return super.primary(runtime, builder, meta);
-    }
-
-    @Override
-    public PrimaryKey primary(DataRuntime runtime, Table table) {
-        return null;
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 列定义:递增列
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param builder builder
-     * @param meta    列
-     * @return StringBuilder
-     */
-    @Override
-    public StringBuilder increment(DataRuntime runtime, StringBuilder builder, Column meta) {
-        return super.increment(runtime, builder, meta);
-    }
-
-    /**
-     * column[命令合成-子流程]<br/>
-     * 列定义:更新行事件
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param builder builder
-     * @param meta    列
-     * @return StringBuilder
-     */
-    @Override
-    public StringBuilder onupdate(DataRuntime runtime, StringBuilder builder, Column meta) {
-        return super.onupdate(runtime, builder, meta);
-    }
-
-    /**
-     * primary[调用入口]<br/>
-     * 添加主键
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    主键
-     * @return 是否执行成功
-     * @throws Exception 异常
-     */
-    @Override
-    public boolean add(DataRuntime runtime, PrimaryKey meta) throws Exception {
-        return super.add(runtime, meta);
-    }
-
-    /**
-     * primary[调用入口]<br/>
-     * 修改主键
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param origin  原主键
-     * @param meta    新主键
-     * @return 是否执行成功
-     * @throws Exception 异常
-     */
-    @Override
-    public boolean alter(DataRuntime runtime, Table table, PrimaryKey origin, PrimaryKey meta) throws Exception {
-        return super.alter(runtime, table, origin, meta);
-    }
-
-    /**
-     * primary[调用入口]<br/>
-     * 删除主键
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    主键
-     * @return 是否执行成功
-     * @throws Exception 异常
-     */
-    @Override
-    public boolean drop(DataRuntime runtime, PrimaryKey meta) throws Exception {
-        return super.drop(runtime, meta);
-    }
-
-    /**
-     * primary[调用入口]<br/>
-     * 添加主键
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param origin  主键
-     * @param name    新名称
-     * @return 是否执行成功
-     * @throws Exception 异常
-     */
-    @Override
-    public boolean rename(DataRuntime runtime, PrimaryKey origin, String name) throws Exception {
-        return super.rename(runtime, origin, name);
-    }
-
-    /**
-     * primary[命令合成]<br/>
-     * 添加主键
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    主键
-     * @param slice   是否只生成片段(不含alter table部分，用于DDL合并)
-     * @return String
-     */
-    @Override
-    public List<Run> buildAddRun(DataRuntime runtime, PrimaryKey meta, boolean slice) throws Exception {
-        return super.buildAddRun(runtime, meta, slice);
     }
 
     /**
@@ -1197,48 +871,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     }
 
     /**
-     * primary[命令合成]<br/>
-     * 修改主键名
-     * 一般不直接调用,如果需要由buildAlterRun内部统一调用
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    主键
-     * @return String
-     */
-    @Override
-    public List<Run> buildRenameRun(DataRuntime runtime, PrimaryKey meta) throws Exception {
-        return super.buildRenameRun(runtime, meta);
-    }
-
-    /**
-     * index[调用入口]<br/>
-     * 添加索引
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    索引
-     * @return 是否执行成功
-     * @throws Exception 异常
-     */
-    @Override
-    public boolean add(DataRuntime runtime, Index meta) throws Exception {
-        return super.add(runtime, meta);
-    }
-
-    /**
-     * index[调用入口]<br/>
-     * 删除索引
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param meta    索引
-     * @return 是否执行成功
-     * @throws Exception 异常
-     */
-    @Override
-    public boolean drop(DataRuntime runtime, Index meta) throws Exception {
-        return super.drop(runtime, meta);
-    }
-
-    /**
      * index[命令合成]<br/>
      * 添加索引
      *
@@ -1249,8 +881,8 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     @Override
     public List<Run> buildAddRun(DataRuntime runtime, Index meta) throws Exception {
         String name = meta.getName();
-        if (com.hwtx.form.util.BasicUtil.isEmpty(name)) {
-            name = "index_" + com.hwtx.form.util.BasicUtil.getRandomString(10);
+        if (BasicUtil.isEmpty(name)) {
+            name = "index_" + BasicUtil.getRandomString(10);
         }
         List<Run> runs = new ArrayList<>();
         Run run = new SimpleRun(runtime);
@@ -1277,7 +909,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             }
             delimiter(builder, column.getName());
             String order = column.getOrder();
-            if (com.hwtx.form.util.BasicUtil.isNotEmpty(order)) {
+            if (BasicUtil.isNotEmpty(order)) {
                 builder.append(" ").append(order);
             }
             qty++;
@@ -1309,7 +941,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             builder.append(" DROP CONSTRAINT ").append(meta.getName());
         } else {
             builder.append("DROP INDEX ").append(meta.getName());
-            if (com.hwtx.form.util.BasicUtil.isNotEmpty(table)) {
+            if (BasicUtil.isNotEmpty(table)) {
                 builder.append(" ON ");
                 name(runtime, builder, table);
             }
@@ -1336,12 +968,12 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         String catalog = null;
         String schema = null;
         try {
-            catalog = com.hwtx.form.util.BasicUtil.evl(rsm.getCatalogName(index));
+            catalog = BasicUtil.evl(rsm.getCatalogName(index));
         } catch (Exception e) {
             log.debug("[获取MetaData失败][驱动未实现:getCatalogName]");
         }
         try {
-            schema = com.hwtx.form.util.BasicUtil.evl(rsm.getSchemaName(index));
+            schema = BasicUtil.evl(rsm.getSchemaName(index));
         } catch (Exception e) {
             log.debug("[获取MetaData失败][驱动未实现:getSchemaName]");
         }
@@ -1405,7 +1037,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             //不准确 POINT 返回 GEOMETRY
             String jdbcType = rsm.getColumnTypeName(index);
             column.setJdbcType(jdbcType);
-            if (com.hwtx.form.util.BasicUtil.isEmpty(column.getTypeName())) {
+            if (BasicUtil.isEmpty(column.getTypeName())) {
                 column.setTypeName(jdbcType);
             }
         } catch (Exception e) {
@@ -1436,15 +1068,15 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                 column.setName(string(keys, "COLUMN_NAME", rs));
             }
             if (null == column.getType()) {
-                column.setType(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "DATA_TYPE", rs), null));
+                column.setType(BasicUtil.parseInt(string(keys, "DATA_TYPE", rs), null));
             }
             if (null == column.getType()) {
-                column.setType(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "SQL_DATA_TYPE", rs), null));
+                column.setType(BasicUtil.parseInt(string(keys, "SQL_DATA_TYPE", rs), null));
             }
             if (null == column.getTypeName()) {
                 String jdbcType = string(keys, "TYPE_NAME", rs);
                 column.setJdbcType(jdbcType);
-                if (com.hwtx.form.util.BasicUtil.isEmpty(column.getTypeName())) {
+                if (BasicUtil.isEmpty(column.getTypeName())) {
                     column.setTypeName(jdbcType);
                 }
             }
@@ -1452,24 +1084,24 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                 column.setPrecision(integer(keys, "COLUMN_SIZE", rs, null));
             }
             if (null == column.getScale()) {
-                column.setScale(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "DECIMAL_DIGITS", rs), null));
+                column.setScale(BasicUtil.parseInt(string(keys, "DECIMAL_DIGITS", rs), null));
             }
             if (null == column.getPosition()) {
-                column.setPosition(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "ORDINAL_POSITION", rs), 0));
+                column.setPosition(BasicUtil.parseInt(string(keys, "ORDINAL_POSITION", rs), 0));
             }
             if (-1 == column.isAutoIncrement()) {
-                column.autoIncrement(com.hwtx.form.util.BasicUtil.parseBoolean(string(keys, "IS_AUTOINCREMENT", rs), false));
+                column.autoIncrement(BasicUtil.parseBoolean(string(keys, "IS_AUTOINCREMENT", rs), false));
             }
             if (-1 == column.isGenerated()) {
-                column.generated(com.hwtx.form.util.BasicUtil.parseBoolean(string(keys, "IS_GENERATEDCOLUMN", rs), false));
+                column.generated(BasicUtil.parseBoolean(string(keys, "IS_GENERATEDCOLUMN", rs), false));
             }
             if (null == column.getComment()) {
                 column.setComment(string(keys, "REMARKS", rs));
             }
             if (null == column.getPosition()) {
-                column.setPosition(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "ORDINAL_POSITION", rs), 0));
+                column.setPosition(BasicUtil.parseInt(string(keys, "ORDINAL_POSITION", rs), 0));
             }
-            if (com.hwtx.form.util.BasicUtil.isEmpty(column.getDefaultValue())) {
+            if (BasicUtil.isEmpty(column.getDefaultValue())) {
                 column.setDefaultValue(string(keys, "COLUMN_DEF", rs));
             }
             ColumnType columnType = type(column.getTypeName());
@@ -1478,44 +1110,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             log.error("column", e);
         }
         return column;
-    }
-
-
-    /**
-     * column[结果集封装](方法4)<br/>
-     * 解析查询结果metadata(0=1)
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param columns columns
-     * @param table   表
-     * @param set     SqlRowSet由spring封装过的结果集ResultSet
-     * @param <T>     Column
-     * @return LinkedHashMap
-     */
-    @Override
-    public <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, boolean create, LinkedHashMap<String, T> columns, Table table, SqlRowSet set) throws Exception {
-        if (null == columns) {
-            columns = new LinkedHashMap<>();
-        }
-        SqlRowSetMetaData rsm = set.getMetaData();
-        for (int i = 1; i <= rsm.getColumnCount(); i++) {
-            String name = rsm.getColumnName(i);
-            if (com.hwtx.form.util.BasicUtil.isEmpty(name)) {
-                continue;
-            }
-            T column = columns.get(name.toUpperCase());
-            if (null == column) {
-                if (create) {
-                    column = (T) column(runtime, column, rsm, i);
-                    if (com.hwtx.form.util.BasicUtil.isEmpty(column.getName())) {
-                        column.setName(name);
-                    }
-                    columns.put(column.getName().toUpperCase(), column);
-                }
-            }
-        }
-        return columns;
     }
 
     /**
@@ -1537,12 +1131,12 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             String catalog = null;
             String schema = null;
             try {
-                catalog = com.hwtx.form.util.BasicUtil.evl(rsm.getCatalogName(index));
+                catalog = BasicUtil.evl(rsm.getCatalogName(index));
             } catch (Exception e) {
                 log.debug("[获取MetaData失败][驱动未实现:getCatalogName]");
             }
             try {
-                schema = com.hwtx.form.util.BasicUtil.evl(rsm.getSchemaName(index));
+                schema = BasicUtil.evl(rsm.getSchemaName(index));
             } catch (Exception e) {
                 log.debug("[获取MetaData失败][驱动未实现:getSchemaName]");
             }
@@ -1601,7 +1195,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             try {
                 String jdbcType = rsm.getColumnTypeName(index);
                 column.setJdbcType(jdbcType);
-                if (com.hwtx.form.util.BasicUtil.isEmpty(column.getTypeName())) {
+                if (BasicUtil.isEmpty(column.getTypeName())) {
                     column.setTypeName(jdbcType);
                 }
             } catch (Exception e) {
@@ -1670,7 +1264,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     public <T extends Column> T column(Catalog catalog, Schema schema, String table, String name, List<T> columns) {
         for (T column : columns) {
             if (null != table && null != name) {
-                String identity = com.hwtx.form.util.BasicUtil.nvl(catalog, "") + "_" + com.hwtx.form.util.BasicUtil.nvl(schema, "") + "_" + BasicUtil.nvl(table, "") + "_" + name;
+                String identity = BasicUtil.nvl(catalog, "") + "_" + BasicUtil.nvl(schema, "") + "_" + BasicUtil.nvl(table, "") + "_" + name;
                 identity = MD5Util.crypto(identity.toUpperCase());
                 if (identity.equals(column.getIdentity())) {
                     return column;
@@ -1730,74 +1324,5 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
      */
     protected String dummy() {
         return "dual";
-    }
-    /* *****************************************************************************************************************
-     * 													多分支子类型选择(子类只选择调用不要出现不要覆盖)
-     * -----------------------------------------------------------------------------------------------------------------
-     * protected String pageXXX()
-     * protected String concatXXX()
-     ******************************************************************************************************************/
-
-
-    protected String concatFun(String... args) {
-        StringBuilder result = new StringBuilder();
-        if (null != args && args.length > 0) {
-            result = new StringBuilder("concat(");
-            int size = args.length;
-            for (int i = 0; i < size; i++) {
-                String arg = args[i];
-                if (i > 0) {
-                    result.append(",");
-                }
-                result.append(arg);
-            }
-            result.append(")");
-        }
-        return result.toString();
-    }
-
-    protected String concatOr(String... args) {
-        StringBuilder result = new StringBuilder();
-        if (null != args && args.length > 0) {
-            int size = args.length;
-            for (int i = 0; i < size; i++) {
-                String arg = args[i];
-                if (i > 0) {
-                    result.append(" || ");
-                }
-                result.append(arg);
-            }
-        }
-        return result.toString();
-    }
-
-    protected String concatAdd(String... args) {
-        StringBuilder result = new StringBuilder();
-        if (null != args && args.length > 0) {
-            int size = args.length;
-            for (int i = 0; i < size; i++) {
-                String arg = args[i];
-                if (i > 0) {
-                    result.append(" + ");
-                }
-                result.append(arg);
-            }
-        }
-        return result.toString();
-    }
-
-    protected String concatAnd(String... args) {
-        StringBuilder result = new StringBuilder();
-        if (null != args && args.length > 0) {
-            int size = args.length;
-            for (int i = 0; i < size; i++) {
-                String arg = args[i];
-                if (i > 0) {
-                    result.append(" & ");
-                }
-                result.append(arg);
-            }
-        }
-        return result.toString();
     }
 }

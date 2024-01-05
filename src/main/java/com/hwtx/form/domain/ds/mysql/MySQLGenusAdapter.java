@@ -657,7 +657,7 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
         runs.add(run);
         StringBuilder builder = run.getBuilder();
         Map<String, Column> columns = meta.getColumns();
-        if (columns.size() > 0) {
+        if (!columns.isEmpty()) {
             if (!slice) {
                 builder.append("ALTER TABLE ");
                 name(runtime, builder, meta.getTable(true));
@@ -759,18 +759,6 @@ public class MySQLGenusAdapter extends DefaultJDBCAdapter {
         }
         ;
         return builder;
-    }
-
-    /**
-     * 拼接字符串
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param args    args
-     * @return String
-     */
-    @Override
-    public String concat(DataRuntime runtime, String... args) {
-        return super.concatFun(args);
     }
 
     /**
