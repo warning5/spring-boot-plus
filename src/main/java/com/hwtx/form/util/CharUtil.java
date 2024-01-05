@@ -1,5 +1,5 @@
 
-package com.hwtx.form.domain.ds.metadata;
+package com.hwtx.form.util;
 
 import com.hwtx.form.util.BasicUtil;
 

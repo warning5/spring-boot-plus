@@ -1,6 +1,7 @@
 package com.hwtx.form.domain.ds.metadata;
 
 import com.hwtx.form.util.BasicUtil;
+import com.hwtx.form.util.BeanUtil;
 import lombok.Data;
 
 import java.util.ArrayList;

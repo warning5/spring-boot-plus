@@ -1,5 +1,7 @@
 package com.hwtx.form.domain.ds.metadata;
 
+import com.hwtx.form.util.BeanUtil;
+
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 
