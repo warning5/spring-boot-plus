@@ -1,6 +1,7 @@
 package com.hwtx.form.domain.ds;
 
 import com.hwtx.form.domain.ds.metadata.*;
+import com.hwtx.form.util.BasicUtil;
 
 import java.util.*;
 
@@ -63,7 +64,7 @@ public interface DriverAdapter {
         feature = feature.toLowerCase();
         if (null != keywords) {
             for (String k : keywords) {
-                if (BasicUtil.isEmpty(k)) {
+                if (com.hwtx.form.util.BasicUtil.isEmpty(k)) {
                     continue;
                 }
                 if (feature.contains(k)) {
@@ -134,7 +135,7 @@ public interface DriverAdapter {
     <T extends BaseMetadata<T>> void checkSchema(DataRuntime runtime, T meta);
 
     default <T extends BaseMetadata<T>> void checkSchema(T meta, String catalog, String schema) {
-        if (BasicUtil.isEmpty(meta.getCatalogName())) {
+        if (com.hwtx.form.util.BasicUtil.isEmpty(meta.getCatalogName())) {
             meta.setCatalog(catalog);
         }
         if (BasicUtil.isEmpty(meta.getSchemaName())) {

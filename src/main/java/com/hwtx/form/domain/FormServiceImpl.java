@@ -6,12 +6,17 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.hwtx.form.annotation.FormValidation;
+import com.hwtx.form.controller.FormHandleParam;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
+import com.hwtx.form.domain.service.FormService;
 import com.hwtx.form.persistence.FormValueEntity;
+import com.hwtx.form.util.Util;
+import io.geekidea.boot.config.properties.BootProperties;
 import io.geekidea.boot.framework.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +24,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
-public class FormService {
+public class FormServiceImpl implements FormService {
 
     public static final String INPUT_FORM_ID = "formId";
     public static final String INPUT_FORM_VALUE_ID = "id";
@@ -37,7 +41,11 @@ public class FormService {
     @Resource
     FormAppValueRepo formAppValueRepo;
     @Resource
-    FormListService service;
+    FormListService formListService;
+    @Resource
+    MetadataRepo metadataRepo;
+    @Resource
+    private BootProperties bootProperties;
 
     private final List<FormDef.CustomerValidation> customerValidations = Lists.newArrayList();
 
@@ -64,6 +72,7 @@ public class FormService {
             .recordStats()
             .build();
 
+    @Override
     public String getRawFormDef(Long formId) throws Exception {
         String formContent = formRepo.getFormRawContent(formId);
         formAppValueRepo.query();
@@ -73,6 +82,7 @@ public class FormService {
         return "";
     }
 
+    @Override
     public void saveFormData(Map<String, String> formData, String user) throws Exception {
         FormValueDto formValue = new FormValueDto();
         formValue.setForm(formData.get(INPUT_FORM_ID));
@@ -86,21 +96,26 @@ public class FormService {
         if (StringUtils.isEmpty(formData.get(INPUT_FORM_VALUE_ID))) {
             formValue.setCreateTime(new Date());
             formValue.setCreateBy(user);
-            formValueRepo.addFormValue(formValue);
+            FormDef formDef = formCache.getIfPresent(Long.parseLong(formValue.getForm()));
+            assert formDef != null;
+            formValueRepo.addFormValue(formValue, formDef);
         } else {
             formValue.setId(Long.parseLong(formData.get(INPUT_FORM_VALUE_ID)));
             formValueRepo.updateFormValue(formValue);
         }
     }
 
+    @Override
     public Map<String, String> validateForm(Long formId, Map<String, String> formValues) throws Exception {
 
         FormDef formDef = formCache.getIfPresent(formId);
         if (formDef == null) {
             formDef = formRepo.getFormDef(formId);
             if (formDef != null) {
-                formCache.put(formId, formDef);
-                formDef.init(customerValidations);
+                formInit(formDef);
+                if (bootProperties.isEnableFormDefCache()) {
+                    formCache.put(formId, formDef);
+                }
             }
         }
         if (formDef == null) {
@@ -122,9 +137,9 @@ public class FormService {
         return validationResultMap;
     }
 
+    @Override
     public String getFormData(FormValueQuery formValueQuery) throws Exception {
         FormValueEntity formValueVo = formValueRepo.getFormValue(formValueQuery);
-        service.add();
         if (formValueVo != null) {
             return formValueVo.getContent();
         }
@@ -132,6 +147,7 @@ public class FormService {
         return null;
     }
 
+    @Override
     public void removeValue(FormValueQuery formValueQuery) throws Exception {
         FormValueDto formValue = new FormValueDto();
         formValue.setLastModifyBy(formValueQuery.getUser());
@@ -142,14 +158,43 @@ public class FormService {
         formValueRepo.updateFormValue(formValue);
     }
 
-    public void handleForm(Long formId) throws Exception {
-        FormDef formDef = formRepo.getFormDef(formId);
+    @Override
+    public void handleForm(FormHandleParam formHandleParam) throws Exception {
+        FormDef formDef = formRepo.getFormDef(formHandleParam.getFormId());
         if (formDef == null) {
             return;
         }
         String formName = formDef.getName();
-        List<FormDef.Item> bodies = formDef.getItem().stream().filter(item -> StringUtils.isNotEmpty(item.getName())).collect(Collectors.toList());
-
-
+        Map<String, FormDef.Item> items = formDef.getValidateItems();
+        switch (FormHandleAction.valueOf(formHandleParam.getHandleAction())) {
+            case CREATE:
+                metadataRepo.create(formName, items.values());
+                break;
+            case ADD:
+                FormDef.Item addItem = items.get(formHandleParam.getAddItem());
+                if (addItem != null) {
+                    metadataRepo.add(formName, addItem);
+                }
+                break;
+            case UPDATE:
+                FormDef.Item updateItem = items.get(formHandleParam.getUpdateToItem());
+                if (updateItem != null) {
+                    metadataRepo.update(formName, formHandleParam.getUpdateFromItem(), updateItem);
+                }
+            case INDEX:
+                throw new UnsupportedOperationException();
+            default:
+                throw new IllegalStateException("Unexpected value: " + FormHandleAction.valueOf(formHandleParam.getHandleAction()));
+        }
     }
+
+    private void formInit(FormDef formDef) {
+        boolean ret = metadataRepo.create(formDef.getName(), formDef.getValidateItems().values());
+        if (ret) {
+            Map<String, String> columnAndType = metadataRepo.getColumnNameAndType(formDef.getName());
+            Class<?> formClass = Util.buildClass("com.hwtx.form.domain.persistence." + Util.firstCharToUpperCase(formDef.getName()), columnAndType);
+            formDef.init(customerValidations, formClass);
+        }
+    }
+
 }

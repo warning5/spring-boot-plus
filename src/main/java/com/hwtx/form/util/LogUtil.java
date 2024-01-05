@@ -1,6 +1,6 @@
 
 
-package com.hwtx.form.domain.ds;
+package com.hwtx.form.util;
 
 import com.hwtx.form.domain.ds.metadata.ClassUtil;
 

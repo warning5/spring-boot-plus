@@ -1,7 +1,7 @@
 
 package com.hwtx.form.domain.ds.entity.geometry;
 
-import com.hwtx.form.domain.ds.NumberUtil;
+import com.hwtx.form.util.NumberUtil;
 
 public class Point extends Geometry{
     private Double x;

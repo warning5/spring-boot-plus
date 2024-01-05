@@ -4,6 +4,8 @@ package com.hwtx.form.domain.ds;
 import cn.hutool.db.meta.MetaUtil;
 import cn.hutool.db.meta.TableType;
 import com.hwtx.form.domain.ds.metadata.*;
+import com.hwtx.form.util.BasicUtil;
+import com.hwtx.form.util.MD5Util;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.jetbrains.annotations.NotNull;
@@ -48,27 +50,27 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
 
     protected void init(Table table, ResultSet set, Map<String, Integer> keys) {
         try {
-            table.setType(BasicUtil.evl(string(keys, "TABLE_TYPE", set), table.getType()));
+            table.setType(com.hwtx.form.util.BasicUtil.evl(string(keys, "TABLE_TYPE", set), table.getType()));
         } catch (Exception e) {
         }
         try {
-            table.setComment(BasicUtil.evl(string(keys, "REMARKS", set), table.getComment()));
+            table.setComment(com.hwtx.form.util.BasicUtil.evl(string(keys, "REMARKS", set), table.getComment()));
         } catch (Exception e) {
         }
         try {
-            table.setTypeCat(BasicUtil.evl(string(keys, "TYPE_CAT", set), table.getTypeCat()));
+            table.setTypeCat(com.hwtx.form.util.BasicUtil.evl(string(keys, "TYPE_CAT", set), table.getTypeCat()));
         } catch (Exception e) {
         }
         try {
-            table.setTypeName(BasicUtil.evl(string(keys, "TYPE_NAME", set), table.getTypeName()));
+            table.setTypeName(com.hwtx.form.util.BasicUtil.evl(string(keys, "TYPE_NAME", set), table.getTypeName()));
         } catch (Exception e) {
         }
         try {
-            table.setSelfReferencingColumn(BasicUtil.evl(string(keys, "SELF_REFERENCING_COL_NAME", set), table.getSelfReferencingColumn()));
+            table.setSelfReferencingColumn(com.hwtx.form.util.BasicUtil.evl(string(keys, "SELF_REFERENCING_COL_NAME", set), table.getSelfReferencingColumn()));
         } catch (Exception e) {
         }
         try {
-            table.setRefGeneration(BasicUtil.evl(string(keys, "REF_GENERATION", set), table.getRefGeneration()));
+            table.setRefGeneration(com.hwtx.form.util.BasicUtil.evl(string(keys, "REF_GENERATION", set), table.getRefGeneration()));
         } catch (Exception e) {
         }
 
@@ -117,20 +119,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             while (set.next()) {
                 String name = set.getString("COLUMN_NAME");
                 if (null == name) {
-                    continue;
-                }
-                String columnCatalog = string(keys, "TABLE_CAT", set, null);
-                if (null != columnCatalog) {
-                    columnCatalog = columnCatalog.trim();
-                }
-                String columnSchema = string(keys, "TABLE_SCHEM", set, null);
-                if (null != columnSchema) {
-                    columnSchema = columnSchema.trim();
-                }
-                if (!BasicUtil.equalsIgnoreCase(catalog, columnCatalog)) {
-                    continue;
-                }
-                if (!BasicUtil.equalsIgnoreCase(schema, columnSchema)) {
                     continue;
                 }
                 Column column = new Column();
@@ -207,10 +195,10 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                     index.setName(string(keys, "INDEX_NAME", set));
                     //index.setType(integer(keys, "TYPE", set, null));
                     index.setUnique(!bool(keys, "NON_UNIQUE", set, false));
-                    String catalog = BasicUtil.evl(string(keys, "TABLE_CATALOG", set), string(keys, "TABLE_CAT", set));
-                    String schema = BasicUtil.evl(string(keys, "TABLE_SCHEMA", set), string(keys, "TABLE_SCHEM", set));
+                    String catalog = com.hwtx.form.util.BasicUtil.evl(string(keys, "TABLE_CATALOG", set), string(keys, "TABLE_CAT", set));
+                    String schema = com.hwtx.form.util.BasicUtil.evl(string(keys, "TABLE_SCHEMA", set), string(keys, "TABLE_SCHEM", set));
                     checkSchema(index, catalog, schema);
-                    if (!BasicUtil.equals(table.getCatalogName(), index.getCatalogName()) || !BasicUtil.equals(table.getSchemaName(), index.getSchemaName())) {
+                    if (!com.hwtx.form.util.BasicUtil.equals(table.getCatalogName(), index.getCatalogName()) || !com.hwtx.form.util.BasicUtil.equals(table.getSchemaName(), index.getSchemaName())) {
                         continue;
                     }
                     index.setTable(string(keys, "TABLE_NAME", set));
@@ -255,7 +243,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     public long update(DataRuntime runtime, Run run) {
         long result;
         String sql = run.getFinalUpdate();
-        if (BasicUtil.isEmpty(sql)) {
+        if (com.hwtx.form.util.BasicUtil.isEmpty(sql)) {
             log.warn("无法获取待执行sql");
             return -1;
         }
@@ -424,7 +412,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                 }
                 delimiter(builder, pk.getName());
                 String order = pk.getOrder();
-                if (BasicUtil.isNotEmpty(order)) {
+                if (com.hwtx.form.util.BasicUtil.isNotEmpty(order)) {
                     builder.append(" ").append(order);
                 }
                 first = false;
@@ -513,14 +501,14 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             // 修改列名
             String name = meta.getName();
             String uname = update.getName();
-            if (!BasicUtil.equalsIgnoreCase(name, uname) && !uname.endsWith("_TMP_UPDATE_TYPE")) {
+            if (!com.hwtx.form.util.BasicUtil.equalsIgnoreCase(name, uname) && !uname.endsWith("_TMP_UPDATE_TYPE")) {
                 runs.addAll(buildRenameRun(runtime, meta));
             }
             // 修改数据类型
             String type = type(runtime, null, meta).toString();
             String utype = type(runtime, null, update).toString();
             boolean exe = false;
-            if (!BasicUtil.equalsIgnoreCase(type, utype)) {
+            if (!com.hwtx.form.util.BasicUtil.equalsIgnoreCase(type, utype)) {
                 List<Run> list = buildChangeTypeRun(runtime, meta);
                 if (null != list) {
                     runs.addAll(list);
@@ -539,7 +527,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             // 修改默认值
             Object def = meta.getDefaultValue();
             Object udef = update.getDefaultValue();
-            if (!BasicUtil.equalsIgnoreCase(def, udef)) {
+            if (!com.hwtx.form.util.BasicUtil.equalsIgnoreCase(def, udef)) {
                 List<Run> defs = buildChangeDefaultRun(runtime, meta);
                 if (null != defs) {
                     runs.addAll(defs);
@@ -557,7 +545,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             // 修改备注
             String comment = meta.getComment();
             String ucomment = update.getComment();
-            if (!BasicUtil.equalsIgnoreCase(comment, ucomment)) {
+            if (!com.hwtx.form.util.BasicUtil.equalsIgnoreCase(comment, ucomment)) {
                 List<Run> cmts = buildChangeCommentRun(runtime, meta);
                 if (null != cmts) {
                     runs.addAll(cmts);
@@ -1261,8 +1249,8 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     @Override
     public List<Run> buildAddRun(DataRuntime runtime, Index meta) throws Exception {
         String name = meta.getName();
-        if (BasicUtil.isEmpty(name)) {
-            name = "index_" + BasicUtil.getRandomString(10);
+        if (com.hwtx.form.util.BasicUtil.isEmpty(name)) {
+            name = "index_" + com.hwtx.form.util.BasicUtil.getRandomString(10);
         }
         List<Run> runs = new ArrayList<>();
         Run run = new SimpleRun(runtime);
@@ -1289,7 +1277,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             }
             delimiter(builder, column.getName());
             String order = column.getOrder();
-            if (BasicUtil.isNotEmpty(order)) {
+            if (com.hwtx.form.util.BasicUtil.isNotEmpty(order)) {
                 builder.append(" ").append(order);
             }
             qty++;
@@ -1321,7 +1309,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             builder.append(" DROP CONSTRAINT ").append(meta.getName());
         } else {
             builder.append("DROP INDEX ").append(meta.getName());
-            if (BasicUtil.isNotEmpty(table)) {
+            if (com.hwtx.form.util.BasicUtil.isNotEmpty(table)) {
                 builder.append(" ON ");
                 name(runtime, builder, table);
             }
@@ -1348,12 +1336,12 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         String catalog = null;
         String schema = null;
         try {
-            catalog = BasicUtil.evl(rsm.getCatalogName(index));
+            catalog = com.hwtx.form.util.BasicUtil.evl(rsm.getCatalogName(index));
         } catch (Exception e) {
             log.debug("[获取MetaData失败][驱动未实现:getCatalogName]");
         }
         try {
-            schema = BasicUtil.evl(rsm.getSchemaName(index));
+            schema = com.hwtx.form.util.BasicUtil.evl(rsm.getSchemaName(index));
         } catch (Exception e) {
             log.debug("[获取MetaData失败][驱动未实现:getSchemaName]");
         }
@@ -1417,7 +1405,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             //不准确 POINT 返回 GEOMETRY
             String jdbcType = rsm.getColumnTypeName(index);
             column.setJdbcType(jdbcType);
-            if (BasicUtil.isEmpty(column.getTypeName())) {
+            if (com.hwtx.form.util.BasicUtil.isEmpty(column.getTypeName())) {
                 column.setTypeName(jdbcType);
             }
         } catch (Exception e) {
@@ -1427,115 +1415,6 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         column.setColumnType(columnType);
         return column;
     }
-
-
-    /**
-     * column[结果集封装](方法3)<br/>
-     * 有表名的情况下可用<br/>
-     * 根据jdbc.datasource.connection.DatabaseMetaData获取指定表的列数据
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param columns columns
-     * @param dbmd    DatabaseMetaData
-     * @param table   表
-     * @param pattern 列名称通配符
-     * @param <T>     Column
-     * @return LinkedHashMap
-     * @throws Exception 异常
-     */
-
-    @Override
-    public <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, boolean create, LinkedHashMap<String, T> columns, DatabaseMetaData dbmd, Table table, String pattern) throws Exception {
-        if (null == columns) {
-            columns = new LinkedHashMap<>();
-        }
-        Catalog catalog = table.getCatalog();
-        Schema schema = table.getSchema();
-        if (BasicUtil.isEmpty(table.getName())) {
-            return columns;
-        }
-        String catalogName = null;
-        String schemaName = null;
-        if (null != catalog) {
-            catalogName = catalog.getName();
-        }
-        if (null != schema) {
-            schemaName = schema.getName();
-        }
-        String[] tmp = checkSchema(catalogName, schemaName);
-        ResultSet set = dbmd.getColumns(tmp[0], tmp[1], table.getName(), pattern);
-        Map<String, Integer> keys = keys(set);
-        while (set.next()) {
-            String name = set.getString("COLUMN_NAME");
-            if (null == name) {
-                continue;
-            }
-            String columnCatalog = string(keys, "TABLE_CAT", set, null);
-            if (null != columnCatalog) {
-                columnCatalog = columnCatalog.trim();
-            }
-            String columnSchema = string(keys, "TABLE_SCHEM", set, null);
-            if (null != columnSchema) {
-                columnSchema = columnSchema.trim();
-            }
-
-
-            T column = columns.get(name.toUpperCase());
-            if (null == column) {
-                if (create) {
-                    column = (T) new Column(name);
-                    columns.put(name.toUpperCase(), column);
-                } else {
-                    continue;
-                }
-            }
-
-            checkSchema(column, columnCatalog, columnSchema);
-            if (!BasicUtil.equalsIgnoreCase(catalog, column.getCatalogName())) {
-                continue;
-            }
-            if (!BasicUtil.equalsIgnoreCase(schema, column.getSchemaName())) {
-                continue;
-            }
-
-
-            String remark = string(keys, "REMARKS", set, column.getComment());
-            column.setComment(remark);
-            column.setTable(BasicUtil.evl(string(keys, "TABLE_NAME", set, table.getName()), column.getTableName(true)));
-            column.setType(integer(keys, "DATA_TYPE", set, column.getType()));
-            column.setType(integer(keys, "SQL_DATA_TYPE", set, column.getType()));
-            String jdbcType = string(keys, "TYPE_NAME", set, column.getTypeName());
-            if (BasicUtil.isEmpty(column.getTypeName())) {
-                //数据库中 有jdbc是支持的类型 如果数据库中有了就不用jdbc的了
-                column.setTypeName(jdbcType);
-            }
-            column.setJdbcType(jdbcType);
-            column.setPrecision(integer(keys, "COLUMN_SIZE", set, column.getPrecision()));
-            column.setScale(integer(keys, "DECIMAL_DIGITS", set, column.getScale()));
-            column.nullable(bool(keys, "NULLABLE", set, column.isNullable()));
-            column.setDefaultValue(value(keys, "COLUMN_DEF", set, column.getDefaultValue()));
-            column.setPosition(integer(keys, "ORDINAL_POSITION", set, column.getPosition()));
-            column.autoIncrement(bool(keys, "IS_AUTOINCREMENT", set, column.isAutoIncrement()));
-            ColumnType columnType = type(column.getTypeName());
-            column.setColumnType(columnType);
-            column(runtime, column, set);
-            column.setName(name);
-        }
-
-        // 主键
-        ResultSet rs = dbmd.getPrimaryKeys(tmp[0], tmp[1], table.getName());
-        while (rs.next()) {
-            String name = rs.getString(4);
-            Column column = columns.get(name.toUpperCase());
-            if (null == column) {
-                continue;
-            }
-            column.primary(true);
-        }
-        return columns;
-    }
-
 
     /**
      * column[结果集封装-子流程](方法3)<br/>
@@ -1557,15 +1436,15 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                 column.setName(string(keys, "COLUMN_NAME", rs));
             }
             if (null == column.getType()) {
-                column.setType(BasicUtil.parseInt(string(keys, "DATA_TYPE", rs), null));
+                column.setType(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "DATA_TYPE", rs), null));
             }
             if (null == column.getType()) {
-                column.setType(BasicUtil.parseInt(string(keys, "SQL_DATA_TYPE", rs), null));
+                column.setType(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "SQL_DATA_TYPE", rs), null));
             }
             if (null == column.getTypeName()) {
                 String jdbcType = string(keys, "TYPE_NAME", rs);
                 column.setJdbcType(jdbcType);
-                if (BasicUtil.isEmpty(column.getTypeName())) {
+                if (com.hwtx.form.util.BasicUtil.isEmpty(column.getTypeName())) {
                     column.setTypeName(jdbcType);
                 }
             }
@@ -1573,24 +1452,24 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                 column.setPrecision(integer(keys, "COLUMN_SIZE", rs, null));
             }
             if (null == column.getScale()) {
-                column.setScale(BasicUtil.parseInt(string(keys, "DECIMAL_DIGITS", rs), null));
+                column.setScale(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "DECIMAL_DIGITS", rs), null));
             }
             if (null == column.getPosition()) {
-                column.setPosition(BasicUtil.parseInt(string(keys, "ORDINAL_POSITION", rs), 0));
+                column.setPosition(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "ORDINAL_POSITION", rs), 0));
             }
             if (-1 == column.isAutoIncrement()) {
-                column.autoIncrement(BasicUtil.parseBoolean(string(keys, "IS_AUTOINCREMENT", rs), false));
+                column.autoIncrement(com.hwtx.form.util.BasicUtil.parseBoolean(string(keys, "IS_AUTOINCREMENT", rs), false));
             }
             if (-1 == column.isGenerated()) {
-                column.generated(BasicUtil.parseBoolean(string(keys, "IS_GENERATEDCOLUMN", rs), false));
+                column.generated(com.hwtx.form.util.BasicUtil.parseBoolean(string(keys, "IS_GENERATEDCOLUMN", rs), false));
             }
             if (null == column.getComment()) {
                 column.setComment(string(keys, "REMARKS", rs));
             }
             if (null == column.getPosition()) {
-                column.setPosition(BasicUtil.parseInt(string(keys, "ORDINAL_POSITION", rs), 0));
+                column.setPosition(com.hwtx.form.util.BasicUtil.parseInt(string(keys, "ORDINAL_POSITION", rs), 0));
             }
-            if (BasicUtil.isEmpty(column.getDefaultValue())) {
+            if (com.hwtx.form.util.BasicUtil.isEmpty(column.getDefaultValue())) {
                 column.setDefaultValue(string(keys, "COLUMN_DEF", rs));
             }
             ColumnType columnType = type(column.getTypeName());
@@ -1622,14 +1501,14 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
         SqlRowSetMetaData rsm = set.getMetaData();
         for (int i = 1; i <= rsm.getColumnCount(); i++) {
             String name = rsm.getColumnName(i);
-            if (BasicUtil.isEmpty(name)) {
+            if (com.hwtx.form.util.BasicUtil.isEmpty(name)) {
                 continue;
             }
             T column = columns.get(name.toUpperCase());
             if (null == column) {
                 if (create) {
                     column = (T) column(runtime, column, rsm, i);
-                    if (BasicUtil.isEmpty(column.getName())) {
+                    if (com.hwtx.form.util.BasicUtil.isEmpty(column.getName())) {
                         column.setName(name);
                     }
                     columns.put(column.getName().toUpperCase(), column);
@@ -1658,12 +1537,12 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             String catalog = null;
             String schema = null;
             try {
-                catalog = BasicUtil.evl(rsm.getCatalogName(index));
+                catalog = com.hwtx.form.util.BasicUtil.evl(rsm.getCatalogName(index));
             } catch (Exception e) {
                 log.debug("[获取MetaData失败][驱动未实现:getCatalogName]");
             }
             try {
-                schema = BasicUtil.evl(rsm.getSchemaName(index));
+                schema = com.hwtx.form.util.BasicUtil.evl(rsm.getSchemaName(index));
             } catch (Exception e) {
                 log.debug("[获取MetaData失败][驱动未实现:getSchemaName]");
             }
@@ -1722,7 +1601,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
             try {
                 String jdbcType = rsm.getColumnTypeName(index);
                 column.setJdbcType(jdbcType);
-                if (BasicUtil.isEmpty(column.getTypeName())) {
+                if (com.hwtx.form.util.BasicUtil.isEmpty(column.getTypeName())) {
                     column.setTypeName(jdbcType);
                 }
             } catch (Exception e) {
@@ -1791,7 +1670,7 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
     public <T extends Column> T column(Catalog catalog, Schema schema, String table, String name, List<T> columns) {
         for (T column : columns) {
             if (null != table && null != name) {
-                String identity = BasicUtil.nvl(catalog, "") + "_" + BasicUtil.nvl(schema, "") + "_" + BasicUtil.nvl(table, "") + "_" + name;
+                String identity = com.hwtx.form.util.BasicUtil.nvl(catalog, "") + "_" + com.hwtx.form.util.BasicUtil.nvl(schema, "") + "_" + BasicUtil.nvl(table, "") + "_" + name;
                 identity = MD5Util.crypto(identity.toUpperCase());
                 if (identity.equals(column.getIdentity())) {
                     return column;

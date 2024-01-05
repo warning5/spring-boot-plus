@@ -5,7 +5,6 @@ import com.hwtx.form.domain.ds.metadata.Table;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.LinkedHashMap;
@@ -24,24 +23,6 @@ public interface JDBCAdapter extends DriverAdapter {
      * @return Column
      */
     Column column(DataRuntime runtime, Column column, ResultSetMetaData rsm, int index);
-
-    /**
-     * column[结果集封装](方法3)<br/>
-     * 有表名的情况下可用<br/>
-     * 根据jdbc.datasource.connection.DatabaseMetaData获取指定表的列数据
-     *
-     * @param runtime 运行环境主要包含驱动适配器 数据源或客户端
-     * @param create  上一步没有查到的,这一步是否需要新创建
-     * @param columns columns
-     * @param dbmd    DatabaseMetaData
-     * @param table   表
-     * @param pattern 列名称通配符
-     * @param <T>     Column
-     * @return LinkedHashMap
-     * @throws Exception 异常
-     */
-    <T extends Column> LinkedHashMap<String, T> columns(DataRuntime runtime, boolean create, LinkedHashMap<String, T> columns, DatabaseMetaData dbmd, Table table, String pattern) throws Exception;
-
 
     /**
      * column[结果集封装-子流程](方法3)<br/>

@@ -1,6 +1,7 @@
 package com.hwtx.form.domain;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.persistence.FormValueEntity;
@@ -21,7 +22,7 @@ public interface FormValueRepo extends IService<FormValueEntity> {
      * @return
      * @throws Exception
      */
-    boolean addFormValue(FormValueDto dto) throws Exception;
+    boolean addFormValue(FormValueDto dto, FormDef formDef) throws Exception;
 
     /**
      * 修改表单值

@@ -3,9 +3,8 @@ package com.hwtx.form.domain.def;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.hwtx.form.Util;
 import com.hwtx.form.domain.FormValidate;
-import lombok.AllArgsConstructor;
+import com.hwtx.form.util.Util;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -18,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -31,13 +32,14 @@ public class FormDef {
     private boolean wrapWithPanel;
     private String name;
     private String api;
-    private List<Item> item;
+    private List<Item> body;
+    private Class<?> formClass;
 
     Map<String, List<ValidateAction>> fieldValidationAction = Maps.newHashMap();
     Map<String, List<FormValidate>> customerFormValidations = Maps.newHashMap();
     static final String validatePrefix = "validate.";
     static final String validateActionSuffix = "Predicate";
-    static final String predicateClassPrefix = FormDef.class.getName() + "$";
+    static final String predicateClassPrefix = FormValidation.class.getName() + "$";
 
     @Getter
     @Builder
@@ -66,44 +68,9 @@ public class FormDef {
         String msg;
     }
 
-    static class RequiredPredicate implements Predicate<String> {
-
-        boolean required = false;
-
-        @Override
-        public boolean test(String s) {
-            return !required || StringUtils.isNotEmpty(s);
-        }
-    }
-
-    @AllArgsConstructor
-    static class IsAlphaPredicate implements Predicate<String> {
-        Boolean isAlpha;
-
-        @Override
-        public boolean test(String s) {
-            return !isAlpha || StringUtils.isAlpha(s);
-        }
-    }
-
-    @AllArgsConstructor
-    static class MaxLengthPredicate implements Predicate<String> {
-        Integer maxLength;
-
-        @Override
-        public boolean test(String s) {
-            return !StringUtils.isNotEmpty(s) || s.length() <= maxLength;
-        }
-    }
-
-    @AllArgsConstructor
-    static class MinLengthPredicate implements Predicate<String> {
-        Integer minLength;
-
-        @Override
-        public boolean test(String s) {
-            return !StringUtils.isNotEmpty(s) || s.length() >= minLength;
-        }
+    public Map<String, Item> getValidateItems() {
+        return body.stream().filter(item -> StringUtils.isNotEmpty(item.getName()))
+                .collect(Collectors.toMap(FormDef.Item::getName, Function.identity()));
     }
 
     @Data
@@ -135,18 +102,18 @@ public class FormDef {
     }
 
     public static void main(String[] args) throws Exception {
-        Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(IsAlphaPredicate.class.getName());
+        Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(FormValidation.IsAlphaPredicate.class.getName());
         Constructor<?> constructor = clazz.getDeclaredConstructor(Boolean.class);
         Object predicateObject = constructor.newInstance(true);
         System.out.println(predicateObject);
     }
 
-    public void init(List<FormDef.CustomerValidation> customerValidations) {
-        if (item != null) {
+    public void init(List<FormDef.CustomerValidation> customerValidations, Class<?> formClass) {
+        if (body != null) {
             Properties properties = new Properties();
             try {
                 properties.load(getClass().getClassLoader().getResourceAsStream("formValidate.properties"));
-                for (Item itemItem : item) {
+                for (Item itemItem : body) {
                     if (itemItem.getValidationsDef() != null) {
                         List<ValidateAction> actions = Lists.newArrayList();
                         for (Field declaredField : ValidationsDef.class.getDeclaredFields()) {
@@ -173,7 +140,7 @@ public class FormDef {
                             actions = Lists.newArrayList();
                         }
                         String msg = (String) properties.get(validatePrefix + "isRequired");
-                        actions.add(0, ValidateAction.builder().msg(msg).predicate(new RequiredPredicate()).build());
+                        actions.add(0, ValidateAction.builder().msg(msg).predicate(new FormValidation.RequiredPredicate()).build());
                     }
                 }
             } catch (Exception e) {
@@ -199,6 +166,7 @@ public class FormDef {
                 }
             });
         }
+        this.formClass = formClass;
     }
 
     public ValidationResult validateForm(String name, String value) {

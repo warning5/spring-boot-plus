@@ -3,6 +3,9 @@ package com.hwtx.form.domain.ds;
 
 import com.google.common.collect.Maps;
 import com.hwtx.form.domain.ds.metadata.*;
+import com.hwtx.form.util.BasicUtil;
+import com.hwtx.form.util.LogUtil;
+import com.hwtx.form.util.SQLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -48,7 +51,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
     }
 
     public void setDelimiter(String delimiter) {
-        if (BasicUtil.isNotEmpty(delimiter)) {
+        if (com.hwtx.form.util.BasicUtil.isNotEmpty(delimiter)) {
             delimiter = delimiter.replaceAll("\\s", "");
             if (delimiter.length() == 1) {
                 this.delimiterFr = delimiter;
@@ -318,7 +321,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         //修改表备注
         String comment = update.getComment();
         if (!comment.equals(meta.getComment())) {
-            if (BasicUtil.isNotEmpty(meta.getComment())) {
+            if (com.hwtx.form.util.BasicUtil.isNotEmpty(meta.getComment())) {
                 runs.addAll(buildChangeCommentRun(runtime, update));
             } else {
                 runs.addAll(buildAppendCommentRun(runtime, update));
@@ -1433,10 +1436,10 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         Catalog catalog = meta.getCatalog();
         Schema schema = meta.getSchema();
         String name = meta.getName();
-        if (BasicUtil.isNotEmpty(catalog)) {
+        if (com.hwtx.form.util.BasicUtil.isNotEmpty(catalog)) {
             delimiter(builder, catalog).append(".");
         }
-        if (BasicUtil.isNotEmpty(schema)) {
+        if (com.hwtx.form.util.BasicUtil.isNotEmpty(schema)) {
             delimiter(builder, schema).append(".");
         }
         delimiter(builder, name);
@@ -1520,7 +1523,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
     protected Integer integer(Map<String, Integer> keys, String key, ResultSet set, Integer def) throws Exception {
         Object value = value(keys, key, set);
         if (null != value) {
-            return BasicUtil.parseInt(value, def);
+            return com.hwtx.form.util.BasicUtil.parseInt(value, def);
         }
         return null;
     }
@@ -1528,7 +1531,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
     protected Boolean bool(Map<String, Integer> keys, String key, ResultSet set, Boolean def) throws Exception {
         Object value = value(keys, key, set);
         if (null != value) {
-            return BasicUtil.parseBoolean(value, def);
+            return com.hwtx.form.util.BasicUtil.parseBoolean(value, def);
         }
         return null;
     }
@@ -1634,7 +1637,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
         }
         //根据值类型
         if (!placeholder) {
-            if (BasicUtil.isNumber(value)) {
+            if (com.hwtx.form.util.BasicUtil.isNumber(value)) {
                 result = value;
             } else {
                 result = "'" + value + "'";
@@ -1655,13 +1658,13 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
 
 
     protected String random(DataRuntime runtime) {
-        return "[SQL:" + System.currentTimeMillis() + "-" + BasicUtil.getRandomNumberString(8) + "][thread:" + Thread.currentThread().getId() + "][ds:" + runtime.datasource() + "]";
+        return "[SQL:" + System.currentTimeMillis() + "-" + com.hwtx.form.util.BasicUtil.getRandomNumberString(8) + "][thread:" + Thread.currentThread().getId() + "][ds:" + runtime.datasource() + "]";
     }
 
     //A.ID,A.COOE,A.NAME
     protected String concat(String prefix, String split, List<String> columns) {
         StringBuilder builder = new StringBuilder();
-        if (BasicUtil.isEmpty(prefix)) {
+        if (com.hwtx.form.util.BasicUtil.isEmpty(prefix)) {
             prefix = "";
         } else {
             if (!prefix.endsWith(".")) {
@@ -1683,14 +1686,14 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
     //master.column = data.column
     protected String concatEqual(String master, String data, String split, List<String> columns) {
         StringBuilder builder = new StringBuilder();
-        if (BasicUtil.isEmpty(master)) {
+        if (com.hwtx.form.util.BasicUtil.isEmpty(master)) {
             master = "";
         } else {
             if (!master.endsWith(".")) {
                 master += ".";
             }
         }
-        if (BasicUtil.isEmpty(data)) {
+        if (com.hwtx.form.util.BasicUtil.isEmpty(data)) {
             data = "";
         } else {
             if (!data.endsWith(".")) {
@@ -1716,7 +1719,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
     public StringBuilder delimiter(StringBuilder builder, BaseMetadata<?> src) {
         if (null != src) {
             String name = src.getName();
-            if (BasicUtil.isNotEmpty(name)) {
+            if (com.hwtx.form.util.BasicUtil.isNotEmpty(name)) {
                 SQLUtil.delimiter(builder, name, getDelimiterFr(), getDelimiterTo());
             }
         }
@@ -1726,7 +1729,7 @@ public abstract class DefaultDriverAdapter implements DriverAdapter {
     protected <T extends BaseMetadata<?>> void fillSchema(T source, T target) {
         Catalog catalog = source.getCatalog();
         Schema schema = source.getSchema();
-        if (BasicUtil.isNotEmpty(catalog)) {
+        if (com.hwtx.form.util.BasicUtil.isNotEmpty(catalog)) {
             target.setCatalog(catalog);
         }
         if (BasicUtil.isNotEmpty(schema)) {

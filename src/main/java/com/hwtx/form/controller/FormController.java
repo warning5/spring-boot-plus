@@ -1,7 +1,8 @@
-package com.hwtx.form;
+package com.hwtx.form.controller;
 
-import com.hwtx.form.domain.FormService;
+import com.hwtx.form.domain.FormServiceImpl;
 import com.hwtx.form.domain.query.FormValueQuery;
+import com.hwtx.form.domain.service.FormService;
 import io.geekidea.boot.framework.response.Api2Result;
 import io.geekidea.boot.framework.response.ApiCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,13 +23,16 @@ public class FormController {
     @Resource
     private FormService formService;
 
-    @GetMapping("/gen/{formId}")
+    @GetMapping("/handle/")
     @Operation(summary = "处理表单变化")
-    public Api2Result gen(@PathVariable Long formId) throws Exception {
-        if (formId == null) {
+    public Api2Result gen(@RequestBody FormHandleParam formHandleParam) throws Exception {
+        if (formHandleParam.getFormId() == null) {
             return Api2Result.fail(ApiCode.FAIL, "表单ID不能为空");
         }
-        formService.handleForm(formId);
+        if (formHandleParam.getHandleAction() == null) {
+            return Api2Result.fail(ApiCode.FAIL, "表单处理动作不可为空");
+        }
+        formService.handleForm(formHandleParam);
         return Api2Result.result(ApiCode.SUCCESS, "处理成功", "");
     }
 
@@ -42,7 +46,7 @@ public class FormController {
     @PostMapping("/save")
     @Operation(summary = "获取表单定义")
     public Api2Result save(@RequestBody Map<String, String> content) throws Exception {
-        String formId = content.get(FormService.INPUT_FORM_ID);
+        String formId = content.get(FormServiceImpl.INPUT_FORM_ID);
         if (StringUtils.isEmpty(formId)) {
             return Api2Result.fail(ApiCode.FAIL, "表单ID不能为空");
         }

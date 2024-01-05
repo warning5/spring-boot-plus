@@ -1,15 +1,18 @@
 
-package com.hwtx.form.domain.ds;
+package com.hwtx.form.util;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
+@Slf4j
 public class NumberUtil {
     /*
      * HEX ：十六进制 Hexadecimal
@@ -33,7 +36,7 @@ public class NumberUtil {
         try {
             num = new BigDecimal(src);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("数据格式化异常", e);
             return "";
         }
         return format(num, pattern);
@@ -280,7 +283,7 @@ public class NumberUtil {
     }
 
     public static List<Integer> random(int fr, int to, int qty) {
-        List<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         Random r = new Random();
         while (true) {
             int rdm = fr + r.nextInt(to - fr);
@@ -296,7 +299,7 @@ public class NumberUtil {
     }
 
     public static List<Double> random(double fr, double to, int qty) {
-        List<Double> list = new ArrayList<Double>();
+        List<Double> list = new ArrayList<>();
         Random r = new Random();
         while (true) {
             double rdm = fr + r.nextDouble() * (to - fr);
@@ -312,7 +315,7 @@ public class NumberUtil {
     }
 
     public static List<Float> random(float fr, float to, int qty) {
-        List<Float> list = new ArrayList<Float>();
+        List<Float> list = new ArrayList<>();
         Random r = new Random();
         while (true) {
             float rdm = fr + r.nextFloat() * (to - fr);
@@ -328,7 +331,7 @@ public class NumberUtil {
     }
 
     public static List<Long> random(long fr, long to, int qty) {
-        List<Long> list = new ArrayList<Long>();
+        List<Long> list = new ArrayList<>();
         Random r = new Random();
         while (true) {
             long rdm = fr + r.nextLong() * (to - fr);
@@ -392,18 +395,6 @@ public class NumberUtil {
                 bytes[i] = (byte) (0xff & (in >> (idx++ * 8)));
             }
         }
-		/*
-		if(big){
-			bytes[3] = (byte) (0xff & (i >> 0));
-			bytes[2] = (byte) (0xff & (i >> 8));
-			bytes[1] = (byte) (0xff & (i >> 16));
-			bytes[0] = (byte) (0xff & (i >> 24));
-		}else {
-			bytes[0] = (byte) (0xff & (i >> 0));
-			bytes[1] = (byte) (0xff & (i >> 8));
-			bytes[2] = (byte) (0xff & (i >> 16));
-			bytes[3] = (byte) (0xff & (i >> 24));
-		}*/
         return bytes;
     }
 
@@ -601,15 +592,15 @@ public class NumberUtil {
     }
 
     public static String byte2string(byte[] bytes, int start, int len) {
-        return byte2string(bytes, start, len, Charset.forName("UTF-8"));
+        return byte2string(bytes, start, len, StandardCharsets.UTF_8);
     }
 
     public static String byte2string(byte[] bytes) {
-        return byte2string(bytes, 0, bytes.length, Charset.forName("UTF-8"));
+        return byte2string(bytes, 0, bytes.length, StandardCharsets.UTF_8);
     }
 
     public static String byte2string(byte[] bytes, int start) {
-        return byte2string(bytes, start, bytes.length - start, Charset.forName("UTF-8"));
+        return byte2string(bytes, start, bytes.length - start, StandardCharsets.UTF_8);
     }
 
     public static String byte2string(byte[] bytes, Charset charset) {
@@ -648,7 +639,7 @@ public class NumberUtil {
             temp /= 10;
         }
         int len = digits % 2 == 0 ? digits / 2 : (digits + 1) / 2;
-        byte bcd[] = new byte[len];
+        byte[] bcd = new byte[len];
         for (int i = 0; i < digits; i++) {
             byte tmp = (byte) (num % 10);
             if (i % 2 == 0) {
@@ -673,8 +664,7 @@ public class NumberUtil {
      * @return String
      */
     public static String byte2bin(byte b) {
-        String value = Integer.toBinaryString((b & 0xFF) + 0x100).substring(1);
-        return value;
+        return Integer.toBinaryString((b & 0xFF) + 0x100).substring(1);
     }
 
     public static int byte2decimal(byte res) {
@@ -708,8 +698,8 @@ public class NumberUtil {
 
     public static String bytes2bcd(byte[] bytes) {
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < bytes.length; i++) {
-            sb.append(byte2bcd(bytes[i]));
+        for (byte aByte : bytes) {
+            sb.append(byte2bcd(aByte));
         }
         return sb.toString();
     }
@@ -724,8 +714,7 @@ public class NumberUtil {
 
     public static String string2hex(String origin, String charset) {
         byte[] bytes = origin.getBytes(Charset.forName(charset));
-        String hex = byte2hex(bytes);
-        return hex;
+        return byte2hex(bytes);
     }
 
     public static String string2hex(String origin) {
@@ -770,7 +759,7 @@ public class NumberUtil {
     }
 
     public static byte[] string2bytes(String src) {
-        return src.getBytes(Charset.forName("UTF-8"));
+        return src.getBytes(StandardCharsets.UTF_8);
     }
 
     /**
@@ -786,25 +775,6 @@ public class NumberUtil {
             char c = str.charAt(i);
             String b = Integer.toHexString(c);
             result = result + b;
-        }
-        return result;
-    }
-
-    /**
-     * ASCII码字符串转数字字符串
-     *
-     * @param content ASCII字符串
-     * @return 字符串
-     */
-    public static String ascii2string(String content) {
-        String result = "";
-        int length = content.length() / 2;
-        for (int i = 0; i < length; i++) {
-            String c = content.substring(i * 2, i * 2 + 2);
-            int a = hex2dec(c);
-            char b = (char) a;
-            String d = String.valueOf(b);
-            result += d;
         }
         return result;
     }
@@ -1133,7 +1103,7 @@ public class NumberUtil {
     public static BigDecimal stdev(List<BigDecimal> list, int scale, int round) {
         BigDecimal var = var(list, scale, round);
         if (null != var) {
-            return new BigDecimal(Math.sqrt(var.doubleValue())).setScale(scale, round);
+            return BigDecimal.valueOf(Math.sqrt(var.doubleValue())).setScale(scale, round);
         }
         return null;
     }
@@ -1141,7 +1111,7 @@ public class NumberUtil {
     public static BigDecimal stdeva(List<BigDecimal> list, int scale, int round) {
         BigDecimal var = vara(list, scale, round);
         if (null != var) {
-            return new BigDecimal(Math.sqrt(var.doubleValue())).setScale(scale, round);
+            return BigDecimal.valueOf(Math.sqrt(var.doubleValue())).setScale(scale, round);
         }
         return null;
     }
@@ -1169,7 +1139,7 @@ public class NumberUtil {
     public static BigDecimal stdevp(List<BigDecimal> list, int scale, int round) {
         BigDecimal var = varp(list, scale, round);
         if (null != var) {
-            return new BigDecimal(Math.sqrt(var.doubleValue())).setScale(scale, round);
+            return BigDecimal.valueOf(Math.sqrt(var.doubleValue())).setScale(scale, round);
         }
         return null;
     }
@@ -1177,7 +1147,7 @@ public class NumberUtil {
     public static BigDecimal stdevpa(List<BigDecimal> list, int scale, int round) {
         BigDecimal var = varpa(list, scale, round);
         if (null != var) {
-            return new BigDecimal(Math.sqrt(var.doubleValue())).setScale(scale, round);
+            return BigDecimal.valueOf(Math.sqrt(var.doubleValue())).setScale(scale, round);
         }
         return null;
     }

@@ -1,4 +1,6 @@
-package com.hwtx.form.domain.ds;
+package com.hwtx.form.util;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.net.Inet4Address;
@@ -8,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 public class BasicUtil {
 
     public static final String SINGLE_CHAR = "abcdefghijklmnopqrstuvwxyz0123456789, .?'_-=+!@#$%^&*() ";
@@ -88,7 +91,7 @@ public class BasicUtil {
                 return true;
             }
             tmp = tmp.trim();
-            if (!tmp.equals("") && !tmp.equals("null")) {
+            if (!tmp.isEmpty() && !tmp.equals("null")) {
                 return false;
             }
         }
@@ -315,43 +318,8 @@ public class BasicUtil {
         return getRandomString(length, new StringBuffer("012356789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"));
     }
 
-    public static String getRandomLowerString(int length) {
-        return getRandomString(length, new StringBuffer("abcdefghijklmnopqrstuvwxyz"));
-    }
-
-    public static String getRandomUpperString(int length) {
-        return getRandomString(length, new StringBuffer("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-    }
-
     public static String getRandomNumberString(int length) {
         return getRandomString(length, new StringBuffer("123567890"));
-    }
-
-    /**
-     * 随机中文字符(GBK)
-     *
-     * @param length length
-     * @return String
-     */
-    public static String getRandomCnString(int length) {
-        String result = "";
-        for (int i = 0; i < length; i++) {
-            String str = null;
-            int hPos, lPos; // 定义高低位
-            Random random = new Random();
-            hPos = (176 + Math.abs(random.nextInt(39))); // 获取高位值
-            lPos = (161 + Math.abs(random.nextInt(93))); // 获取低位值
-            byte[] b = new byte[2];
-            b[0] = (Integer.valueOf(hPos).byteValue());
-            b[1] = (Integer.valueOf(lPos).byteValue());
-            try {
-                str = new String(b, "GBk"); // 转成中文
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            result += str;
-        }
-        return result;
     }
 
     /**
@@ -389,35 +357,8 @@ public class BasicUtil {
             Double.parseDouble(str);
             result = true;
         } catch (Exception e) {
-            result = false;
         }
         return result;
-    }
-
-    public static boolean isBoolean(Object obj) {
-        boolean result = false;
-        if (null == obj) {
-            return result;
-        }
-        if (obj instanceof Boolean) {
-            return true;
-        }
-        if (obj.toString().equalsIgnoreCase("true") || obj.toString().equalsIgnoreCase("false")) {
-            return true;
-        }
-        return result;
-    }
-
-    public static Byte parseByte(Object value, Byte def) {
-        try {
-            return Byte.parseByte(value.toString());
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    public static Byte parseByte(Object value) throws Exception {
-        return Byte.parseByte(value.toString());
     }
 
     public static Short parseShort(Object value, Short def) {
@@ -617,46 +558,6 @@ public class BasicUtil {
     }
 
     /**
-     * 压缩空白 将多个空白压缩成一个空格
-     *
-     * @param str str
-     * @return String
-     */
-    public static String compress(String str) {
-        if (null != str) {
-            str = str.replaceAll("\\s{2,}", " ").trim();
-        }
-        return str;
-    }
-
-    public static String[] compress(String[] strs) {
-        if (null != strs) {
-            int size = strs.length;
-            for (int i = 0; i < size; i++) {
-                strs[i] = compress(strs[i]);
-            }
-        }
-        return strs;
-    }
-
-    public static List<String> compress(List<String> strs) {
-        List<String> result = new ArrayList<>();
-        if (null != strs) {
-            for (String str : strs) {
-                result.add(compress(str));
-            }
-        }
-        return strs;
-    }
-
-    public static String compressXml(String xml) {
-        xml = compress(xml);
-        xml = xml.replaceAll("<\\!--[\\s\\S]*-->", "");
-        xml = xml.replaceAll("\\s{1,}<", "<");
-        return xml;
-    }
-
-    /**
      * 填充字符(从左侧填充)
      *
      * @param src 原文
@@ -665,7 +566,7 @@ public class BasicUtil {
      * @return String
      */
     public static String fillLChar(String src, String chr, int len) {
-        if (null != src && null != chr && chr.length() > 0) {
+        if (null != src && null != chr && !chr.isEmpty()) {
             while (src.length() < len) {
                 src = chr + src;
             }
@@ -674,7 +575,7 @@ public class BasicUtil {
     }
 
     public static String fillRChar(String src, String chr, int len) {
-        if (null != src && null != chr && chr.length() > 0) {
+        if (null != src && null != chr && !chr.isEmpty()) {
             while (src.length() < len) {
                 src = src + chr;
             }
@@ -688,23 +589,6 @@ public class BasicUtil {
 
     public static String fillChar(String src, int len) {
         return fillChar(src, "0", len);
-    }
-
-
-    public static String fillLChar(int src, String chr, int len) {
-        return fillLChar(src + "", chr, len);
-    }
-
-    public static String fillRChar(int src, String chr, int len) {
-        return fillRChar(src + "", chr, len);
-    }
-
-    public static String fillChar(int src, String chr, int len) {
-        return fillChar(src + "", chr, len);
-    }
-
-    public static String fillChar(int src, int len) {
-        return fillChar(src + "", len);
     }
 
 
@@ -859,7 +743,7 @@ public class BasicUtil {
      */
     @SuppressWarnings("rawtypes")
     public static List<InetAddress> localInetAddress() {
-        List<InetAddress> ips = new ArrayList<InetAddress>();
+        List<InetAddress> ips = new ArrayList<>();
         try {
             Enumeration allNetInterfaces = NetworkInterface.getNetworkInterfaces();
             InetAddress ip = null;
@@ -868,13 +752,13 @@ public class BasicUtil {
                 Enumeration addresses = netInterface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     ip = (InetAddress) addresses.nextElement();
-                    if (ip != null && ip instanceof Inet4Address) {
+                    if (ip instanceof Inet4Address) {
                         ips.add(ip);
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("", e);
         }
         return ips;
     }
@@ -914,40 +798,9 @@ public class BasicUtil {
             if (null == o) {
                 continue;
             }
+            assert obj != null;
             if (obj.equals(o)) {
                 return true;
-            }
-        }
-        return false;
-    }
-
-    public static <T> boolean containsString(boolean ignoreNull, boolean ignoreCase, Collection<T> objs, String obj) {
-        if (null == objs) {
-            return false;
-        }
-        int idx = 0;
-        for (T o : objs) {
-            if (ignoreNull) {
-                if (null == obj || null == o) {
-                    continue;
-                }
-            } else {
-                if (null == obj && null == o) {
-                    return true;
-                }
-            }
-            if (null != obj) {
-                if (null == o) {
-                    continue;
-                }
-                String val = o.toString();
-                if (ignoreCase) {
-                    obj = obj.toLowerCase();
-                    val = val.toLowerCase();
-                }
-                if (obj.equals(val)) {
-                    return true;
-                }
             }
         }
         return false;
@@ -984,10 +837,6 @@ public class BasicUtil {
             }
         }
         return -1;
-    }
-
-    public static boolean containsString(Collection<Object> objs, String obj) {
-        return containsString(false, false, objs, obj);
     }
 
     public static int index(Collection<Object> objs, String obj) {
@@ -1032,10 +881,6 @@ public class BasicUtil {
             }
         }
         return builder.toString();
-    }
-
-    public static String omit(String src, int left, int right) {
-        return omit(src, left, right, "*");
     }
 
     public static String omit(String src, int left, int right, String ellipsis) {

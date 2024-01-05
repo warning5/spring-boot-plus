@@ -1,5 +1,6 @@
 package com.hwtx.form.domain;
 
+import com.google.common.collect.Maps;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.def.FormItemType;
 import com.hwtx.form.domain.ds.DatasourceDao;
@@ -12,7 +13,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -23,11 +26,11 @@ public class MetadataRepo {
     @Resource
     private DatasourceDao datasourceDao;
 
-    public boolean create(String formName, List<FormDef.Item> itemItems) {
+    public boolean create(String formName, Collection<FormDef.Item> itemItems) {
         Table table = new Table(formName);
         if (datasourceDao.exists(table)) {
             log.info("数据表【{}】已存在无需创建", formName);
-            return false;
+            return true;
         }
         table.addColumn("id", StandardColumnType.BIGINT.getName()).primary(true).autoIncrement(true).setComment("主键").setNullable(false);
         buildItemColumn(itemItems).forEach(table::addColumn);
@@ -79,28 +82,66 @@ public class MetadataRepo {
         }
     }
 
-    private List<Column> buildItemColumn(List<FormDef.Item> itemItems) {
+    public Map<String, String> getColumnNameAndType(String formName) {
+        Table table = new Table(formName);
+        if (!datasourceDao.exists(table)) {
+            log.error("数据表【{}】不存在", formName);
+            return Maps.newHashMap();
+        }
+        try {
+            Map<String, Column> columns = datasourceDao.columns(table);
+            Map<String, String> ret = Maps.newHashMap();
+            for (Map.Entry<String, Column> entry : columns.entrySet()) {
+                ret.put(entry.getKey(), entry.getValue().getJavaType().toString());
+            }
+            return ret;
+        } catch (Exception e) {
+            log.error("", e);
+            throw new RuntimeException("无法获取表列信息,table = " + formName);
+        }
+    }
+
+    public String buildInsertDsl(FormDef formDef) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO ").append(formDef.getName()).append("(");
+        for (FormDef.Item item : formDef.getBody()) {
+            if (item.getName() != null) {
+                sb.append(item.getName()).append(", ");
+            }
+        }
+        sb.append(") VALUES (");
+        for (FormDef.Item item : formDef.getBody()) {
+            if (item.getName() != null) {
+                sb.append(":").append(item.getName()).append(", ");
+            }
+        }
+        return sb.toString();
+    }
+
+    private List<Column> buildItemColumn(Collection<FormDef.Item> itemItems) {
         return itemItems.stream().map(this::buildColumn).collect(Collectors.toList());
     }
 
     private Column buildColumn(FormDef.Item item) {
         Column column = new Column();
         FormDef.ValidationsDef validationsDef = item.getValidationsDef();
-        if (BooleanUtils.isTrue(validationsDef.getIsNumeric()) || Objects.equals(FormItemType.INPUT_NUMBER.getType(), item.getType())) {
-            if (item.getPrecision() != null) {
-                column.setName(item.getName()).setTypeName(StandardColumnType.DECIMAL.getName()).setPrecision(10, item.getPrecision()).setComment(item.getLabel());
-            } else {
-                column.setName(item.getName()).setTypeName(StandardColumnType.INT.getName()).setComment(item.getLabel());
+        if (validationsDef != null) {
+            if (BooleanUtils.isTrue(validationsDef.getIsNumeric()) || Objects.equals(FormItemType.INPUT_NUMBER.getType(), item.getType())) {
+                if (item.getPrecision() != null) {
+                    column.setName(item.getName()).setTypeName(StandardColumnType.DECIMAL.getName()).setPrecision(10, item.getPrecision()).setComment(item.getLabel());
+                } else {
+                    column.setName(item.getName()).setTypeName(StandardColumnType.INT.getName()).setComment(item.getLabel());
+                }
+            } else if (BooleanUtils.isTrue(validationsDef.getIsAlpha())) {
+                int length = 200;
+                if (validationsDef.getMaxLength() != null) {
+                    length = validationsDef.getMaxLength();
+                }
+                if (validationsDef.getMinLength() != null) {
+                    length += validationsDef.getMinLength();
+                }
+                column.setName(item.getName()).setTypeName(StandardColumnType.VARCHAR.getName()).setPrecision(length).setComment(item.getLabel());
             }
-        } else if (BooleanUtils.isTrue(validationsDef.getIsAlpha())) {
-            int length = 200;
-            if (validationsDef.getMaxLength() != null) {
-                length = validationsDef.getMaxLength();
-            }
-            if (validationsDef.getMinLength() != null) {
-                length += validationsDef.getMinLength();
-            }
-            column.setName(item.getName()).setTypeName(StandardColumnType.VARCHAR.getName()).setPrecision(length).setComment(item.getLabel());
         } else {
             column.setName(item.getName()).setTypeName(StandardColumnType.VARCHAR.getName()).setPrecision(200).setComment(item.getLabel());
         }

@@ -21,6 +21,8 @@ public class BootProperties {
      */
     private List<String> excludePaths;
 
+    private boolean enableFormDefCache;
+
     public void setExcludePaths(List<String> excludePaths) {
         this.excludePaths = YamlUtil.parseListArray(excludePaths);
     }

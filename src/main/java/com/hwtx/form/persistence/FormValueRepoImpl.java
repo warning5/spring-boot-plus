@@ -1,15 +1,27 @@
 package com.hwtx.form.persistence;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hwtx.form.domain.FormValueRepo;
+import com.hwtx.form.domain.MetadataRepo;
+import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
 import io.geekidea.boot.framework.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 表单值 服务实现类
@@ -21,12 +33,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class FormValueRepoImpl extends ServiceImpl<FormValueMapper, FormValueEntity> implements FormValueRepo {
 
+    @Resource
+    private JdbcTemplate jdbcTemplate;
+    @Resource
+    private MetadataRepo metadataRepo;
+
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addFormValue(FormValueDto dto) throws Exception {
+    public boolean addFormValue(FormValueDto dto, FormDef formDef) throws Exception {
         FormValueEntity formValueEntity = new FormValueEntity();
         BeanUtils.copyProperties(dto, formValueEntity);
-        return save(formValueEntity);
+        save(formValueEntity);
+        Object target = JSON.parseObject(dto.getContent(), formDef.getFormClass());
+
+        String sql = metadataRepo.buildInsertDsl(formDef);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(Objects.requireNonNull(jdbcTemplate.getDataSource()));
+        template.update(sql, new BeanPropertySqlParameterSource(target), keyHolder);
+        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
