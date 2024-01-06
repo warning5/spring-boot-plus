@@ -134,6 +134,8 @@ public abstract class DefaultJDBCAdapter extends DefaultDriverAdapter implements
                     column.setTypeName(jdbcType);
                 }
                 column.setJdbcType(jdbcType);
+                StandardColumnType standardColumnType = StandardColumnType.valueOf(jdbcType);
+                column.setJavaType(standardColumnType.compatible());
                 column.setPrecision(integer(keys, "COLUMN_SIZE", set, column.getPrecision()));
                 column.setScale(integer(keys, "DECIMAL_DIGITS", set, column.getScale()));
                 column.nullable(bool(keys, "NULLABLE", set, column.isNullable()));

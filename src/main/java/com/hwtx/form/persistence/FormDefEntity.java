@@ -44,6 +44,7 @@ public class FormDefEntity implements Serializable {
     @Schema(description = "最后修改时间")
     private Date lastModifyTime;
 
+    @Schema(description = "修改者")
     private String lastModifyBy;
 
 }

@@ -39,8 +39,6 @@ public class FormServiceImpl implements FormService {
     @Resource
     FormValueRepo formValueRepo;
     @Resource
-    FormAppValueRepo formAppValueRepo;
-    @Resource
     FormListService formListService;
     @Resource
     MetadataRepo metadataRepo;
@@ -75,7 +73,6 @@ public class FormServiceImpl implements FormService {
     @Override
     public String getRawFormDef(Long formId) throws Exception {
         String formContent = formRepo.getFormRawContent(formId);
-        formAppValueRepo.query();
         if (StringUtils.isNotEmpty(formContent)) {
             return formContent;
         }
@@ -97,8 +94,9 @@ public class FormServiceImpl implements FormService {
             formValue.setCreateTime(new Date());
             formValue.setCreateBy(user);
             FormDef formDef = formCache.getIfPresent(Long.parseLong(formValue.getForm()));
-            assert formDef != null;
-            formValueRepo.addFormValue(formValue, formDef);
+            if (formDef != null) {
+                formValueRepo.addFormValue(formValue, formDef);
+            }
         } else {
             formValue.setId(Long.parseLong(formData.get(INPUT_FORM_VALUE_ID)));
             formValueRepo.updateFormValue(formValue);
@@ -193,7 +191,7 @@ public class FormServiceImpl implements FormService {
         if (ret) {
             Map<String, String> columnAndType = metadataRepo.getColumnNameAndType(formDef.getName());
             Class<?> formClass = Util.buildClass("com.hwtx.form.domain.persistence." + Util.firstCharToUpperCase(formDef.getName()), columnAndType);
-            formDef.init(customerValidations, formClass);
+            formDef.init(customerValidations);
         }
     }
 

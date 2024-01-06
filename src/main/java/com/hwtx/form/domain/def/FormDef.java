@@ -33,7 +33,6 @@ public class FormDef {
     private String name;
     private String api;
     private List<Item> body;
-    private Class<?> formClass;
 
     Map<String, List<ValidateAction>> fieldValidationAction = Maps.newHashMap();
     Map<String, List<FormValidate>> customerFormValidations = Maps.newHashMap();
@@ -69,7 +68,7 @@ public class FormDef {
     }
 
     public Map<String, Item> getValidateItems() {
-        return body.stream().filter(item -> StringUtils.isNotEmpty(item.getName()))
+        return body.stream().filter(item -> StringUtils.isNotEmpty(item.getName())).filter(item -> !"id".equalsIgnoreCase(item.getName()))
                 .collect(Collectors.toMap(FormDef.Item::getName, Function.identity()));
     }
 
@@ -108,7 +107,7 @@ public class FormDef {
         System.out.println(predicateObject);
     }
 
-    public void init(List<FormDef.CustomerValidation> customerValidations, Class<?> formClass) {
+    public void init(List<FormDef.CustomerValidation> customerValidations) {
         if (body != null) {
             Properties properties = new Properties();
             try {
@@ -166,7 +165,6 @@ public class FormDef {
                 }
             });
         }
-        this.formClass = formClass;
     }
 
     public ValidationResult validateForm(String name, String value) {

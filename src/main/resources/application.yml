@@ -100,7 +100,7 @@ boot:
     - /favicon.ico
     - /index.html
     - /file/**
-  enableFormDefCache: false
+  enableFormDefCache: true
 
 # 登录权限配置
 login:

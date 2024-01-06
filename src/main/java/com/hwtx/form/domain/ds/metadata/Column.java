@@ -70,7 +70,7 @@ public class Column extends BaseMetadata<Column> implements Serializable {
     protected ColumnType columnType;
     protected String childTypeName;
     protected ColumnType childColumnType;
-    protected JavaType javaType;
+    protected Class<?> javaType;
     protected String jdbcType; // 有可能与typeName不一致 可能多个typeName对应一个jdbcType 如point>
     protected Integer precision; // 整个字段的长度(包含小数部分)  123.45：precision = 5, scale = 2 对于SQL Server 中 varchar(max)设置成 -1 null:表示未设置
     protected Integer scale; // 小数部分的长度
@@ -1080,7 +1080,7 @@ public class Column extends BaseMetadata<Column> implements Serializable {
     }
 
 
-    public JavaType getJavaType() {
+    public Class<?> getJavaType() {
         if (getmap && null != update) {
             return update.javaType;
         }
@@ -1088,7 +1088,7 @@ public class Column extends BaseMetadata<Column> implements Serializable {
     }
 
 
-    public Column setJavaType(JavaType javaType) {
+    public Column setJavaType(Class<?> javaType) {
         if (setmap && null != update) {
             update.setJavaType(javaType);
             return this;

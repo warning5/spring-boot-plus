@@ -13,11 +13,10 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.geekidea.boot.common.constant.SystemConstant.*;
 
 @Repository
 @Slf4j
@@ -34,13 +33,10 @@ public class MetadataRepo {
         }
         table.addColumn("id", StandardColumnType.BIGINT.getName()).primary(true).autoIncrement(true).setComment("主键").setNullable(false);
         buildItemColumn(itemItems).forEach(table::addColumn);
-        table.addColumn("status", StandardColumnType.TINYINT.getName()).setPrecision(1)
-                .setComment("逻辑删除 1:正常  0:删除").setNullable(true).setDefaultValue(1);
-        table.addColumn("create_time", StandardColumnType.DATETIME.getName())
-                .setComment("创建时间").setNullable(false).setDefaultValue(JDBCAdapter.SQL_BUILD_IN_VALUE.CURRENT_TIMESTAMP);
+        table.addColumn("status", StandardColumnType.TINYINT.getName()).setPrecision(1).setComment("逻辑删除 1:正常  0:删除").setNullable(true).setDefaultValue(1);
+        table.addColumn("create_time", StandardColumnType.DATETIME.getName()).setComment("创建时间").setNullable(false).setDefaultValue(JDBCAdapter.SQL_BUILD_IN_VALUE.CURRENT_TIMESTAMP);
         table.addColumn("create_by", StandardColumnType.VARCHAR.getName()).setPrecision(64).setComment("创建者").setDefaultValue("");
-        table.addColumn("last_modify_time", StandardColumnType.DATETIME.getName())
-                .setComment("最后修改时间").setNullable(false).setDefaultValue(JDBCAdapter.SQL_BUILD_IN_VALUE.CURRENT_TIMESTAMP);
+        table.addColumn("last_modify_time", StandardColumnType.DATETIME.getName()).setComment("最后修改时间").setNullable(false).setDefaultValue(JDBCAdapter.SQL_BUILD_IN_VALUE.CURRENT_TIMESTAMP);
         table.addColumn("last_modify_by", StandardColumnType.VARCHAR.getName()).setPrecision(64).setComment("修改人").setDefaultValue("");
         try {
             return datasourceDao.create(table);
@@ -92,7 +88,7 @@ public class MetadataRepo {
             Map<String, Column> columns = datasourceDao.columns(table);
             Map<String, String> ret = Maps.newHashMap();
             for (Map.Entry<String, Column> entry : columns.entrySet()) {
-                ret.put(entry.getKey(), entry.getValue().getJavaType().toString());
+                ret.put(entry.getKey(), entry.getValue().getJavaType().getName());
             }
             return ret;
         } catch (Exception e) {
@@ -101,20 +97,25 @@ public class MetadataRepo {
         }
     }
 
-    public String buildInsertDsl(FormDef formDef) {
+    public String buildInsertDsl(Collection<FormDef.Item> items, String name) {
         StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ").append(formDef.getName()).append("(");
-        for (FormDef.Item item : formDef.getBody()) {
-            if (item.getName() != null) {
-                sb.append(item.getName()).append(", ");
-            }
+        sb.append("INSERT INTO ").append(name).append("(");
+        for (FormDef.Item item : items) {
+            sb.append(item.getName()).append(", ");
         }
+        for (String item : getDdDefaultColumns()) {
+            sb.append(item).append(", ");
+        }
+        sb.delete(sb.length() - 2, sb.length());
         sb.append(") VALUES (");
-        for (FormDef.Item item : formDef.getBody()) {
-            if (item.getName() != null) {
-                sb.append(":").append(item.getName()).append(", ");
-            }
+        for (FormDef.Item item : items) {
+            sb.append(":").append(item.getName()).append(", ");
         }
+        for (String item : getDdDefaultColumns()) {
+            sb.append(":").append(item).append(", ");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append(")");
         return sb.toString();
     }
 
@@ -149,5 +150,9 @@ public class MetadataRepo {
             column.setNullable(false);
         }
         return column;
+    }
+
+    private List<String> getDdDefaultColumns() {
+        return Arrays.asList(create_time, create_by, last_modify_time, last_modify_by);
     }
 }

@@ -21,10 +21,13 @@ public class FormAppValueRepoImpl implements FormAppValueRepo {
     @Resource
     private JdbcTemplate jdbcTemplate;
 
+    public static void main(String[] args) {
+        new FormAppValueRepoImpl().query();
+    }
     @Override
     public void query() {
         ClassPool pool = ClassPool.getDefault();
-        CtClass cc = pool.makeClass("com.example.DynamicPojo");
+        CtClass cc = pool.makeClass("com.hwtx.form.domain.persistence.Form_add");
         Map<String, String> fields = Maps.newHashMap();
         fields.put("form", String.class.getName());
         fields.put("page", String.class.getName());
