@@ -12,11 +12,9 @@ import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.domain.service.FormService;
 import com.hwtx.form.persistence.FormValueEntity;
-import com.hwtx.form.util.Util;
 import io.geekidea.boot.config.properties.BootProperties;
 import io.geekidea.boot.framework.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -189,10 +187,8 @@ public class FormServiceImpl implements FormService {
     private void formInit(FormDef formDef) {
         boolean ret = metadataRepo.create(formDef.getName(), formDef.getValidateItems().values());
         if (ret) {
-            Map<String, String> columnAndType = metadataRepo.getColumnNameAndType(formDef.getName());
-            Class<?> formClass = Util.buildClass("com.hwtx.form.domain.persistence." + Util.firstCharToUpperCase(formDef.getName()), columnAndType);
+//            Map<String, String> columnAndType = metadataRepo.getColumnNameAndType(formDef.getName());
             formDef.init(customerValidations);
         }
     }
-
 }
