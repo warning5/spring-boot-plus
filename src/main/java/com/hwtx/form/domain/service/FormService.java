@@ -1,12 +1,15 @@
 package com.hwtx.form.domain.service;
 
 import com.hwtx.form.controller.FormHandleParam;
+import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.query.FormValueQuery;
 
 import java.util.Map;
 
 public interface FormService {
     String getRawFormDef(Long formId) throws Exception;
+
+    FormDef getFormDef(Long formId) throws Exception;
 
     void saveFormData(Map<String, String> formData, String user) throws Exception;
 

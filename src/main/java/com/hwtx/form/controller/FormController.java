@@ -1,6 +1,8 @@
 package com.hwtx.form.controller;
 
+import com.hwtx.form.domain.FormListService;
 import com.hwtx.form.domain.FormServiceImpl;
+import com.hwtx.form.domain.dto.FormListQuery;
 import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.domain.service.FormService;
 import io.geekidea.boot.framework.response.Api2Result;
@@ -9,6 +11,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -22,6 +26,8 @@ public class FormController {
 
     @Resource
     private FormService formService;
+    @Resource
+    private FormListService formListService;
 
     @GetMapping("/handle/")
     @Operation(summary = "处理表单变化")
@@ -77,5 +83,14 @@ public class FormController {
         formValueQuery.setUser("admin");
         formService.removeValue(formValueQuery);
         return Api2Result.build(ApiCode.SUCCESS, "删除成功", "");
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "删除表单数据")
+    public Api2Result pageList(FormListQuery formListQuery, @PageableDefault(page = 1, size = 20) Pageable pageable) throws Exception {
+        if (formListQuery.getFormId() == null) {
+            return Api2Result.result(ApiCode.FAIL, "表单ID不能为空", "");
+        }
+        return Api2Result.result(ApiCode.SUCCESS, "删除成功", formListService.list(formListQuery, "admin", pageable));
     }
 }

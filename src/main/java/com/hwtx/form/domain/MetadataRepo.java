@@ -8,6 +8,7 @@ import com.hwtx.form.domain.ds.JDBCAdapter;
 import com.hwtx.form.domain.ds.StandardColumnType;
 import com.hwtx.form.domain.ds.metadata.Column;
 import com.hwtx.form.domain.ds.metadata.Table;
+import com.hwtx.form.domain.dto.FormListQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Repository;
@@ -24,11 +25,13 @@ public class MetadataRepo {
 
     @Resource
     private DatasourceDao datasourceDao;
+    public static final String tablePrefix = "form_";
 
     public boolean create(String formName, Collection<FormDef.Item> itemItems) {
-        Table table = new Table(formName);
+        String tableName = getTableName(formName);
+        Table table = new Table(tableName);
         if (datasourceDao.exists(table)) {
-            log.info("数据表【{}】已存在无需创建", formName);
+            log.info("数据表【{}】已存在无需创建", tableName);
             return true;
         }
         table.addColumn("id", StandardColumnType.BIGINT.getName()).primary(true).autoIncrement(true).setComment("主键").setNullable(false);
@@ -47,9 +50,9 @@ public class MetadataRepo {
     }
 
     public boolean add(String formName, FormDef.Item item) {
-        Table table = new Table(formName);
+        Table table = new Table(getTableName(formName));
         if (!datasourceDao.exists(table)) {
-            log.error("数据表【{}】不存在，无法新增表单列【{}】", formName, item.getName());
+            log.error("数据表【{}】不存在，无法新增表单列【{}】", getTableName(formName), item.getName());
             return false;
         }
         Column column = buildColumn(item);
@@ -62,9 +65,9 @@ public class MetadataRepo {
     }
 
     public boolean update(String formName, String oldColumnName, FormDef.Item newItem) {
-        Table table = new Table(formName);
+        Table table = new Table(getTableName(formName));
         if (!datasourceDao.exists(table)) {
-            log.error("数据表【{}】不存在，无法变更表单列【{}】", formName, newItem.getName());
+            log.error("数据表【{}】不存在，无法变更表单列【{}】", getTableName(formName), newItem.getName());
             return false;
         }
         Column newColumn = buildColumn(newItem);
@@ -78,28 +81,29 @@ public class MetadataRepo {
         }
     }
 
-    public Map<String, String> getColumnNameAndType(String formName) {
-        Table table = new Table(formName);
+    public Map<String, Class<?>> getColumnNameAndType(String formName) {
+        String tableName = getTableName(formName);
+        Table table = new Table(tableName);
         if (!datasourceDao.exists(table)) {
-            log.error("数据表【{}】不存在", formName);
+            log.error("数据表【{}】不存在", tableName);
             return Maps.newHashMap();
         }
         try {
             Map<String, Column> columns = datasourceDao.columns(table);
-            Map<String, String> ret = Maps.newHashMap();
+            Map<String, Class<?>> ret = Maps.newHashMap();
             for (Map.Entry<String, Column> entry : columns.entrySet()) {
-                ret.put(entry.getKey(), entry.getValue().getJavaType().getName());
+                ret.put(entry.getKey(), entry.getValue().getJavaType());
             }
             return ret;
         } catch (Exception e) {
             log.error("", e);
-            throw new RuntimeException("无法获取表列信息,table = " + formName);
+            throw new RuntimeException("无法获取表列信息,table = " + tableName);
         }
     }
 
     public String buildInsertDsl(Collection<FormDef.Item> items, String name) {
         StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ").append(name).append("(");
+        sb.append("INSERT INTO ").append(getTableName(name)).append("(");
         for (FormDef.Item item : items) {
             sb.append(item.getName()).append(", ");
         }
@@ -117,6 +121,32 @@ public class MetadataRepo {
         sb.delete(sb.length() - 2, sb.length());
         sb.append(")");
         return sb.toString();
+    }
+
+    public String buildSelectDslWithPage(Collection<FormDef.Item> items, FormListQuery formListQuery, String name) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("SELECT ");
+        for (FormDef.Item item : items) {
+            builder.append(item.getName()).append(", ");
+        }
+        builder.delete(builder.length() - 2, builder.length());
+        builder.append(" FROM ").append(getTableName(name));
+        if (formListQuery.getFormId() != null) {
+            builder.append(" WHERE form_id = ?");
+        }
+        builder.append(" AND status = 1 AND create_by = ? LIMIT ? OFFSET ? ");
+        return builder.toString();
+    }
+
+    public String buildCountDsl(FormListQuery formListQuery, String name) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("SELECT ").append("COUNT(*) ");
+        builder.append(" FROM ").append(getTableName(name));
+        if (formListQuery.getFormId() != null) {
+            builder.append(" WHERE form_id = ?");
+        }
+        builder.append(" AND status = 1 AND create_by = ? LIMIT ? OFFSET ? ");
+        return builder.toString();
     }
 
     private List<Column> buildItemColumn(Collection<FormDef.Item> itemItems) {
@@ -154,5 +184,9 @@ public class MetadataRepo {
 
     private List<String> getDdDefaultColumns() {
         return Arrays.asList(create_time, create_by, last_modify_time, last_modify_by);
+    }
+
+    private String getTableName(String name) {
+        return tablePrefix + name;
     }
 }

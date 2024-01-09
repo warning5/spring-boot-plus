@@ -10,6 +10,8 @@ import com.hwtx.form.controller.FormHandleParam;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
+import com.hwtx.form.domain.repo.FormRepo;
+import com.hwtx.form.domain.repo.FormValueRepo;
 import com.hwtx.form.domain.service.FormService;
 import com.hwtx.form.persistence.FormValueEntity;
 import io.geekidea.boot.config.properties.BootProperties;
@@ -36,8 +38,6 @@ public class FormServiceImpl implements FormService {
     FormRepo formRepo;
     @Resource
     FormValueRepo formValueRepo;
-    @Resource
-    FormListService formListService;
     @Resource
     MetadataRepo metadataRepo;
     @Resource
@@ -78,6 +78,21 @@ public class FormServiceImpl implements FormService {
     }
 
     @Override
+    public FormDef getFormDef(Long formId) throws Exception {
+        FormDef formDef = formCache.getIfPresent(formId);
+        if (formDef == null) {
+            formDef = formRepo.getFormDef(formId);
+            if (formDef != null) {
+                formInit(formDef);
+                if (bootProperties.isEnableFormDefCache()) {
+                    formCache.put(formId, formDef);
+                }
+            }
+        }
+        return formDef;
+    }
+
+    @Override
     public void saveFormData(Map<String, String> formData, String user) throws Exception {
         FormValueDto formValue = new FormValueDto();
         formValue.setForm(formData.get(INPUT_FORM_ID));
@@ -91,7 +106,7 @@ public class FormServiceImpl implements FormService {
         if (StringUtils.isEmpty(formData.get(INPUT_FORM_VALUE_ID))) {
             formValue.setCreateTime(new Date());
             formValue.setCreateBy(user);
-            FormDef formDef = formCache.getIfPresent(Long.parseLong(formValue.getForm()));
+            FormDef formDef = getFormDef(Long.parseLong(formValue.getForm()));
             if (formDef != null) {
                 formValueRepo.addFormValue(formValue, formDef);
             }
@@ -104,28 +119,18 @@ public class FormServiceImpl implements FormService {
     @Override
     public Map<String, String> validateForm(Long formId, Map<String, String> formValues) throws Exception {
 
-        FormDef formDef = formCache.getIfPresent(formId);
-        if (formDef == null) {
-            formDef = formRepo.getFormDef(formId);
-            if (formDef != null) {
-                formInit(formDef);
-                if (bootProperties.isEnableFormDefCache()) {
-                    formCache.put(formId, formDef);
-                }
-            }
-        }
+        FormDef formDef = getFormDef(formId);
         if (formDef == null) {
             throw new BusinessException("表单定义不存在");
         }
 
         Map<String, String> validationResultMap = new HashMap<>();
 
-        FormDef finalFormDef = formDef;
         formValues.entrySet().stream().filter(entry -> !Objects.equals(entry.getKey(), INPUT_FORM_ID))
                 .forEach(entry -> {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    FormDef.ValidationResult validationResult = finalFormDef.validateForm(key, value);
+                    FormDef.ValidationResult validationResult = formDef.validateForm(key, value);
                     if (!validationResult.isPass()) {
                         validationResultMap.put(validationResult.getKey(), validationResult.getMessage());
                     }
@@ -187,8 +192,8 @@ public class FormServiceImpl implements FormService {
     private void formInit(FormDef formDef) {
         boolean ret = metadataRepo.create(formDef.getName(), formDef.getValidateItems().values());
         if (ret) {
-//            Map<String, String> columnAndType = metadataRepo.getColumnNameAndType(formDef.getName());
-            formDef.init(customerValidations);
+            Map<String, Class<?>> formItemType = metadataRepo.getColumnNameAndType(formDef.getName());
+            formDef.init(customerValidations, formItemType);
         }
     }
 }

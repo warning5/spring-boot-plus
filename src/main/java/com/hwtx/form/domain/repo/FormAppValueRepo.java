@@ -1,4 +1,4 @@
-package com.hwtx.form.domain;
+package com.hwtx.form.domain.repo;
 
 public interface FormAppValueRepo {
     void query();

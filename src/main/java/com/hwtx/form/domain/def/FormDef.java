@@ -33,6 +33,7 @@ public class FormDef {
     private String name;
     private String api;
     private List<Item> body;
+    private Map<String, Class<?>> formItemType = Maps.newHashMap();
 
     Map<String, List<ValidateAction>> fieldValidationAction = Maps.newHashMap();
     Map<String, List<FormValidate>> customerFormValidations = Maps.newHashMap();
@@ -107,7 +108,7 @@ public class FormDef {
         System.out.println(predicateObject);
     }
 
-    public void init(List<FormDef.CustomerValidation> customerValidations) {
+    public void init(List<FormDef.CustomerValidation> customerValidations, Map<String, Class<?>> formItemType) {
         if (body != null) {
             Properties properties = new Properties();
             try {
@@ -165,6 +166,7 @@ public class FormDef {
                 }
             });
         }
+        this.formItemType = formItemType;
     }
 
     public ValidationResult validateForm(String name, String value) {

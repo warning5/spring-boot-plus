@@ -1,4 +1,4 @@
-package com.hwtx.form.domain;
+package com.hwtx.form.domain.repo;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hwtx.form.domain.def.FormDef;

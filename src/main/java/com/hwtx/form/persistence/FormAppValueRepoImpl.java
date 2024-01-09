@@ -2,7 +2,7 @@ package com.hwtx.form.persistence;
 
 import com.google.common.collect.Maps;
 import com.hwtx.form.util.Util;
-import com.hwtx.form.domain.FormAppValueRepo;
+import com.hwtx.form.domain.repo.FormAppValueRepo;
 import org.apache.ibatis.javassist.ClassPool;
 import org.apache.ibatis.javassist.CtClass;
 import org.apache.ibatis.javassist.CtField;
