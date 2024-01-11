@@ -2,7 +2,7 @@ package $!{package.ServiceImpl};
 
 #if($!{cfg.generatorType} == 'BASIC')
 import $!{superServiceImplClassPackage};
-import $!{package.Entity}.$!{cfg.uniqueEntityName};
+import $!{package.Entity}.$!{entity};
 import $!{package.Mapper}.$!{table.mapperName};
 import $!{package.Service}.$!{table.serviceName};
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import $!{cfg.orderByItem};
 import $!{cfg.paging};
 import $!{cfg.pagingUtilPath};
 import $!{cfg.dtoPath};
-import $!{package.Entity}.$!{cfg.uniqueEntityName};
+import $!{package.Entity}.$!{entity};
 import $!{package.Mapper}.$!{table.mapperName};
 import $!{cfg.queryPath};
 import $!{package.Service}.$!{table.serviceName};
@@ -42,7 +42,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class $!{table.serviceImplName} extends $!{superServiceImplClass}<$!{table.mapperName}, $!{cfg.uniqueEntityName}> implements $!{table.serviceName} {
+public class $!{table.serviceImplName} extends $!{superServiceImplClass}<$!{table.mapperName}, $!{entity}> implements $!{table.serviceName} {
 
     @Autowired
     private $!{table.mapperName} $!{cfg.mapperObjectName};
@@ -51,24 +51,24 @@ public class $!{table.serviceImplName} extends $!{superServiceImplClass}<$!{tabl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean add$!{entity}($!{cfg.dtoName} $!{cfg.dtoObjectName}) throws Exception {
-        $!{cfg.uniqueEntityName} $!{cfg.uniqueEntityObjectName} = new $!{cfg.uniqueEntityName}();
-        BeanUtils.copyProperties($!{cfg.dtoObjectName}, $!{cfg.uniqueEntityObjectName});
-        return save($!{cfg.uniqueEntityObjectName});
+        $!{entity} $!{cfg.entityObjectName} = new $!{entity}();
+        BeanUtils.copyProperties($!{cfg.dtoObjectName}, $!{cfg.entityObjectName});
+        return save($!{cfg.entityObjectName});
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean update$!{entity}($!{cfg.dtoName} $!{cfg.dtoObjectName}) throws Exception {
         Long $!{cfg.pkIdName} = $!{cfg.dtoObjectName}.get$!{cfg.pascalPkIdName}();
-        $!{cfg.uniqueEntityName} $!{cfg.uniqueEntityObjectName} = getById($!{cfg.pkIdName});
-        if ($!{cfg.uniqueEntityObjectName} == null) {
+        $!{entity} $!{cfg.entityObjectName} = getById($!{cfg.pkIdName});
+        if ($!{cfg.entityObjectName} == null) {
             throw new BusinessException("$!{table.comment}不存在");
         }
-        BeanUtils.copyProperties($!{cfg.dtoObjectName}, $!{cfg.uniqueEntityObjectName});
+        BeanUtils.copyProperties($!{cfg.dtoObjectName}, $!{cfg.entityObjectName});
     #if($!{cfg.pascalUpdateTimeColumnName})
-        $!{cfg.uniqueEntityObjectName}.set$!{cfg.pascalUpdateTimeColumnName}(new Date());
+        $!{cfg.entityObjectName}.set$!{cfg.pascalUpdateTimeColumnName}(new Date());
     #end
-        return updateById($!{cfg.uniqueEntityObjectName});
+        return updateById($!{cfg.entityObjectName});
     }
 
     @Transactional(rollbackFor = Exception.class)

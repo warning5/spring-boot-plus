@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.Map;
 
+import static com.hwtx.form.domain.FormConstants.INPUT_FORM_ID;
+
 @Slf4j
 @RestController
 @Tag(name = "表单管理")
@@ -52,7 +54,7 @@ public class FormController {
     @PostMapping("/save")
     @Operation(summary = "获取表单定义")
     public Api2Result save(@RequestBody Map<String, String> content) throws Exception {
-        String formId = content.get(FormServiceImpl.INPUT_FORM_ID);
+        String formId = content.get(INPUT_FORM_ID);
         if (StringUtils.isEmpty(formId)) {
             return Api2Result.fail(ApiCode.FAIL, "表单ID不能为空");
         }
@@ -66,12 +68,12 @@ public class FormController {
 
     @GetMapping("/get")
     @Operation(summary = "获取表单数据")
-    public String get(FormValueQuery formValueQuery) throws Exception {
+    public Api2Result get(FormValueQuery formValueQuery) throws Exception {
         if (formValueQuery.getValueId() == null) {
-            return Api2Result.build(ApiCode.SUCCESS, "", "{}");
+            return Api2Result.result(ApiCode.SUCCESS, "", "{}");
         }
         formValueQuery.setUser("admin");
-        return Api2Result.build(ApiCode.SUCCESS, "加载成功", formService.getFormData(formValueQuery));
+        return Api2Result.result(ApiCode.SUCCESS, "加载成功", formService.getFormData(formValueQuery));
     }
 
     @PostMapping("/remove")
@@ -91,6 +93,6 @@ public class FormController {
         if (formListQuery.getFormId() == null) {
             return Api2Result.result(ApiCode.FAIL, "表单ID不能为空", "");
         }
-        return Api2Result.result(ApiCode.SUCCESS, "删除成功", formListService.list(formListQuery, "admin", pageable));
+        return Api2Result.result(ApiCode.SUCCESS, "查询成功", formListService.list(formListQuery, "admin", pageable));
     }
 }

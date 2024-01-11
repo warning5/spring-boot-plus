@@ -1,9 +1,9 @@
 package com.hwtx.form.domain;
 
-import com.alibaba.fastjson2.JSON;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.hwtx.form.annotation.FormValidation;
 import com.hwtx.form.controller.FormHandleParam;
@@ -13,7 +13,7 @@ import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.domain.repo.FormRepo;
 import com.hwtx.form.domain.repo.FormValueRepo;
 import com.hwtx.form.domain.service.FormService;
-import com.hwtx.form.persistence.FormValueEntity;
+import com.hwtx.form.domain.vo.FormData;
 import io.geekidea.boot.config.properties.BootProperties;
 import io.geekidea.boot.framework.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
@@ -25,12 +25,10 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.hwtx.form.domain.FormConstants.*;
+
 @Service
 public class FormServiceImpl implements FormService {
-
-    public static final String INPUT_FORM_ID = "formId";
-    public static final String INPUT_FORM_VALUE_ID = "id";
-    public static final String INPUT_FORM_PAGE = "pageX";
 
     @Resource
     ApplicationContext applicationContext;
@@ -96,23 +94,24 @@ public class FormServiceImpl implements FormService {
     public void saveFormData(Map<String, String> formData, String user) throws Exception {
         FormValueDto formValue = new FormValueDto();
         formValue.setForm(formData.get(INPUT_FORM_ID));
-        formValue.setContent(JSON.toJSONString(formData));
+        Map<String, Object> data = Maps.newHashMap();
+        data.putAll(formData);
+        formValue.setFormData(data);
         formValue.setPage(formData.get(INPUT_FORM_PAGE));
 
         formValue.setLastModifyBy(user);
         formValue.setLastModifyTime(new Date());
         formValue.setK1(user);
-
+        FormDef formDef = getFormDef(Long.parseLong(formValue.getForm()));
         if (StringUtils.isEmpty(formData.get(INPUT_FORM_VALUE_ID))) {
             formValue.setCreateTime(new Date());
             formValue.setCreateBy(user);
-            FormDef formDef = getFormDef(Long.parseLong(formValue.getForm()));
             if (formDef != null) {
-                formValueRepo.addFormValue(formValue, formDef);
+                formValueRepo.addFormValue(formDef, formValue);
             }
         } else {
             formValue.setId(Long.parseLong(formData.get(INPUT_FORM_VALUE_ID)));
-            formValueRepo.updateFormValue(formValue);
+            formValueRepo.updateFormValue(formDef, formValue);
         }
     }
 
@@ -139,13 +138,9 @@ public class FormServiceImpl implements FormService {
     }
 
     @Override
-    public String getFormData(FormValueQuery formValueQuery) throws Exception {
-        FormValueEntity formValueVo = formValueRepo.getFormValue(formValueQuery);
-        if (formValueVo != null) {
-            return formValueVo.getContent();
-        }
-
-        return null;
+    public FormData getFormData(FormValueQuery formValueQuery) throws Exception {
+        FormDef formDef = getFormDef(Long.parseLong(formValueQuery.getFormId()));
+        return formValueRepo.getFormValue(formDef, formValueQuery);
     }
 
     @Override
@@ -156,7 +151,8 @@ public class FormServiceImpl implements FormService {
         formValue.setId(formValueQuery.getValueId());
         formValue.setK1(formValueQuery.getUser());
         formValue.setStatus(false);
-        formValueRepo.updateFormValue(formValue);
+        FormDef formDef = getFormDef(Long.parseLong(formValueQuery.getFormId()));
+        formValueRepo.updateFormValue(formDef, formValue);
     }
 
     @Override

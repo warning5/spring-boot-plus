@@ -1,5 +1,6 @@
 package com.hwtx.form.domain;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.def.FormItemType;
@@ -9,8 +10,12 @@ import com.hwtx.form.domain.ds.StandardColumnType;
 import com.hwtx.form.domain.ds.metadata.Column;
 import com.hwtx.form.domain.ds.metadata.Table;
 import com.hwtx.form.domain.dto.FormListQuery;
+import com.hwtx.form.domain.dto.FormValueDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.cglib.beans.BeanMap;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
@@ -107,7 +112,7 @@ public class MetadataRepo {
         for (FormDef.Item item : items) {
             sb.append(item.getName()).append(", ");
         }
-        for (String item : getDdDefaultColumns()) {
+        for (String item : getCreateDefaultColumns()) {
             sb.append(item).append(", ");
         }
         sb.delete(sb.length() - 2, sb.length());
@@ -115,7 +120,7 @@ public class MetadataRepo {
         for (FormDef.Item item : items) {
             sb.append(":").append(item.getName()).append(", ");
         }
-        for (String item : getDdDefaultColumns()) {
+        for (String item : getCreateDefaultColumns()) {
             sb.append(":").append(item).append(", ");
         }
         sb.delete(sb.length() - 2, sb.length());
@@ -125,14 +130,14 @@ public class MetadataRepo {
 
     public String buildSelectDslWithPage(Collection<FormDef.Item> items, FormListQuery formListQuery, String name) {
         StringBuilder builder = new StringBuilder();
-        builder.append("SELECT ");
+        builder.append("SELECT id,");
         for (FormDef.Item item : items) {
             builder.append(item.getName()).append(", ");
         }
         builder.delete(builder.length() - 2, builder.length());
         builder.append(" FROM ").append(getTableName(name));
         if (formListQuery.getFormId() != null) {
-            builder.append(" WHERE form_id = ?");
+            builder.append(" WHERE ").append(FormConstants.INPUT_FORM_ID).append(" = ?");
         }
         builder.append(" AND status = 1 AND create_by = ? LIMIT ? OFFSET ? ");
         return builder.toString();
@@ -143,9 +148,9 @@ public class MetadataRepo {
         builder.append("SELECT ").append("COUNT(*) ");
         builder.append(" FROM ").append(getTableName(name));
         if (formListQuery.getFormId() != null) {
-            builder.append(" WHERE form_id = ?");
+            builder.append(" WHERE ").append(FormConstants.INPUT_FORM_ID).append(" = ?");
         }
-        builder.append(" AND status = 1 AND create_by = ? LIMIT ? OFFSET ? ");
+        builder.append(" AND status = 1 AND create_by = ?");
         return builder.toString();
     }
 
@@ -182,11 +187,36 @@ public class MetadataRepo {
         return column;
     }
 
-    private List<String> getDdDefaultColumns() {
+    private List<String> getCreateDefaultColumns() {
         return Arrays.asList(create_time, create_by, last_modify_time, last_modify_by);
+    }
+
+    private List<String> getModifyDefaultColumns() {
+        return Arrays.asList(last_modify_time, last_modify_by);
     }
 
     private String getTableName(String name) {
         return tablePrefix + name;
+    }
+
+    public String buildSearchFormData(FormDef formDef) {
+        return "SELECT *" +
+                " FROM " + getTableName(formDef.getName()) +
+                " WHERE " + FormConstants.INPUT_FORM_VALUE_ID + " = ?" +
+                " AND status = 1 AND create_by = ?";
+    }
+
+    public String buildUpdateFormData(FormDef formDef, Collection<FormDef.Item> items, Map<String, Object> formData, List<Object> params) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("UPDATE ").append(getTableName(formDef.getName())).append(" SET ");
+        items.forEach(item -> {
+            builder.append(item.getName()).append(" = ?").append(", ");
+            params.add(formData.get(item.getName()));
+        });
+        getModifyDefaultColumns().forEach(col -> builder.append(col).append(" = ?").append(", "));
+        builder.delete(builder.length() - 2, builder.length());
+        builder.append(" WHERE ").append(FormConstants.INPUT_FORM_VALUE_ID).append(" = ?");
+        builder.append(" AND status = 1 AND create_by = ?");
+        return builder.toString();
     }
 }

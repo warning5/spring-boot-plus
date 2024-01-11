@@ -3,6 +3,7 @@ package com.hwtx.form.domain.service;
 import com.hwtx.form.controller.FormHandleParam;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.query.FormValueQuery;
+import com.hwtx.form.domain.vo.FormData;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public interface FormService {
 
     Map<String, String> validateForm(Long formId, Map<String, String> formValues) throws Exception;
 
-    String getFormData(FormValueQuery formValueQuery) throws Exception;
+    FormData getFormData(FormValueQuery formValueQuery) throws Exception;
 
     void removeValue(FormValueQuery formValueQuery) throws Exception;
 

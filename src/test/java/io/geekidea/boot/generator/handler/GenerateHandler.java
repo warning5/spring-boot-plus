@@ -245,17 +245,6 @@ public class GenerateHandler {
             String colonTableName = underlineToColon(tableName);
             String entityObjectName = pascalToCamel(entityName);
             String appName = config.getAppName();
-            String uniqueEntityName;
-            String uniqueEntityObjectName;
-            if (entityName.startsWith(appName)) {
-                int length = appName.length();
-                uniqueEntityName = entityName.substring(length);
-                uniqueEntityObjectName = pascalToCamel(entityObjectName.substring(length));
-                ;
-            } else {
-                uniqueEntityName = entityName;
-                uniqueEntityObjectName = entityObjectName;
-            }
             String serviceName = tableInfo.getServiceName();
             String mapperName = tableInfo.getMapperName();
             String serviceObjectName = pascalToCamel(serviceName);
@@ -463,12 +452,10 @@ public class GenerateHandler {
 
             // 自定义APP文件和对象名称
             String appEntityName = appName + entityName;
-            String appEntityObjectName = pascalToCamel(appName) + entityName;
             cfgMap.put("appName", appName);
             cfgMap.put("appMapping", config.getAppMapping());
             cfgMap.put("adminMapping", config.getAdminMapping());
             cfgMap.put("appEntityName", appEntityName);
-            cfgMap.put("appEntityObjectName", appEntityObjectName);
             String appTableComment = appName + tableInfo.getComment();
             cfgMap.put("appTableComment", appTableComment);
             String appQueryFileName = String.format(config.getFormatAppQueryFileName(), entityName);
@@ -481,9 +468,6 @@ public class GenerateHandler {
             cfgMap.put("appVoObjectName", appVoObjectName);
             cfgMap.put("appQueryPath", queryPackagePath + "." + appQueryFileName);
             cfgMap.put("appVoPath", voPackagePath + "." + appVoFileName);
-
-            cfgMap.put("uniqueEntityName", uniqueEntityName);
-            cfgMap.put("uniqueEntityObjectName", uniqueEntityObjectName);
 
             cfgMap.put("logPackagePath", config.getLogPackagePath());
             cfgMap.put("sysLog", config.isSysLog());

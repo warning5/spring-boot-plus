@@ -1,5 +1,6 @@
 package com.hwtx.form.domain.dto;
 
+import io.geekidea.boot.common.constant.SystemConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -7,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 修改表单值参数
@@ -36,7 +38,7 @@ public class FormValueDto implements Serializable {
     @Schema(description = "表单值")
     @NotBlank(message = "表单值不能为空")
     @Length(max = 65535, message = "表单值长度超过限制")
-    private String content;
+    private Map<String, Object> formData;
 
     @Schema(description = "表单项值的归属主体1")
     @NotBlank(message = "表单项值的归属主体1不能为空")
@@ -56,19 +58,37 @@ public class FormValueDto implements Serializable {
     @Schema(description = "逻辑删除 1:正常  0:删除")
     private Boolean status;
 
-    @Schema(description = "创建者")
-    @Length(max = 64, message = "创建者长度超过限制")
-    private String createBy;
+    public void setCreateBy(String createBy) {
+        formData.put(SystemConstant.create_by, createBy);
+    }
 
-    @Schema(description = "创建时间")
-    private Date createTime;
+    public void setCreateTime(Date createTime) {
+        formData.put(SystemConstant.create_time, createTime);
+    }
 
-    @Schema(description = "最后修改时间")
-    private Date lastModifyTime;
+    public void setLastModifyTime(Date lastModifyTime) {
+        formData.put(SystemConstant.last_modify_time, lastModifyTime);
+    }
 
-    @Length(max = 64, message = "长度超过限制")
-    private String lastModifyBy;
+    public void setLastModifyBy(String lastModifyBy) {
+        formData.put(SystemConstant.last_modify_by, lastModifyBy);
+    }
 
+    public String getCreateBy() {
+        return (String) formData.get(SystemConstant.create_by);
+    }
+
+    public Date getCreateTime() {
+        return (Date) formData.get(SystemConstant.create_time);
+    }
+
+    public Date getLastModifyTime() {
+        return (Date) formData.get(SystemConstant.last_modify_time);
+    }
+
+    public String getLastModifyBy() {
+        return (String) formData.get(SystemConstant.last_modify_by);
+    }
 }
 
 

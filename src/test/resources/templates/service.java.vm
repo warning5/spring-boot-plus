@@ -2,12 +2,12 @@ package $!{package.Service};
 
 #if($!{cfg.generatorType} == 'BASIC')
 import $!{superServiceClassPackage};
-import $!{package.Entity}.$!{cfg.uniqueEntityName};
+import $!{package.Entity}.$!{entity};
 #elseif($!{cfg.generatorType} == 'FULL')
 import $!{superServiceClassPackage};
 import $!{cfg.paging};
 import $!{cfg.dtoPath};
-import $!{package.Entity}.$!{cfg.uniqueEntityName};
+import $!{package.Entity}.$!{entity};
 import $!{cfg.queryPath};
 import $!{cfg.voPath};
 #if($!{cfg.generatorApi})
@@ -23,7 +23,7 @@ import $!{cfg.appVoPath};
  * @author $!{author}
  * @since $!{date}
  */
-public interface $!{table.serviceName} extends $!{superServiceClass}<$!{cfg.uniqueEntityName}> {
+public interface $!{table.serviceName} extends $!{superServiceClass}<$!{entity}> {
 
 #if($!{cfg.generatorType} == 'FULL')
     /**

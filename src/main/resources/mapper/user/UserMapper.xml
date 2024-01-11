@@ -14,4 +14,15 @@
         from user
     </select>
 
+    <select id="getAppUserById" resultType="io.geekidea.boot.user.vo.UserAppVo">
+        select *
+        from user
+        where id = #{id}
+    </select>
+
+    <select id="getAppUserPage" resultType="io.geekidea.boot.user.vo.UserAppVo">
+        select *
+        from user
+    </select>
+
 </mapper>

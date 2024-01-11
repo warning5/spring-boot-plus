@@ -2,7 +2,7 @@ package com.hwtx.form.domain;
 
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormListQuery;
-import com.hwtx.form.domain.repo.FormListRepo;
+import com.hwtx.form.domain.repo.FormValueRepo;
 import com.hwtx.form.domain.service.FormService;
 import com.hwtx.form.domain.vo.FormListVo;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +16,7 @@ public class FormListService {
     @Resource
     private FormService formService;
     @Resource
-    private FormListRepo formListRepo;
+    private FormValueRepo formListRepo;
 
     public FormListVo list(FormListQuery formListQuery, String user, Pageable pageable) throws Exception {
         FormDef formDef = formService.getFormDef(formListQuery.getFormId());

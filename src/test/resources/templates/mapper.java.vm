@@ -2,11 +2,11 @@ package $!{package.Mapper};
 
 #if($!{cfg.generatorType} == 'BASIC')
 import $!{superMapperClassPackage};
-import $!{package.Entity}.$!{cfg.uniqueEntityName};
+import $!{package.Entity}.$!{entity};
 import org.apache.ibatis.annotations.Mapper;
 #elseif($!{cfg.generatorType} == 'FULL')
 import $!{superMapperClassPackage};
-import $!{package.Entity}.$!{cfg.uniqueEntityName};
+import $!{package.Entity}.$!{entity};
 import $!{cfg.queryPath};
 import $!{cfg.voPath};
 #if($!{cfg.generatorApi})
@@ -25,7 +25,7 @@ import java.util.List;
  * @since $!{date}
  */
 @Mapper
-public interface $!{table.mapperName} extends $!{superMapperClass}<$!{cfg.uniqueEntityName}> {
+public interface $!{table.mapperName} extends $!{superMapperClass}<$!{entity}> {
 
 #if($!{cfg.generatorType} == 'FULL')
     /**
