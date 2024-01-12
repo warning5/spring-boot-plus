@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.hwtx.form.domain.MetadataRepo;
 import com.hwtx.form.domain.def.FormDef;
+import com.hwtx.form.domain.ds.DefaultColumn;
 import com.hwtx.form.domain.dto.FormListQuery;
 import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
@@ -120,10 +121,7 @@ public class FormValueRepoImpl implements FormValueRepo {
     public boolean updateFormValue(FormDef formDef, FormValueDto dto) throws Exception {
         List<Object> param = Lists.newArrayList();
         String sql = metadataRepo.buildUpdateFormData(formDef, formDef.getValidateItems().values(), dto.getFormData(), param);
-        param.add(dto.getLastModifyTime());
-        param.add(dto.getLastModifyBy());
         param.add(dto.getId());
-        param.add(dto.getForm());
         param.add(dto.getK1());
         return jdbcTemplate.update(sql, param.toArray()) > 0;
     }

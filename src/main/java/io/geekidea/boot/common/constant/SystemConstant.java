@@ -8,8 +8,4 @@ package io.geekidea.boot.common.constant;
  **/
 public interface SystemConstant {
 
-    String create_time = "create_time";
-    String create_by = "create_by";
-    String last_modify_time = "last_modify_time";
-    String last_modify_by = "last_modify_by";
 }

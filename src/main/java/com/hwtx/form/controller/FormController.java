@@ -73,22 +73,22 @@ public class FormController {
             return Api2Result.result(ApiCode.SUCCESS, "", "{}");
         }
         formValueQuery.setUser("admin");
-        return Api2Result.result(ApiCode.SUCCESS, "加载成功", formService.getFormData(formValueQuery));
+        return Api2Result.result(ApiCode.SUCCESS, "加载成功", formService.getFormData(formValueQuery).getData());
     }
 
     @PostMapping("/remove")
     @Operation(summary = "删除表单数据")
-    public String remove(FormValueQuery formValueQuery) throws Exception {
+    public Api2Result remove(FormValueQuery formValueQuery) throws Exception {
         if (formValueQuery.getValueId() == null) {
-            return Api2Result.build(ApiCode.FAIL, "数据ID不能为空", "");
+            return Api2Result.result(ApiCode.FAIL, "数据ID不能为空", "");
         }
         formValueQuery.setUser("admin");
         formService.removeValue(formValueQuery);
-        return Api2Result.build(ApiCode.SUCCESS, "删除成功", "");
+        return Api2Result.result(ApiCode.SUCCESS, "删除成功", "");
     }
 
     @GetMapping("/list")
-    @Operation(summary = "删除表单数据")
+    @Operation(summary = "获取表单列表")
     public Api2Result pageList(FormListQuery formListQuery, @PageableDefault(page = 1, size = 20) Pageable pageable) throws Exception {
         if (formListQuery.getFormId() == null) {
             return Api2Result.result(ApiCode.FAIL, "表单ID不能为空", "");

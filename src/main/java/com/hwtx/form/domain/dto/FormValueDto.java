@@ -1,6 +1,7 @@
 package com.hwtx.form.domain.dto;
 
-import io.geekidea.boot.common.constant.SystemConstant;
+import com.google.common.collect.Maps;
+import com.hwtx.form.domain.ds.DefaultColumn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -38,7 +39,7 @@ public class FormValueDto implements Serializable {
     @Schema(description = "表单值")
     @NotBlank(message = "表单值不能为空")
     @Length(max = 65535, message = "表单值长度超过限制")
-    private Map<String, Object> formData;
+    private Map<String, Object> formData = Maps.newHashMap();
 
     @Schema(description = "表单项值的归属主体1")
     @NotBlank(message = "表单项值的归属主体1不能为空")
@@ -59,35 +60,35 @@ public class FormValueDto implements Serializable {
     private Boolean status;
 
     public void setCreateBy(String createBy) {
-        formData.put(SystemConstant.create_by, createBy);
+        formData.put(DefaultColumn.create_by.name(), createBy);
     }
 
     public void setCreateTime(Date createTime) {
-        formData.put(SystemConstant.create_time, createTime);
+        formData.put(DefaultColumn.create_time.name(), createTime);
     }
 
     public void setLastModifyTime(Date lastModifyTime) {
-        formData.put(SystemConstant.last_modify_time, lastModifyTime);
+        formData.put(DefaultColumn.last_modify_time.name(), lastModifyTime);
     }
 
     public void setLastModifyBy(String lastModifyBy) {
-        formData.put(SystemConstant.last_modify_by, lastModifyBy);
+        formData.put(DefaultColumn.last_modify_by.name(), lastModifyBy);
     }
 
     public String getCreateBy() {
-        return (String) formData.get(SystemConstant.create_by);
+        return (String) formData.get(DefaultColumn.create_by.name());
     }
 
     public Date getCreateTime() {
-        return (Date) formData.get(SystemConstant.create_time);
+        return (Date) formData.get(DefaultColumn.create_time.name());
     }
 
     public Date getLastModifyTime() {
-        return (Date) formData.get(SystemConstant.last_modify_time);
+        return (Date) formData.get(DefaultColumn.last_modify_time.name());
     }
 
     public String getLastModifyBy() {
-        return (String) formData.get(SystemConstant.last_modify_by);
+        return (String) formData.get(DefaultColumn.last_modify_by.name());
     }
 }
 

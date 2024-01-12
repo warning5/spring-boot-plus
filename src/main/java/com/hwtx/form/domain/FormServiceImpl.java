@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import com.hwtx.form.annotation.FormValidation;
 import com.hwtx.form.controller.FormHandleParam;
 import com.hwtx.form.domain.def.FormDef;
+import com.hwtx.form.domain.ds.DefaultColumn;
 import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.domain.repo.FormRepo;
@@ -151,6 +152,7 @@ public class FormServiceImpl implements FormService {
         formValue.setId(formValueQuery.getValueId());
         formValue.setK1(formValueQuery.getUser());
         formValue.setStatus(false);
+        formValue.getFormData().put(DefaultColumn.status.name(), DefaultColumn.Status_DELETED);
         FormDef formDef = getFormDef(Long.parseLong(formValueQuery.getFormId()));
         formValueRepo.updateFormValue(formDef, formValue);
     }

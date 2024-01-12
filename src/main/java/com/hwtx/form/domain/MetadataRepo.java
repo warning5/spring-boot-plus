@@ -1,28 +1,24 @@
 package com.hwtx.form.domain;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.def.FormItemType;
 import com.hwtx.form.domain.ds.DatasourceDao;
+import com.hwtx.form.domain.ds.DefaultColumn;
 import com.hwtx.form.domain.ds.JDBCAdapter;
 import com.hwtx.form.domain.ds.StandardColumnType;
 import com.hwtx.form.domain.ds.metadata.Column;
 import com.hwtx.form.domain.ds.metadata.Table;
 import com.hwtx.form.domain.dto.FormListQuery;
-import com.hwtx.form.domain.dto.FormValueDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.cglib.beans.BeanMap;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.geekidea.boot.common.constant.SystemConstant.*;
+import static com.hwtx.form.domain.ds.DefaultColumn.*;
 
 @Repository
 @Slf4j
@@ -39,13 +35,19 @@ public class MetadataRepo {
             log.info("数据表【{}】已存在无需创建", tableName);
             return true;
         }
-        table.addColumn("id", StandardColumnType.BIGINT.getName()).primary(true).autoIncrement(true).setComment("主键").setNullable(false);
+        table.addColumn(DefaultColumn.id.name(), StandardColumnType.BIGINT.getName()).primary(true).autoIncrement(true)
+                .setComment(DefaultColumn.id.getComment()).setNullable(false);
         buildItemColumn(itemItems).forEach(table::addColumn);
-        table.addColumn("status", StandardColumnType.TINYINT.getName()).setPrecision(1).setComment("逻辑删除 1:正常  0:删除").setNullable(true).setDefaultValue(1);
-        table.addColumn("create_time", StandardColumnType.DATETIME.getName()).setComment("创建时间").setNullable(false).setDefaultValue(JDBCAdapter.SQL_BUILD_IN_VALUE.CURRENT_TIMESTAMP);
-        table.addColumn("create_by", StandardColumnType.VARCHAR.getName()).setPrecision(64).setComment("创建者").setDefaultValue("");
-        table.addColumn("last_modify_time", StandardColumnType.DATETIME.getName()).setComment("最后修改时间").setNullable(false).setDefaultValue(JDBCAdapter.SQL_BUILD_IN_VALUE.CURRENT_TIMESTAMP);
-        table.addColumn("last_modify_by", StandardColumnType.VARCHAR.getName()).setPrecision(64).setComment("修改人").setDefaultValue("");
+        table.addColumn(DefaultColumn.status.name(), StandardColumnType.TINYINT.getName()).setPrecision(1)
+                .setComment(DefaultColumn.status.getComment()).setNullable(true).setDefaultValue(1);
+        table.addColumn(create_time.name(), StandardColumnType.DATETIME.getName())
+                .setComment(create_time.getComment()).setNullable(false).setDefaultValue(JDBCAdapter.SQL_BUILD_IN_VALUE.CURRENT_TIMESTAMP);
+        table.addColumn(create_by.name(), StandardColumnType.VARCHAR.getName()).setPrecision(64)
+                .setComment(create_by.getComment()).setDefaultValue("");
+        table.addColumn(last_modify_time.name(), StandardColumnType.DATETIME.getName())
+                .setComment(last_modify_time.getComment()).setNullable(false).setDefaultValue(JDBCAdapter.SQL_BUILD_IN_VALUE.CURRENT_TIMESTAMP);
+        table.addColumn(DefaultColumn.last_modify_by.name(), StandardColumnType.VARCHAR.getName()).setPrecision(64)
+                .setComment(DefaultColumn.last_modify_by.getComment()).setDefaultValue("");
         try {
             return datasourceDao.create(table);
         } catch (Exception e) {
@@ -136,10 +138,13 @@ public class MetadataRepo {
         }
         builder.delete(builder.length() - 2, builder.length());
         builder.append(" FROM ").append(getTableName(name));
+        builder.append(" WHERE 1 = 1");
         if (formListQuery.getFormId() != null) {
-            builder.append(" WHERE ").append(FormConstants.INPUT_FORM_ID).append(" = ?");
+            builder.append(" AND ").append(FormConstants.INPUT_FORM_ID).append(" = ?");
         }
-        builder.append(" AND status = 1 AND create_by = ? LIMIT ? OFFSET ? ");
+        builder.append(" AND ").append(DefaultColumn.status.name()).append(" = ").append(DefaultColumn.Status_NORMAL);
+        builder.append(" AND ").append(create_by.name()).append(" = ").append("?");
+        builder.append(" LIMIT ? OFFSET ?");
         return builder.toString();
     }
 
@@ -147,10 +152,12 @@ public class MetadataRepo {
         StringBuilder builder = new StringBuilder();
         builder.append("SELECT ").append("COUNT(*) ");
         builder.append(" FROM ").append(getTableName(name));
+        builder.append(" WHERE 1 = 1");
         if (formListQuery.getFormId() != null) {
-            builder.append(" WHERE ").append(FormConstants.INPUT_FORM_ID).append(" = ?");
+            builder.append(" AND ").append(FormConstants.INPUT_FORM_ID).append(" = ?");
         }
-        builder.append(" AND status = 1 AND create_by = ?");
+        builder.append(" AND ").append(DefaultColumn.status.name()).append(" = ").append(DefaultColumn.Status_NORMAL);
+        builder.append(" AND ").append(create_by.name()).append(" = ").append("?");
         return builder.toString();
     }
 
@@ -188,11 +195,11 @@ public class MetadataRepo {
     }
 
     private List<String> getCreateDefaultColumns() {
-        return Arrays.asList(create_time, create_by, last_modify_time, last_modify_by);
+        return Arrays.asList(create_time.name(), create_by.name(), last_modify_time.name(), last_modify_by.name());
     }
 
     private List<String> getModifyDefaultColumns() {
-        return Arrays.asList(last_modify_time, last_modify_by);
+        return Arrays.asList(last_modify_time.name(), last_modify_by.name());
     }
 
     private String getTableName(String name) {
@@ -200,23 +207,36 @@ public class MetadataRepo {
     }
 
     public String buildSearchFormData(FormDef formDef) {
-        return "SELECT *" +
-                " FROM " + getTableName(formDef.getName()) +
-                " WHERE " + FormConstants.INPUT_FORM_VALUE_ID + " = ?" +
-                " AND status = 1 AND create_by = ?";
+        StringBuilder builder = new StringBuilder();
+        builder.append("SELECT *" + " FROM ").append(getTableName(formDef.getName())).append(" WHERE ").append(FormConstants.INPUT_FORM_VALUE_ID).append(" = ?");
+        builder.append(" AND ").append(DefaultColumn.status.name()).append(" = ").append(DefaultColumn.Status_NORMAL);
+        builder.append(" AND ").append(create_by.name()).append(" = ").append("?");
+        return builder.toString();
     }
 
     public String buildUpdateFormData(FormDef formDef, Collection<FormDef.Item> items, Map<String, Object> formData, List<Object> params) {
         StringBuilder builder = new StringBuilder();
         builder.append("UPDATE ").append(getTableName(formDef.getName())).append(" SET ");
         items.forEach(item -> {
-            builder.append(item.getName()).append(" = ?").append(", ");
-            params.add(formData.get(item.getName()));
+            Object value = formData.get(item.getName());
+            if (value != null) {
+                builder.append(item.getName()).append(" = ?").append(", ");
+                params.add(value);
+            }
         });
         getModifyDefaultColumns().forEach(col -> builder.append(col).append(" = ?").append(", "));
-        builder.delete(builder.length() - 2, builder.length());
+        params.add(formData.get(last_modify_time.name()));
+        params.add(formData.get(last_modify_by.name()));
+        Object status = formData.get(DefaultColumn.status.name());
+        if (status != null) {
+            builder.append(DefaultColumn.status.name()).append(" = ?");
+            params.add(status);
+        } else {
+            builder.delete(builder.length() - 2, builder.length());
+        }
         builder.append(" WHERE ").append(FormConstants.INPUT_FORM_VALUE_ID).append(" = ?");
-        builder.append(" AND status = 1 AND create_by = ?");
+        builder.append(" AND ").append(DefaultColumn.status.name()).append(" = ").append(DefaultColumn.Status_NORMAL);
+        builder.append(" AND ").append(create_by.name()).append(" = ").append("?");
         return builder.toString();
     }
 }

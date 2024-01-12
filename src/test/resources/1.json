@@ -2,12 +2,12 @@
   "type": "form",
   "actions": [],
   "wrapWithPanel": false,
-  "name": "sample-edit-form",
+  "name": "form_add",
   "api": {
     "method": "post",
     "url": "http://localhost:8888/api/form/save"
   },
-  "initApi": "http://localhost:8888/api/form/get?valueId=${id}",
+  "initApi": "http://localhost:8888/api/form/get?valueId=${id}&formId=2",
   "body": [
     {
       "type": "input-text",
