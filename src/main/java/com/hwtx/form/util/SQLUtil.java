@@ -1,6 +1,6 @@
 package com.hwtx.form.util;
 
-import com.hwtx.form.domain.ds.metadata.BaseMetadata;
+import com.hwtx.form.persistence.ds.metadata.BaseMetadata;
 
 import java.util.Arrays;
 import java.util.HashSet;

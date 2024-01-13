@@ -1,7 +1,7 @@
 package com.hwtx.form.domain.dto;
 
 import com.google.common.collect.Maps;
-import com.hwtx.form.domain.ds.DefaultColumn;
+import com.hwtx.form.persistence.ds.DefaultColumn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
