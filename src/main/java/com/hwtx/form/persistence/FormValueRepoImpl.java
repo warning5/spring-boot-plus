@@ -1,10 +1,6 @@
 package com.hwtx.form.persistence;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.hwtx.form.domain.FormSearchExt;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormListQuery;
 import com.hwtx.form.domain.dto.FormValueDto;
@@ -12,7 +8,6 @@ import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.domain.repo.FormValueRepo;
 import com.hwtx.form.domain.vo.FormData;
 import com.hwtx.form.domain.vo.FormListVo;
-import io.geekidea.boot.framework.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,23 +38,15 @@ public class FormValueRepoImpl implements FormValueRepo {
     private JdbcTemplate jdbcTemplate;
     @Resource
     private MetadataRepo metadataRepo;
-    ObjectMapper mapper = new ObjectMapper();
-    ThreadLocal<FormDef> formDefThreadLocal = new ThreadLocal<>();
-
-    {
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(Object.class, new FormTypeDeserializer());
-        mapper.registerModule(module);
-    }
 
     @Override
-    public FormListVo query(FormDef formDef, FormListQuery formListQuery, String user, Pageable pageable) {
+    public FormListVo query(FormDef formDef, FormListQuery formListQuery, FormSearchExt formSearchExt, String user, Pageable pageable) {
         int pageSize = pageable.getPageSize();
         int pageNum = pageable.getPageNumber();
         int start = (pageNum - 1) * pageSize;
-        String sql = metadataRepo.buildSelectDslWithPage(formDef.getValidateItems().values(), formListQuery, formDef.getName());
         List<Object> param = Lists.newArrayList();
-        param.add(formDef.getFormId());
+        String sql = metadataRepo.buildSelectDslWithPage(formDef.getValidateItems().values(), formListQuery,
+                formSearchExt, formDef, param);
         param.add(user);
         param.add(pageSize);
         param.add(start);
@@ -77,40 +63,16 @@ public class FormValueRepoImpl implements FormValueRepo {
         return formListVo;
     }
 
-    public class FormTypeDeserializer extends JsonDeserializer<Object> {
-        @Override
-        public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            FormDef formDef = formDefThreadLocal.get();
-            if (formDef == null) {
-                throw new BusinessException("无法获取表单定义");
-            }
-            Class<?> itemType = formDef.getFormItemType().get(p.getCurrentName());
-            if (itemType != null) {
-                if (Objects.equals(itemType, Integer.class)) {
-                    return Integer.valueOf(p.getValueAsString());
-                } else if (Objects.equals(itemType, Long.class)) {
-                    return Long.valueOf(p.getValueAsString());
-                }
-            }
-            return p.getValueAsString();
-        }
-    }
-
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean addFormValue(FormDef formDef, FormValueDto dto) throws Exception {
-        try {
-            formDefThreadLocal.set(formDef);
-            MapSqlParameterSource parameters = new MapSqlParameterSource();
-            parameters.addValues(dto.getFormData());
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValues(dto.getFormData());
 
-            String sql = metadataRepo.buildInsertDsl(formDef.getValidateItems().values(), formDef.getName());
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(Objects.requireNonNull(jdbcTemplate.getDataSource()));
-            template.update(sql, parameters, keyHolder);
-        } finally {
-            formDefThreadLocal.remove();
-        }
+        String sql = metadataRepo.buildInsertDsl(formDef.getValidateItems().values(), formDef.getName());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(Objects.requireNonNull(jdbcTemplate.getDataSource()));
+        template.update(sql, parameters, keyHolder);
         return true;
     }
 
@@ -126,7 +88,10 @@ public class FormValueRepoImpl implements FormValueRepo {
 
     @Override
     public FormData getFormValue(FormDef formDef, FormValueQuery formValueQuery) {
+        long start = System.currentTimeMillis();
         String sql = metadataRepo.buildSearchFormData(formDef);
+        log.info("构建查询表单详情数据，formId = {}, valueId = {}, spend = {}ms", formDef.getFormId(),
+                formValueQuery.getValueId(), (System.currentTimeMillis() - start));
         Map<String, Object> content = jdbcTemplate.queryForMap(sql, formValueQuery.getValueId(), formValueQuery.getUser());
         return FormData.builder().data(content).build();
     }

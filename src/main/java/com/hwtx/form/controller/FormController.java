@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static com.hwtx.form.domain.FormConstants.INPUT_FORM_ID;
@@ -89,10 +90,12 @@ public class FormController {
 
     @GetMapping("/list")
     @Operation(summary = "获取表单列表")
-    public Api2Result pageList(FormListQuery formListQuery, @PageableDefault(page = 1, size = 20) Pageable pageable) throws Exception {
+    public Api2Result pageList(FormListQuery formListQuery, @PageableDefault(page = 1, size = 20) Pageable pageable,
+                               HttpServletRequest request) throws Exception {
         if (formListQuery.getFormId() == null) {
             return Api2Result.result(ApiCode.FAIL, "表单ID不能为空", "");
         }
+        formListQuery.setSearchData(request.getParameterMap());
         return Api2Result.result(ApiCode.SUCCESS, "查询成功", formListService.list(formListQuery, "admin", pageable));
     }
 }

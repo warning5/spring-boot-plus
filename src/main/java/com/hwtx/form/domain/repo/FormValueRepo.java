@@ -1,6 +1,6 @@
 package com.hwtx.form.domain.repo;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.hwtx.form.domain.FormSearchExt;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormListQuery;
 import com.hwtx.form.domain.dto.FormValueDto;
@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
  */
 public interface FormValueRepo {
 
-    FormListVo query(FormDef formDef, FormListQuery formListQuery, String user, Pageable pageable);
+    FormListVo query(FormDef formDef, FormListQuery formListQuery, FormSearchExt formSearchExt, String user, Pageable pageable);
 
     /**
      * 添加表单值
