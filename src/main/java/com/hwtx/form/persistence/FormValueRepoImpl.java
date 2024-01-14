@@ -80,8 +80,7 @@ public class FormValueRepoImpl implements FormValueRepo {
     @Override
     public boolean updateFormValue(FormDef formDef, FormValueDto dto) throws Exception {
         List<Object> param = Lists.newArrayList();
-        String sql = metadataRepo.buildUpdateFormData(formDef, formDef.getValidateItems().values(), dto.getFormData(), param);
-        param.add(dto.getId());
+        String sql = metadataRepo.buildUpdateFormData(formDef, formDef.getValidateItems().values(), dto, param);
         param.add(dto.getK1());
         return jdbcTemplate.update(sql, param.toArray()) > 0;
     }
@@ -91,8 +90,8 @@ public class FormValueRepoImpl implements FormValueRepo {
         long start = System.currentTimeMillis();
         String sql = metadataRepo.buildSearchFormData(formDef);
         log.info("构建查询表单详情数据，formId = {}, valueId = {}, spend = {}ms", formDef.getFormId(),
-                formValueQuery.getValueId(), (System.currentTimeMillis() - start));
-        Map<String, Object> content = jdbcTemplate.queryForMap(sql, formValueQuery.getValueId(), formValueQuery.getUser());
+                formValueQuery.getValueIds(), (System.currentTimeMillis() - start));
+        Map<String, Object> content = jdbcTemplate.queryForMap(sql, formValueQuery.getValueIds().get(0), formValueQuery.getUser());
         return FormData.builder().data(content).build();
     }
 }

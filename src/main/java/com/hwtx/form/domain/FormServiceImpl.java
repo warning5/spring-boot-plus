@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import com.hwtx.form.annotation.FormValidation;
 import com.hwtx.form.controller.FormHandleParam;
 import com.hwtx.form.domain.def.FormDef;
+import com.hwtx.form.domain.dto.BatchFormValue;
 import com.hwtx.form.persistence.MetadataRepo;
 import com.hwtx.form.persistence.ds.DefaultColumn;
 import com.hwtx.form.domain.dto.FormValueDto;
@@ -147,10 +148,10 @@ public class FormServiceImpl implements FormService {
 
     @Override
     public void removeValue(FormValueQuery formValueQuery) throws Exception {
-        FormValueDto formValue = new FormValueDto();
+        BatchFormValue formValue = new BatchFormValue();
         formValue.setLastModifyBy(formValueQuery.getUser());
         formValue.setLastModifyTime(new Date());
-        formValue.setId(formValueQuery.getValueId());
+        formValue.setValueIds(formValueQuery.getValueIds());
         formValue.setK1(formValueQuery.getUser());
         formValue.setStatus(false);
         formValue.getFormData().put(DefaultColumn.status.name(), DefaultColumn.Status_DELETED);

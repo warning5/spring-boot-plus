@@ -5,7 +5,9 @@ import com.hwtx.form.domain.FormConstants;
 import com.hwtx.form.domain.FormSearchExt;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.def.FormItemType;
+import com.hwtx.form.domain.dto.BatchFormValue;
 import com.hwtx.form.domain.dto.FormListQuery;
+import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.persistence.ds.DatasourceDao;
 import com.hwtx.form.persistence.ds.DefaultColumn;
 import com.hwtx.form.persistence.ds.JDBCAdapter;
@@ -248,7 +250,8 @@ public class MetadataRepo {
         return builder.toString();
     }
 
-    public String buildUpdateFormData(FormDef formDef, Collection<FormDef.Item> items, Map<String, Object> formData, List<Object> params) {
+    public String buildUpdateFormData(FormDef formDef, Collection<FormDef.Item> items, FormValueDto dto, List<Object> params) {
+        Map<String, Object> formData = dto.getFormData();
         StringBuilder builder = new StringBuilder();
         builder.append("UPDATE ").append(getTableName(formDef.getName())).append(" SET ");
         items.forEach(item -> {
@@ -268,7 +271,20 @@ public class MetadataRepo {
         } else {
             builder.delete(builder.length() - 2, builder.length());
         }
-        builder.append(" WHERE ").append(FormConstants.INPUT_FORM_VALUE_ID).append(" = ?");
+        builder.append(" WHERE 1=1 ");
+        if (dto.isBatch()) {
+            BatchFormValue batchFormValue = (BatchFormValue) dto;
+            builder.append(" AND ").append(FormConstants.INPUT_FORM_VALUE_ID).append(" IN (");
+            batchFormValue.getValueIds().forEach(valueId -> {
+                builder.append("?,");
+                params.add(valueId);
+            });
+            builder.deleteCharAt(builder.length() - 1);
+            builder.append(")");
+        } else {
+            builder.append(" AND ").append(FormConstants.INPUT_FORM_VALUE_ID).append(" = ?");
+            params.add(dto.getId());
+        }
         builder.append(" AND ").append(DefaultColumn.status.name()).append(" = ").append(DefaultColumn.Status_NORMAL);
         builder.append(" AND ").append(create_by.name()).append(" = ").append("?");
         return builder.toString();

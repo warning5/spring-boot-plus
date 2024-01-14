@@ -1,7 +1,6 @@
 package com.hwtx.form.controller;
 
 import com.hwtx.form.domain.FormListService;
-import com.hwtx.form.domain.FormServiceImpl;
 import com.hwtx.form.domain.dto.FormListQuery;
 import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.domain.service.FormService;
@@ -10,6 +9,7 @@ import io.geekidea.boot.framework.response.ApiCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -70,17 +70,20 @@ public class FormController {
     @GetMapping("/get")
     @Operation(summary = "获取表单数据")
     public Api2Result get(FormValueQuery formValueQuery) throws Exception {
-        if (formValueQuery.getValueId() == null) {
-            return Api2Result.result(ApiCode.SUCCESS, "", "{}");
+        if (CollectionUtils.isEmpty(formValueQuery.getValueIds())) {
+            return Api2Result.fail("数据标识不能为空");
+        }
+        if (formValueQuery.getValueIds().size() > 1) {
+            return Api2Result.fail("数据标识只能唯一");
         }
         formValueQuery.setUser("admin");
         return Api2Result.result(ApiCode.SUCCESS, "加载成功", formService.getFormData(formValueQuery).getData());
     }
 
-    @PostMapping("/remove")
+    @RequestMapping(value = "/remove", method = RequestMethod.POST)
     @Operation(summary = "删除表单数据")
     public Api2Result remove(FormValueQuery formValueQuery) throws Exception {
-        if (formValueQuery.getValueId() == null) {
+        if (CollectionUtils.isEmpty(formValueQuery.getValueIds())) {
             return Api2Result.result(ApiCode.FAIL, "数据ID不能为空", "");
         }
         formValueQuery.setUser("admin");
@@ -90,10 +93,9 @@ public class FormController {
 
     @GetMapping("/list")
     @Operation(summary = "获取表单列表")
-    public Api2Result pageList(FormListQuery formListQuery, @PageableDefault(page = 1, size = 20) Pageable pageable,
-                               HttpServletRequest request) throws Exception {
+    public Api2Result pageList(FormListQuery formListQuery, @PageableDefault(page = 1, size = 20) Pageable pageable, HttpServletRequest request) throws Exception {
         if (formListQuery.getFormId() == null) {
-            return Api2Result.result(ApiCode.FAIL, "表单ID不能为空", "");
+            return Api2Result.fail("表单ID不能为空");
         }
         formListQuery.setSearchData(request.getParameterMap());
         return Api2Result.result(ApiCode.SUCCESS, "查询成功", formListService.list(formListQuery, "admin", pageable));

@@ -59,6 +59,10 @@ public class FormValueDto implements Serializable {
     @Schema(description = "逻辑删除 1:正常  0:删除")
     private Boolean status;
 
+    public boolean isBatch() {
+        return false;
+    }
+
     public void setCreateBy(String createBy) {
         formData.put(DefaultColumn.create_by.name(), createBy);
     }
