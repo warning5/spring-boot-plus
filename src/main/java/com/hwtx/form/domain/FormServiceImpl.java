@@ -1,5 +1,6 @@
 package com.hwtx.form.domain;
 
+import com.alibaba.fastjson2.JSON;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
@@ -9,14 +10,15 @@ import com.hwtx.form.annotation.FormValidation;
 import com.hwtx.form.controller.FormHandleParam;
 import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.BatchFormValue;
-import com.hwtx.form.persistence.MetadataRepo;
-import com.hwtx.form.persistence.ds.DefaultColumn;
 import com.hwtx.form.domain.dto.FormValueDto;
 import com.hwtx.form.domain.query.FormValueQuery;
 import com.hwtx.form.domain.repo.FormRepo;
 import com.hwtx.form.domain.repo.FormValueRepo;
 import com.hwtx.form.domain.service.FormService;
 import com.hwtx.form.domain.vo.FormData;
+import com.hwtx.form.persistence.FormChangeLog;
+import com.hwtx.form.persistence.MetadataRepo;
+import com.hwtx.form.persistence.ds.DefaultColumn;
 import io.geekidea.boot.config.properties.BootProperties;
 import io.geekidea.boot.framework.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +31,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.hwtx.form.domain.FormConstants.*;
+import static com.hwtx.form.domain.FormHandleAction.ADD;
+import static com.hwtx.form.domain.FormHandleAction.CREATE;
 
 @Service
 public class FormServiceImpl implements FormService {
@@ -160,32 +164,42 @@ public class FormServiceImpl implements FormService {
     }
 
     @Override
-    public void handleForm(FormHandleParam formHandleParam) throws Exception {
+    public void handleForm(FormHandleParam formHandleParam, String user) throws Exception {
         FormDef formDef = formRepo.getFormDef(formHandleParam.getFormId());
         if (formDef == null) {
             return;
         }
         String formName = formDef.getName();
         Map<String, FormDef.Item> items = formDef.getValidateItems();
+        boolean ret = false;
+        FormChangeLog formChangeLog = new FormChangeLog();
+        formChangeLog.setLastModifyBy(user);
+        formChangeLog.setCreateBy(user);
+        formChangeLog.setContent(JSON.toJSONString(formHandleParam));
         switch (FormHandleAction.valueOf(formHandleParam.getHandleAction())) {
             case CREATE:
-                metadataRepo.create(formName, items.values());
+                ret = metadataRepo.create(formName, items.values());
+                formChangeLog.setType(CREATE.ordinal());
                 break;
             case ADD:
                 FormDef.Item addItem = items.get(formHandleParam.getAddItem());
                 if (addItem != null) {
-                    metadataRepo.add(formName, addItem);
+                    ret = metadataRepo.add(formName, addItem);
+                    formChangeLog.setType(ADD.ordinal());
                 }
                 break;
             case UPDATE:
                 FormDef.Item updateItem = items.get(formHandleParam.getUpdateToItem());
                 if (updateItem != null) {
-                    metadataRepo.update(formName, formHandleParam.getUpdateFromItem(), updateItem);
+                    ret = metadataRepo.update(formName, formHandleParam.getUpdateFromItem(), updateItem);
                 }
             case INDEX:
                 throw new UnsupportedOperationException();
             default:
                 throw new IllegalStateException("Unexpected value: " + FormHandleAction.valueOf(formHandleParam.getHandleAction()));
+        }
+        if (ret) {
+            formRepo.saveFormChangeLog(formChangeLog);
         }
     }
 

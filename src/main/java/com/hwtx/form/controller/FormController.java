@@ -41,7 +41,7 @@ public class FormController {
         if (formHandleParam.getHandleAction() == null) {
             return Api2Result.fail(ApiCode.FAIL, "表单处理动作不可为空");
         }
-        formService.handleForm(formHandleParam);
+        formService.handleForm(formHandleParam, "admin");
         return Api2Result.result(ApiCode.SUCCESS, "处理成功", "");
     }
 

@@ -3,21 +3,16 @@ package com.hwtx.form.persistence;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hwtx.form.domain.def.FormDef;
-import com.hwtx.form.domain.repo.FormRepo;
 import com.hwtx.form.domain.dto.FormDefDto;
-import com.hwtx.form.domain.query.FormDefAppQuery;
-import com.hwtx.form.domain.vo.FormDefAppVo;
+import com.hwtx.form.domain.repo.FormRepo;
 import io.geekidea.boot.framework.exception.BusinessException;
-import io.geekidea.boot.framework.page.OrderByItem;
-import io.geekidea.boot.framework.page.Paging;
-import io.geekidea.boot.util.PagingUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.Date;
 
 /**
  * 表单定义 服务实现类
@@ -31,6 +26,8 @@ public class FormRepoImpl extends ServiceImpl<FormDefMapper, FormDefEntity> impl
 
     @Resource
     private FormDefMapper formDefMapper;
+    @Resource
+    private FormChangeLogMapper formChangeLogMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -79,9 +76,9 @@ public class FormRepoImpl extends ServiceImpl<FormDefMapper, FormDefEntity> impl
     }
 
     @Override
-    public Paging<FormDefAppVo> getAppFormDefPage(FormDefAppQuery query) throws Exception {
-        PagingUtil.handlePage(query, OrderByItem.desc("id"));
-        List<FormDefAppVo> list = formDefMapper.getAppFormDefPage(query);
-        return new Paging<>(list);
+    public boolean saveFormChangeLog(FormChangeLog formChangeLog) {
+        formChangeLog.setLastModifyTime(new Date());
+        formChangeLog.setCreateTime(new Date());
+        return formChangeLogMapper.insert(formChangeLog) > 0;
     }
 }

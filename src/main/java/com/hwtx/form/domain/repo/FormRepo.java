@@ -5,6 +5,8 @@ import com.hwtx.form.domain.def.FormDef;
 import com.hwtx.form.domain.dto.FormDefDto;
 import com.hwtx.form.domain.query.FormDefAppQuery;
 import com.hwtx.form.domain.vo.FormDefAppVo;
+import com.hwtx.form.persistence.FormChangeLog;
+import com.hwtx.form.persistence.FormChangeLogMapper;
 import com.hwtx.form.persistence.FormDefEntity;
 import io.geekidea.boot.framework.page.Paging;
 
@@ -62,13 +64,7 @@ public interface FormRepo extends IService<FormDefEntity> {
      */
     FormDef getFormDef(Long id) throws Exception;
 
-    /**
-     * App表单定义分页列表
-     *
-     * @param query
-     * @return
-     * @throws Exception
-     */
-    Paging<FormDefAppVo> getAppFormDefPage(FormDefAppQuery query) throws Exception;
+
+    boolean saveFormChangeLog(FormChangeLog formChangeLog);
 
 }

@@ -40,7 +40,7 @@ public class MetadataRepo {
         Table table = new Table(tableName);
         if (datasourceDao.exists(table)) {
             log.info("数据表【{}】已存在无需创建", tableName);
-            return true;
+            return false;
         }
         table.addColumn(DefaultColumn.id.name(), StandardColumnType.BIGINT.getName()).primary(true).autoIncrement(true)
                 .setComment(DefaultColumn.id.getComment()).setNullable(false);
@@ -82,6 +82,11 @@ public class MetadataRepo {
         Table table = new Table(getTableName(formName));
         if (!datasourceDao.exists(table)) {
             log.error("数据表【{}】不存在，无法变更表单列【{}】", getTableName(formName), newItem.getName());
+            return false;
+        }
+        Integer count = datasourceDao.runtime().getProcessor().queryForObject("select count(1) from " + getTableName(formName) + " where 1 = 1 and " + status.name() + " = 1", Integer.class);
+        if (count != null && count > 1) {
+            log.error("数据表【{}】已存在数据，无法变更表单列【{}】", getTableName(formName), newItem.getName());
             return false;
         }
         Column newColumn = buildColumn(newItem);
