@@ -52,7 +52,6 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
             throw new BusinessException("系统配置不存在");
         }
         BeanUtils.copyProperties(dto, sysConfig);
-        sysConfig.setUpdateTime(new Date());
         return updateById(sysConfig);
     }
 

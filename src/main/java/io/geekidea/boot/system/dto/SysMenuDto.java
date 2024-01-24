@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @since 2022-12-26
  */
 @Data
-@Schema(description = "修改系统菜单参数")
+@Schema(description = "系统菜单参数")
 public class SysMenuDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -29,16 +29,15 @@ public class SysMenuDto implements Serializable {
     @Schema(description = "父id")
     private Long parentId;
 
-    @Schema(description = "菜单唯一编码")
-    @NotBlank(message = "菜单唯一编码不能为空")
-    @Length(max = 100, message = "菜单唯一编码长度超过限制")
+    @Schema(description = "菜单编码")
+    @Length(max = 100, message = "菜单编码长度超过限制")
     private String code;
 
     @Schema(description = "菜单图标")
     @Length(max = 100, message = "菜单图标长度超过限制")
     private String icon;
 
-    @Schema(description = "菜单类型，1：菜单，2：外链，3：权限")
+    @Schema(description = "菜单类型，1：目录，2：菜单，3：权限")
     @NotNull(message = "菜单类型不能为空")
     private Integer type;
 
@@ -51,10 +50,6 @@ public class SysMenuDto implements Serializable {
     @Schema(description = "前端路由地址")
     @Length(max = 200, message = "前端路由地址长度超过限制")
     private String routeUrl;
-
-    @Schema(description = "路由名称")
-    @Length(max = 20, message = "路由名称长度超过限制")
-    private String routeName;
 
     @Schema(description = "重定向")
     @Length(max = 100, message = "重定向长度超过限制")
@@ -69,16 +64,6 @@ public class SysMenuDto implements Serializable {
 
     @Schema(description = "是否缓存，0：否 1：是")
     private Boolean isCache;
-
-    @Schema(description = "是否外链，0：否 1：是")
-    private Boolean isLink;
-
-    @Schema(description = "链接地址")
-    @Length(max = 100, message = "链接地址长度超过限制")
-    private String linkUrl;
-    
-    @Schema(description = "是否首页 0：否，1：是")
-    private Boolean isHome;
 
 }
 

@@ -1,5 +1,6 @@
 package io.geekidea.boot.auth.interceptor;
 
+import io.geekidea.boot.auth.annotation.IgnoreLogin;
 import io.geekidea.boot.auth.annotation.Permission;
 import io.geekidea.boot.auth.cache.LoginCache;
 import io.geekidea.boot.auth.util.LoginUtil;
@@ -43,8 +44,8 @@ public class LoginInterceptor extends BaseExcludeMethodInterceptor {
             }
         }
         // 判断是否存在@IgnoreLogin，存在，则跳过
-        boolean existIgnoreLoginAnnotation = isExistIgnoreLoginAnnotation(handlerMethod);
-        if (existIgnoreLoginAnnotation) {
+        IgnoreLogin ignoreLoginAnnotation = getIgnoreLoginAnnotation(handlerMethod);
+        if (ignoreLoginAnnotation != null) {
             return true;
         }
         // 校验登录

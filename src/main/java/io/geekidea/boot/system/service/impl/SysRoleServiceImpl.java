@@ -67,10 +67,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         if (sysRole == null) {
             throw new BusinessException("系统角色不存在");
         }
-        // 只修改名称和备注
         sysRole.setName(dto.getName());
+        sysRole.setIsSystem(dto.getIsSystem());
         sysRole.setRemark(dto.getRemark());
-        sysRole.setUpdateTime(new Date());
         return updateById(sysRole);
     }
 

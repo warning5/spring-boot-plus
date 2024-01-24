@@ -25,13 +25,13 @@ public class SysMenuTreeVo {
     @Schema(description = "父id")
     private Long parentId;
 
-    @Schema(description = "菜单唯一编码")
+    @Schema(description = "菜单编码")
     private String code;
 
     @Schema(description = "菜单图标")
     private String icon;
 
-    @Schema(description = "菜单类型，1：菜单，2：外链，3：权限")
+    @Schema(description = "菜单类型，1：目录，2：菜单，3：权限")
     private Integer type;
 
     @Schema(description = "状态，0：禁用，1：启用")
@@ -43,8 +43,8 @@ public class SysMenuTreeVo {
     @Schema(description = "前端路由地址")
     private String routeUrl;
 
-    @Schema(description = "创建时间")
-    private Date createTime;
+    @Schema(description = "组件路径")
+    private String componentPath;
 
     @Schema(description = "子菜单集合")
     private List<SysMenuTreeVo> children;

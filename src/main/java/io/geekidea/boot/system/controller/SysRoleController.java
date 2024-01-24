@@ -147,7 +147,6 @@ public class SysRoleController {
      */
     @PostMapping("/getMenuIdsByRoleId/{roleId}")
     @Operation(summary = "获取角色权限ID集合")
-    @Permission("sys:role:menu-ids")
     public ApiResult getMenuIdsByRoleId(@PathVariable Long roleId) throws Exception {
         List<Long> list = sysMenuService.getMenuIdsByRoleId(roleId);
         return ApiResult.success(list);

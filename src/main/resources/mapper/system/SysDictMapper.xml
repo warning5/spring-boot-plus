@@ -24,7 +24,7 @@
     </select>
 
     <select id="getAppSysDictList" parameterType="io.geekidea.boot.system.query.SysDictAppQuery"
-            resultType="io.geekidea.boot.system.vo.SysDictAppVo">
+            resultType="io.geekidea.boot.system.vo.AppSysDictVo">
         select value, label, dict_code
         from sys_dict
         where status = 1

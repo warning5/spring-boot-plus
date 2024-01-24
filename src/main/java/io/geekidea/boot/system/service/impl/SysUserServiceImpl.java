@@ -1,18 +1,23 @@
 package io.geekidea.boot.system.service.impl;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.read.listener.PageReadListener;
+import com.alibaba.excel.read.listener.ReadListener;
+import com.alibaba.excel.util.ListUtils;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.geekidea.boot.auth.service.LoginRedisService;
 import io.geekidea.boot.auth.util.LoginUtil;
+import io.geekidea.boot.common.constant.CommonConstant;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.OrderByItem;
 import io.geekidea.boot.framework.page.Paging;
-import io.geekidea.boot.system.dto.SysUserDto;
-import io.geekidea.boot.system.dto.SysUserResetPasswordDto;
-import io.geekidea.boot.system.dto.SysUserUpdatePasswordDto;
-import io.geekidea.boot.system.dto.SysUserUpdateProfileDto;
+import io.geekidea.boot.system.dto.*;
 import io.geekidea.boot.system.entity.SysUser;
+import io.geekidea.boot.system.listener.SysUserImportListener;
 import io.geekidea.boot.system.mapper.SysUserMapper;
 import io.geekidea.boot.system.query.SysUserQuery;
 import io.geekidea.boot.system.service.SysUserService;
@@ -22,12 +27,15 @@ import io.geekidea.boot.util.PasswordUtil;
 import io.geekidea.boot.util.TokenUtil;
 import io.geekidea.boot.util.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -71,7 +79,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("系统用户不存在");
         }
         BeanUtils.copyProperties(dto, sysUser);
-        sysUser.setUpdateTime(new Date());
         return updateById(sysUser);
     }
 
@@ -111,7 +118,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateProfile(SysUserUpdateProfileDto sysUserUpdateProfileDto) throws Exception {
-        Long id = sysUserUpdateProfileDto.getId();
+        Long id = LoginUtil.getUserId();
         SysUser sysUser = getById(id);
         if (sysUser == null) {
             throw new BusinessException("用户信息不存在");
@@ -120,11 +127,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         lambdaUpdateWrapper.set(SysUser::getNickname, sysUserUpdateProfileDto.getNickname());
         lambdaUpdateWrapper.set(SysUser::getPhone, sysUserUpdateProfileDto.getPhone());
         lambdaUpdateWrapper.set(SysUser::getEmail, sysUserUpdateProfileDto.getEmail());
-        lambdaUpdateWrapper.set(SysUser::getGender, sysUserUpdateProfileDto.getGender());
         lambdaUpdateWrapper.set(SysUser::getHead, sysUserUpdateProfileDto.getHead());
         lambdaUpdateWrapper.eq(SysUser::getId, id);
         boolean flag = update(lambdaUpdateWrapper);
-        // TODO 更新缓存中的用户信息
         return flag;
     }
 
@@ -166,6 +171,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (count > 0) {
             throw new BusinessException(username + "用户名已经存在");
         }
+    }
+
+    @Override
+    public boolean importExcel(MultipartFile multipartFile) throws Exception {
+        String originalFilename = multipartFile.getOriginalFilename();
+        log.info("导入的Excel文件名称：" + originalFilename);
+        String extension = FilenameUtils.getExtension(originalFilename).toLowerCase();
+        if (!(extension.endsWith(CommonConstant.XLS) || extension.endsWith(CommonConstant.XLSX))) {
+            throw new BusinessException("只能导入xls或xlsx格式的Excel文件");
+        }
+        InputStream inputStream = multipartFile.getInputStream();
+
+        EasyExcel.read(inputStream, SysUserExcelDto.class, new PageReadListener<SysUserExcelDto>(dataList -> {
+            for (SysUserExcelDto demoData : dataList) {
+                log.info("读取到一条数据{}", JSON.toJSONString(demoData));
+            }
+        },10)).sheet().doRead();
+
+
+        return false;
     }
 
     /**

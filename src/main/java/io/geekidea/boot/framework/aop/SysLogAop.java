@@ -10,7 +10,7 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import io.geekidea.boot.auth.annotation.Permission;
-import io.geekidea.boot.auth.util.LoginCommonUtil;
+import io.geekidea.boot.auth.util.CommonLoginUtil;
 import io.geekidea.boot.common.constant.AopConstant;
 import io.geekidea.boot.common.constant.CommonConstant;
 import io.geekidea.boot.common.enums.SystemType;
@@ -500,7 +500,7 @@ public class SysLogAop {
                     sysLog.setSystemType(systemType.getCode());
                     // 记录用户ID
                     try {
-                        Long userId = LoginCommonUtil.getUserId(systemType);
+                        Long userId = CommonLoginUtil.getUserId(systemType);
                         sysLog.setUserId(userId);
                     } catch (Exception e) {
 

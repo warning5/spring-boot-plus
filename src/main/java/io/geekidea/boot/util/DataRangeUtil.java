@@ -1,8 +1,8 @@
 package io.geekidea.boot.util;
 
-import io.geekidea.boot.auth.util.LoginAppUtil;
+import io.geekidea.boot.auth.util.AppLoginUtil;
 import io.geekidea.boot.auth.util.LoginUtil;
-import io.geekidea.boot.auth.vo.LoginAppVo;
+import io.geekidea.boot.auth.vo.AppLoginVo;
 import io.geekidea.boot.auth.vo.LoginVo;
 import io.geekidea.boot.common.enums.SystemType;
 import io.geekidea.boot.framework.query.DataRangeQuery;
@@ -36,13 +36,13 @@ public class DataRangeUtil {
      * @param dataRangeQuery
      */
     public static void handleAppLogin(DataRangeQuery dataRangeQuery) throws Exception {
-        LoginAppVo loginAppVo = LoginAppUtil.getLoginVo();
-        if (loginAppVo != null) {
-            Long userId = loginAppVo.getUserId();
+        AppLoginVo appLoginVo = AppLoginUtil.getLoginVo();
+        if (appLoginVo != null) {
+            Long userId = appLoginVo.getUserId();
             dataRangeQuery.setLoginCommonUserId(userId);
             dataRangeQuery.setLoginAppUserId(userId);
-            dataRangeQuery.setLoginAppVip(loginAppVo.isVip());
-            dataRangeQuery.setLoginAppVipLevel(loginAppVo.getVipLevel());
+            dataRangeQuery.setLoginAppUserRoleId(appLoginVo.getUserRoleId());
+            dataRangeQuery.setLoginAppUserRoleCode(appLoginVo.getUserRoleCode());
         }
     }
 
@@ -60,9 +60,9 @@ public class DataRangeUtil {
                 dataRangeQuery.setLoginCommonUserId(loginVo.getUserId());
             }
         } else if (SystemType.APP == systemType) {
-            LoginAppVo loginAppVo = LoginAppUtil.getLoginVo();
-            if (loginAppVo != null) {
-                dataRangeQuery.setLoginCommonUserId(loginAppVo.getUserId());
+            AppLoginVo appLoginVo = AppLoginUtil.getLoginVo();
+            if (appLoginVo != null) {
+                dataRangeQuery.setLoginCommonUserId(appLoginVo.getUserId());
             }
         }
     }

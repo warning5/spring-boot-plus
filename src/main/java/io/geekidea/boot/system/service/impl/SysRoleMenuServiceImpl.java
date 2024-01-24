@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 角色菜单关系表 服务实现类
  *
@@ -24,9 +26,16 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public void deleteSysRoleMenuByRoleId(Long roleId) {
-        LambdaUpdateWrapper<SysRoleMenu> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        lambdaUpdateWrapper.eq(SysRoleMenu::getRoleId, roleId);
-        remove(lambdaUpdateWrapper);
+        LambdaUpdateWrapper<SysRoleMenu> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SysRoleMenu::getRoleId, roleId);
+        remove(wrapper);
+    }
+
+    @Override
+    public void deleteSysRoleMenuByMenuIds(List<Long> menuIds) {
+        LambdaUpdateWrapper<SysRoleMenu> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(SysRoleMenu::getMenuId, menuIds);
+        remove(wrapper);
     }
 
 }

@@ -38,16 +38,16 @@ public class DataRangeQuery implements Serializable {
     @Null(message = "非法参数")
     private String loginRoleCode;
 
-    @Schema(description = "是否是移动端的会员", hidden = true)
+    @Schema(description = "移动端登录用户角色ID", hidden = true)
     @Null(message = "非法参数")
-    private Boolean loginAppVip;
+    private Long loginAppUserRoleId;
+
+    @Schema(description = "移动端登录用户角色编码", hidden = true)
+    @Null(message = "非法参数")
+    private String loginAppUserRoleCode;
 
     @Schema(description = "APP登录用户ID", hidden = true)
     @Null(message = "非法参数")
     private Long loginAppUserId;
-
-    @Schema(description = "APP端登录VIP级别", hidden = true)
-    @Null(message = "非法参数")
-    private Integer loginAppVipLevel;
 
 }

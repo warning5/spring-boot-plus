@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @since 2023-11-25
  */
 @Data
-@Schema(description = "修改字典类型参数")
+@Schema(description = "字典类型参数")
 public class SysDictTypeDto implements Serializable {
 
     private static final long serialVersionUID = 1L;

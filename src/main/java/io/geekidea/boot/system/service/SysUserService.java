@@ -9,6 +9,7 @@ import io.geekidea.boot.system.dto.SysUserUpdateProfileDto;
 import io.geekidea.boot.system.entity.SysUser;
 import io.geekidea.boot.system.query.SysUserQuery;
 import io.geekidea.boot.system.vo.SysUserVo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 系统用户 服务接口
@@ -98,5 +99,14 @@ public interface SysUserService extends IService<SysUser> {
      * @throws Exception
      */
     void checkUsernameExists(String username) throws Exception;
+
+    /**
+     * 导入Excel用户数据
+     *
+     * @param multipartFile
+     * @return
+     * @throws Exception
+     */
+    boolean importExcel(MultipartFile multipartFile) throws Exception;
 
 }

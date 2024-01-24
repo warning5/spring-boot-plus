@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @since 2023-11-26
  */
 @Data
-@Schema(description = "修改系统文件参数")
+@Schema(description = "系统文件参数")
 public class SysFileDto implements Serializable {
 
     private static final long serialVersionUID = 1L;

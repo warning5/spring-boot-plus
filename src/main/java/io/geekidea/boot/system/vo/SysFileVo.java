@@ -67,8 +67,17 @@ public class SysFileVo implements Serializable {
     @Schema(description = "文件类型 1：图片，2：音视频，3：文档，4：文件")
     private Integer fileType;
 
+    @Schema(description = "创建人ID")
+    private Long createId;
+
     @Schema(description = "创建时间")
     private Date createTime;
+
+    @Schema(description = "修改人ID")
+    private Long updateId;
+
+    @Schema(description = "修改时间")
+    private Date updateTime;
 
 }
 

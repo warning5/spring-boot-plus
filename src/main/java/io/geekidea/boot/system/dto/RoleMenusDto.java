@@ -11,7 +11,7 @@ import java.util.List;
  * @date 2023/6/18
  **/
 @Data
-@Schema(description = "设置角色权限")
+@Schema(description = "设置角色权限Dto")
 public class RoleMenusDto {
 
     @Schema(description = "角色ID")

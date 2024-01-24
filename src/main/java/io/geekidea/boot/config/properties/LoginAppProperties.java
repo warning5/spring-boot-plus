@@ -4,6 +4,7 @@ import io.geekidea.boot.common.constant.LoginConstant;
 import io.geekidea.boot.util.YamlUtil;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @date 2022/6/26
  **/
 @Data
+@Component
 @ConfigurationProperties(prefix = "login.app")
 public class LoginAppProperties {
 

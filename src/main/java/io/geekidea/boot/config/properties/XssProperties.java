@@ -2,12 +2,14 @@ package io.geekidea.boot.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * @author geekidea
  * @date 2023/7/9
  **/
 @Data
+@Component
 @ConfigurationProperties(prefix = "xss")
 public class XssProperties {
 

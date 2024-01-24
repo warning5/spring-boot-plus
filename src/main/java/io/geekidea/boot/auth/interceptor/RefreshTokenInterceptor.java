@@ -1,6 +1,6 @@
 package io.geekidea.boot.auth.interceptor;
 
-import io.geekidea.boot.auth.service.LoginRedisAppService;
+import io.geekidea.boot.auth.service.AppLoginRedisService;
 import io.geekidea.boot.auth.service.LoginRedisService;
 import io.geekidea.boot.common.enums.SystemType;
 import io.geekidea.boot.framework.interceptor.BaseExcludeMethodInterceptor;
@@ -23,7 +23,7 @@ public class RefreshTokenInterceptor extends BaseExcludeMethodInterceptor {
     private LoginRedisService loginRedisService;
 
     @Autowired
-    private LoginRedisAppService loginRedisAppService;
+    private AppLoginRedisService appLoginRedisService;
 
     @Override
     protected boolean preHandleMethod(HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
@@ -31,7 +31,7 @@ public class RefreshTokenInterceptor extends BaseExcludeMethodInterceptor {
         if (SystemType.ADMIN == systemType) {
             loginRedisService.refreshToken();
         } else if (SystemType.APP == systemType) {
-            loginRedisAppService.refreshToken();
+            appLoginRedisService.refreshToken();
         }
         return true;
     }

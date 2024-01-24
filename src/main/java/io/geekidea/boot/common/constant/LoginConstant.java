@@ -12,7 +12,7 @@ public interface LoginConstant {
     /**
      * 默认的token名称
      */
-    String TOKEN_NAME = "token";
+    String TOKEN_NAME = "Authorization";
 
     /**
      * token前缀
@@ -73,5 +73,10 @@ public interface LoginConstant {
      * 管理员admin角色ID
      */
     List<Long> ADMIN_ROLE_ID_LIST = Arrays.asList(1L);
+
+    /**
+     * APP端普通用户角色
+     */
+    Long APP_NORMAL_USER_ROLE = 1L;
 
 }

@@ -1,14 +1,16 @@
 package io.geekidea.boot.system.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.geekidea.boot.auth.util.LoginUtil;
+import io.geekidea.boot.common.constant.SystemConstant;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.system.dto.SysMenuDto;
 import io.geekidea.boot.system.entity.SysMenu;
+import io.geekidea.boot.system.enums.SysMenuType;
 import io.geekidea.boot.system.mapper.SysMenuMapper;
 import io.geekidea.boot.system.query.SysMenuQuery;
 import io.geekidea.boot.system.service.SysMenuService;
+import io.geekidea.boot.system.service.SysRoleMenuService;
 import io.geekidea.boot.system.vo.SysMenuTreeVo;
 import io.geekidea.boot.system.vo.SysMenuVo;
 import io.geekidea.boot.system.vo.SysNavMenuTreeVo;
@@ -20,7 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,12 +40,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Autowired
     private SysMenuMapper sysMenuMapper;
 
+    @Autowired
+    private SysRoleMenuService sysRoleMenuService;
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean addSysMenu(SysMenuDto dto) throws Exception {
-        checkCodeExists(dto.getCode());
         SysMenu sysMenu = new SysMenu();
         BeanUtils.copyProperties(dto, sysMenu);
+        Long parentId = dto.getParentId();
+        if (parentId == null) {
+            sysMenu.setParentId(SystemConstant.ROOT_MENU_ID);
+        }
         return save(sysMenu);
     }
 
@@ -55,14 +64,41 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             throw new BusinessException("系统菜单不存在");
         }
         BeanUtils.copyProperties(dto, sysMenu);
-        sysMenu.setUpdateTime(new Date());
         return updateById(sysMenu);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean deleteSysMenu(Long id) throws Exception {
-        return removeById(id);
+        // 获取菜单
+        SysMenu sysMenu = getById(id);
+        if (sysMenu == null) {
+            throw new BusinessException("菜单数据不存在");
+        }
+        // 所有关联菜单ID集合
+        List<Long> deleteMenuIds = new ArrayList<>();
+        deleteMenuIds.add(id);
+        Integer type = sysMenu.getType();
+        SysMenuType sysMenuType = SysMenuType.get(type);
+        if (SysMenuType.DIR == sysMenuType) {
+            // 如果是目录，则先查询所有的子菜单ID，再根据子菜单ID查询所有的权限菜单ID
+            List<Long> menuIds = sysMenuMapper.getChildrenMenuIds(Arrays.asList(id));
+            deleteMenuIds.addAll(menuIds);
+            if (CollectionUtils.isNotEmpty(menuIds)) {
+                List<Long> permissionMenuIds = sysMenuMapper.getChildrenMenuIds(menuIds);
+                deleteMenuIds.addAll(permissionMenuIds);
+            }
+        } else if (SysMenuType.MENU == sysMenuType) {
+            // 如果是菜单，则查询所有的权限子菜单
+            List<Long> menuIds = sysMenuMapper.getChildrenMenuIds(Arrays.asList(id));
+            if (CollectionUtils.isNotEmpty(menuIds)) {
+                deleteMenuIds.addAll(menuIds);
+            }
+        }
+        // 删除角色菜单关系表中的相关菜单关联
+        sysRoleMenuService.deleteSysRoleMenuByMenuIds(deleteMenuIds);
+        // 删除所有关联菜单
+        return removeByIds(deleteMenuIds);
     }
 
     @Override
@@ -115,16 +151,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<Long> getMenuIdsByRoleId(Long roleId) throws Exception {
         return sysMenuMapper.getMenuIdsByRoleId(roleId);
-    }
-
-    @Override
-    public void checkCodeExists(String code) throws Exception {
-        LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(SysMenu::getCode, code);
-        long count = count(wrapper);
-        if (count > 0) {
-            throw new BusinessException(code + "权限标识已经存在");
-        }
     }
 
     /**

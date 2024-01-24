@@ -3,6 +3,8 @@ package io.geekidea.boot.system.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.geekidea.boot.system.entity.SysRoleMenu;
 
+import java.util.List;
+
 /**
  * 角色菜单关系表 服务接口
  *
@@ -17,5 +19,7 @@ public interface SysRoleMenuService extends IService<SysRoleMenu> {
      * @param roleId
      */
     void deleteSysRoleMenuByRoleId(Long roleId);
+
+    void deleteSysRoleMenuByMenuIds(List<Long> menuIds);
 
 }

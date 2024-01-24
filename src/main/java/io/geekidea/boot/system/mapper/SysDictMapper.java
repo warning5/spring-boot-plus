@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.geekidea.boot.system.entity.SysDict;
 import io.geekidea.boot.system.query.SysDictAppQuery;
 import io.geekidea.boot.system.query.SysDictQuery;
-import io.geekidea.boot.system.vo.SysDictAppVo;
+import io.geekidea.boot.system.vo.AppSysDictVo;
 import io.geekidea.boot.system.vo.SysDictVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,6 +18,7 @@ import java.util.List;
  */
 @Mapper
 public interface SysDictMapper extends BaseMapper<SysDict> {
+
 
     /**
      * 字典数据详情
@@ -41,6 +42,6 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
      * @param query
      * @return
      */
-    List<SysDictAppVo> getAppSysDictList(SysDictAppQuery query);
+    List<AppSysDictVo> getAppSysDictList(SysDictAppQuery query);
 
 }

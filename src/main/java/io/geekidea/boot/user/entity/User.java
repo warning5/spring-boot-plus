@@ -1,8 +1,7 @@
 package io.geekidea.boot.user.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -47,11 +46,8 @@ public class User implements Serializable {
     @Schema(description = "头像")
     private String head;
 
-    @Schema(description = "是否是VIP，1：是，0：否")
-    private Boolean isVip;
-
-    @Schema(description = "VIP等级 1：普通会员，2：黄金会员，3：铂金会员，4：钻石会员")
-    private Integer vipLevel;
+    @Schema(description = "用户角色ID")
+    private Long userRoleId;
 
     @Schema(description = "状态 1：正常，0：禁用")
     private Boolean status;
@@ -77,10 +73,20 @@ public class User implements Serializable {
     @Schema(description = "备注")
     private String remark;
 
+    @Schema(description = "创建人ID")
+    @TableField(fill = FieldFill.INSERT)
+    private Long createId;
+
     @Schema(description = "创建时间")
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
+    @Schema(description = "修改人ID")
+    @TableField(fill = FieldFill.UPDATE)
+    private Long updateId;
+
     @Schema(description = "修改时间")
+    @TableField(fill = FieldFill.UPDATE)
     private Date updateTime;
 
 }

@@ -16,7 +16,7 @@ import java.util.Date;
  * @since 2023-11-25
  */
 @Data
-@Schema(description = "修改用户信息参数")
+@Schema(description = "用户信息参数")
 public class UserDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,12 +52,8 @@ public class UserDto implements Serializable {
     @Length(max = 200, message = "头像长度超过限制")
     private String head;
 
-    @Schema(description = "是否是VIP，1：是，0：否")
-    private Boolean isVip;
-
-    @Schema(description = "VIP等级 1：普通会员，2：黄金会员，3：铂金会员，4：钻石会员")
-    @NotNull(message = "VIP等级 1：普通会员，2：黄金会员，3：铂金会员，4：钻石会员不能为空")
-    private Integer vipLevel;
+    @Schema(description = "用户角色ID")
+    private Long userRoleId;
 
     @Schema(description = "状态 1：正常，0：禁用")
     @NotNull(message = "状态 1：正常，0：禁用不能为空")

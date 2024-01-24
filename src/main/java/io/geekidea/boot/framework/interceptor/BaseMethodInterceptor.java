@@ -1,5 +1,6 @@
 package io.geekidea.boot.framework.interceptor;
 
+import io.geekidea.boot.auth.annotation.AppUserRole;
 import io.geekidea.boot.auth.annotation.IgnoreLogin;
 import io.geekidea.boot.auth.annotation.Login;
 import org.springframework.web.method.HandlerMethod;
@@ -35,41 +36,60 @@ public abstract class BaseMethodInterceptor implements HandlerInterceptor {
     }
 
     /**
-     * 获取方法上和类上是否有@Login注解，如果没有，则放行，否则，则校验
+     * 获取方法上和类上的@Login注解
      *
      * @param handlerMethod
      * @return
      */
-    protected boolean isExistLoginAnnotation(HandlerMethod handlerMethod) {
+    protected Login getLoginAnnotation(HandlerMethod handlerMethod) {
         // 从方法上获取登录注解
         Login login = handlerMethod.getMethodAnnotation(Login.class);
         if (login != null) {
-            return true;
+            return login;
         }
         // 从类上获取登录注解
         login = handlerMethod.getMethod().getDeclaringClass().getAnnotation(Login.class);
         if (login != null) {
-            return true;
+            return login;
         }
-        return false;
+        return null;
     }
 
     /**
-     * 获取方法上和类上是否有@IgnoreLogin注解，如果有，则放行，否则，则校验
+     * 获取方法上和类上的@IgnoreLogin注解
      *
      * @param handlerMethod
      * @return
      */
-    protected boolean isExistIgnoreLoginAnnotation(HandlerMethod handlerMethod) {
+    protected IgnoreLogin getIgnoreLoginAnnotation(HandlerMethod handlerMethod) {
         IgnoreLogin ignoreLogin = handlerMethod.getMethodAnnotation(IgnoreLogin.class);
         if (ignoreLogin != null) {
-            return true;
+            return ignoreLogin;
         }
         ignoreLogin = handlerMethod.getMethod().getDeclaringClass().getAnnotation(IgnoreLogin.class);
         if (ignoreLogin != null) {
-            return true;
+            return ignoreLogin;
         }
-        return false;
+        return null;
+    }
+
+
+    /**
+     * 获取方法上和类上的@AppUserRole注解
+     *
+     * @param handlerMethod
+     * @return
+     */
+    protected AppUserRole getAppUserRoleAnnotation(HandlerMethod handlerMethod) {
+        AppUserRole appUserRole = handlerMethod.getMethodAnnotation(AppUserRole.class);
+        if (appUserRole != null) {
+            return appUserRole;
+        }
+        appUserRole = handlerMethod.getMethod().getDeclaringClass().getAnnotation(AppUserRole.class);
+        if (appUserRole != null) {
+            return appUserRole;
+        }
+        return null;
     }
 
 

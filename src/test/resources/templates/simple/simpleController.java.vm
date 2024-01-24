@@ -1,9 +1,9 @@
 package $!{controllerPackage};
 
-    #if($!{generateService})
-    import $!{servicePackage}.$!{serviceName};
-    import org.springframework.beans.factory.annotation.Autowired;
-    #end
+#if($!{generateService})
+import $!{servicePackage}.$!{serviceName};
+import org.springframework.beans.factory.annotation.Autowired;
+#end
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;

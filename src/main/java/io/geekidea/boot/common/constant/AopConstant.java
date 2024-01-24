@@ -14,7 +14,7 @@ public interface AopConstant {
     /**
      * APP切点
      */
-    String APP_POINTCUT = "execution(public * " + CommonConstant.PACKAGE_NAME + "..*.controller..*AppController*.*(..))";
+    String APP_POINTCUT = "execution(public * " + CommonConstant.PACKAGE_NAME + "..*.controller..App*Controller*.*(..))";
 
     /**
      * 管理后台切点

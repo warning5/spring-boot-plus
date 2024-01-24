@@ -13,31 +13,29 @@
     <select id="getSysUserPage" parameterType="io.geekidea.boot.system.query.SysUserQuery"
             resultType="io.geekidea.boot.system.vo.SysUserVo">
         select u.*,
-        r.name roleName
+        r.name roleName,
+        r.is_system roleIsSystem
         from sys_user u
         inner join sys_role r
         on u.role_id = r.id
         <where>
-            <if test="username != null and username != ''">
-                u.username like concat('%',#{username},'%')
-            </if>
-            <if test="nickname != null and nickname != ''">
-                and u.nickname like concat('%',#{nickname},'%')
-            </if>
             <if test="roleId != null">
                 and r.id = #{roleId}
-            </if>
-            <if test="phone != null and phone != ''">
-                and u.phone like concat('%',#{phone},'%')
             </if>
             <if test="status != null">
                 and u.status = #{status}
             </if>
-            <if test="createStartTime != null">
-                and date(u.create_time) >= date(#{createStartTime})
+            <if test="startCreateTime != null">
+                and date(u.create_time) >= date(#{startCreateTime})
             </if>
-            <if test="createEndTime != null">
-                and date(u.create_time) &lt;= date(#{createEndTime})
+            <if test="endCreateTime != null">
+                and date(u.create_time) &lt;= date(#{endCreateTime})
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (u.username like concat('%',#{keyword},'%')
+                or u.nickname like concat('%',#{keyword},'%')
+                or u.phone like concat('%',#{keyword},'%')
+                or u.email like concat('%',#{keyword},'%'))
             </if>
         </where>
     </select>

@@ -4,7 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import io.geekidea.boot.auth.util.LoginCommonUtil;
+import io.geekidea.boot.auth.util.CommonLoginUtil;
 import io.geekidea.boot.common.constant.UploadConstant;
 import io.geekidea.boot.common.enums.FileServerType;
 import io.geekidea.boot.common.enums.SysFileType;
@@ -122,7 +122,7 @@ public class UploadServiceImpl implements UploadService {
         SystemType systemType = SystemTypeUtil.getSystemTypeByToken();
         if (systemType != null) {
             sysFile.setSystemType(systemType.getCode());
-            sysFile.setUserId(LoginCommonUtil.getUserId(systemType));
+            sysFile.setUserId(CommonLoginUtil.getUserId(systemType));
         }
         // 文件物理路径，本地文件服务时才有
         if (uploadFile != null) {
@@ -143,6 +143,8 @@ public class UploadServiceImpl implements UploadService {
         uploadVo.setOriginalFilename(originalFilename);
         uploadVo.setFilename(newFileName);
         uploadVo.setUrl(url);
+        uploadVo.setSize(size);
+        uploadVo.setSizeMb(sizeMb);
         log.info("文件上传结束");
         return uploadVo;
     }
@@ -181,7 +183,7 @@ public class UploadServiceImpl implements UploadService {
     }
 
     private void checkUploadType(String type, BigDecimal sizeMb, String extension) throws Exception {
-        UploadType uploadType = UploadType.getUploadType(type);
+        UploadType uploadType = UploadType.get(type);
         System.out.println("uploadType = " + uploadType);
         if (UploadType.ANY == uploadType) {
             return;

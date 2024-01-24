@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @since 2022-12-26
  */
 @Data
-@Schema(description = "修改系统用户参数")
+@Schema(description = "系统用户参数")
 public class SysUserDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -41,9 +41,6 @@ public class SysUserDto implements Serializable {
     @Schema(description = "电子邮件")
     @Length(max = 255, message = "电子邮件长度超过限制")
     private String email;
-
-    @Schema(description = "性别，0：未知，1：男，2：女，默认0")
-    private Integer gender;
 
     @Schema(description = "状态，0：禁用，1：启用")
     private Boolean status;

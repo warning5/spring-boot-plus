@@ -3,7 +3,7 @@ package io.geekidea.boot.system.controller;
 import io.geekidea.boot.framework.response.ApiResult;
 import io.geekidea.boot.system.query.SysDictAppQuery;
 import io.geekidea.boot.system.service.SysDictService;
-import io.geekidea.boot.system.vo.SysDictAppVo;
+import io.geekidea.boot.system.vo.AppSysDictVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +41,8 @@ public class SysDictAppController {
      */
     @PostMapping("/getAppSysDictList")
     @Operation(summary = "App字典数据列表")
-    public ApiResult<SysDictAppVo> getAppSysDictList(@Valid @RequestBody SysDictAppQuery query) throws Exception {
-        Map<String,List<SysDictAppVo>> map = sysDictService.getAppSysDictList(query);
+    public ApiResult<AppSysDictVo> getAppSysDictList(@Valid @RequestBody SysDictAppQuery query) throws Exception {
+        Map<String,List<AppSysDictVo>> map = sysDictService.getAppSysDictList(query);
         return ApiResult.success(map);
     }
 

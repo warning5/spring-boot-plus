@@ -27,11 +27,20 @@ public class SysRoleVo implements Serializable {
     @Schema(description = "角色唯一编码")
     private String code;
 
+    @Schema(description = "是否系统内置角色 1：是，0：否")
+    private Boolean isSystem;
+
     @Schema(description = "角色备注")
     private String remark;
 
+    @Schema(description = "创建人ID")
+    private Long createId;
+
     @Schema(description = "创建时间")
     private Date createTime;
+
+    @Schema(description = "修改人ID")
+    private Long updateId;
 
     @Schema(description = "修改时间")
     private Date updateTime;

@@ -39,11 +39,14 @@ public class UserVo implements Serializable {
     @Schema(description = "头像")
     private String head;
 
-    @Schema(description = "是否是VIP，1：是，0：否")
-    private Boolean isVip;
+    @Schema(description = "用户角色ID")
+    private Long userRoleId;
 
-    @Schema(description = "VIP等级 1：普通会员，2：黄金会员，3：铂金会员，4：钻石会员")
-    private Integer vipLevel;
+    @Schema(description = "用户角色编码")
+    private String userRoleCode;
+
+    @Schema(description = "用户角色名称")
+    private String userRoleName;
 
     @Schema(description = "状态 1：正常，0：禁用")
     private Boolean status;

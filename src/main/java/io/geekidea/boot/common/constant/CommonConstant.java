@@ -19,31 +19,6 @@ public interface CommonConstant {
     String COMMON_PACKAGE_NAME = PACKAGE_NAME + ".common";
 
     /**
-     * 系统管理包名称
-     */
-    String AUTH_PACKAGE_NAME = PACKAGE_NAME + ".auth";
-
-    /**
-     * 系统管理包名称
-     */
-    String SYSTEM_PACKAGE_NAME = PACKAGE_NAME + ".system";
-
-    /**
-     * APP用户管理包名称
-     */
-    String USER_PACKAGE_NAME = PACKAGE_NAME + ".user";
-
-    /**
-     * demo包名称
-     */
-    String DEMO_PACKAGE_NAME = PACKAGE_NAME + ".demo";
-
-    /**
-     * 达人通AI包名称
-     */
-    String AI_PACKAGE_NAME = PACKAGE_NAME + ".ai";
-
-    /**
      * 默认页码为1
      */
     Integer DEFAULT_PAGE_INDEX = 1;
@@ -89,4 +64,14 @@ public interface CommonConstant {
      * swaggerUI访问路径
      */
     String SWAGGER_UI_PATH = "/swagger-ui/index.html";
+
+    /**
+     * xls后缀
+     */
+    String XLS = "xls";
+
+    /**
+     * xlsx后缀
+     */
+    String XLSX = "xlsx";
 }

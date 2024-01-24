@@ -39,8 +39,14 @@ public class SysConfigVo implements Serializable {
     @Schema(description = "备注")
     private String remark;
 
+    @Schema(description = "创建人ID")
+    private Long createId;
+
     @Schema(description = "创建时间")
     private Date createTime;
+
+    @Schema(description = "修改人ID")
+    private Long updateId;
 
     @Schema(description = "修改时间")
     private Date updateTime;

@@ -104,7 +104,6 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
             <version>3.5.4.1</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
@@ -164,7 +163,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
-            <version>3.3.2</version>
+            <version>3.3.3</version>
         </dependency>
         <dependency>
             <groupId>org.lionsoul</groupId>

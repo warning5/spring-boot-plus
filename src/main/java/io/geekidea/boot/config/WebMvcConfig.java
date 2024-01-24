@@ -70,13 +70,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public LoginAppInterceptor loginAppInterceptor() {
-        return new LoginAppInterceptor();
+    public AppLoginInterceptor loginAppInterceptor() {
+        return new AppLoginInterceptor();
     }
 
     @Bean
-    public LoginCommonInterceptor loginCommonInterceptor() {
-        return new LoginCommonInterceptor();
+    public CommonLoginInterceptor loginCommonInterceptor() {
+        return new CommonLoginInterceptor();
     }
 
     @Bean

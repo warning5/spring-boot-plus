@@ -6,9 +6,5 @@ package io.geekidea.boot.common.constant;
  **/
 public interface SysDictConstant {
 
-    /**
-     * 会员等级
-     */
-    String VIP_LEVEL = "vip_level";
 
 }

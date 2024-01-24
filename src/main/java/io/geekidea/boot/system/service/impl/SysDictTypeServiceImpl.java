@@ -51,7 +51,6 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         sysDictType.setIsSystem(dto.getIsSystem());
         sysDictType.setName(dto.getName());
         sysDictType.setRemark(dto.getRemark());
-        sysDictType.setUpdateTime(new Date());
         return updateById(sysDictType);
     }
 

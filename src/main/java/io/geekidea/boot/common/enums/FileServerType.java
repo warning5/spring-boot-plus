@@ -1,5 +1,8 @@
 package io.geekidea.boot.common.enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 系统类型
  *
@@ -19,21 +22,36 @@ public enum FileServerType {
         this.desc = desc;
     }
 
-    public static FileServerType getFileServerType(Integer code) {
-        for (FileServerType fileServerType : values()) {
-            if (fileServerType.getCode().equals(code)) {
-                return fileServerType;
-            }
-        }
-        return null;
-    }
-
     public Integer getCode() {
         return code;
     }
 
     public String getDesc() {
         return desc;
+    }
+
+    private static final Map<Integer, FileServerType> map = new HashMap<>();
+
+    static {
+        for (FileServerType type : values()) {
+            map.put(type.code, type);
+        }
+    }
+
+    public static FileServerType get(Integer code) {
+        FileServerType type = map.get(code);
+        if (type == null) {
+            return LOCAL;
+        }
+        return type;
+    }
+
+    public static String getDesc(Integer code) {
+        FileServerType fileServerType = get(code);
+        if (fileServerType == null) {
+            return null;
+        }
+        return fileServerType.getDesc();
     }
 
 }

@@ -6,7 +6,7 @@ import io.geekidea.boot.system.dto.SysDictDto;
 import io.geekidea.boot.system.entity.SysDict;
 import io.geekidea.boot.system.query.SysDictAppQuery;
 import io.geekidea.boot.system.query.SysDictQuery;
-import io.geekidea.boot.system.vo.SysDictAppVo;
+import io.geekidea.boot.system.vo.AppSysDictVo;
 import io.geekidea.boot.system.vo.SysDictVo;
 
 import java.io.Serializable;
@@ -74,7 +74,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    Map<String, List<SysDictAppVo>> getAppSysDictList(SysDictAppQuery query) throws Exception;
+    Map<String, List<AppSysDictVo>> getAppSysDictList(SysDictAppQuery query) throws Exception;
 
     /**
      * 根据字典编码获取字典列表

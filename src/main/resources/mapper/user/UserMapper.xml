@@ -14,15 +14,12 @@
         from user
     </select>
 
-    <select id="getAppUserById" resultType="io.geekidea.boot.user.vo.UserAppVo">
-        select *
-        from user
-        where id = #{id}
-    </select>
-
-    <select id="getAppUserPage" resultType="io.geekidea.boot.user.vo.UserAppVo">
-        select *
-        from user
+    <select id="getAppUserById" resultType="io.geekidea.boot.user.vo.AppUserVo">
+        select u.*, r.name userRoleName
+        from user u
+                 left join user_role r
+                            on u.user_role_id = r.id
+        where u.id = #{id}
     </select>
 
 </mapper>

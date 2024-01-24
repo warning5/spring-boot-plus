@@ -1,8 +1,6 @@
 package io.geekidea.boot.system.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -78,10 +76,20 @@ public class SysFile implements Serializable {
     @Schema(description = "IP区域")
     private String ipArea;
 
+    @Schema(description = "创建人ID")
+    @TableField(fill = FieldFill.INSERT)
+    private Long createId;
+
     @Schema(description = "创建时间")
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
+    @Schema(description = "修改人ID")
+    @TableField(fill = FieldFill.UPDATE)
+    private Long updateId;
+
     @Schema(description = "修改时间")
+    @TableField(fill = FieldFill.UPDATE)
     private Date updateTime;
 
 }

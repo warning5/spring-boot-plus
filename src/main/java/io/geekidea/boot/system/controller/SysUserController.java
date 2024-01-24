@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -151,7 +152,6 @@ public class SysUserController {
      */
     @PostMapping("/updateProfile")
     @Operation(summary = "修改个人信息")
-    @Permission("sys:user:update-profile")
     public ApiResult updateProfile(@Valid @RequestBody SysUserUpdateProfileDto sysUserUpdateProfileDto) throws Exception {
         boolean flag = sysUserService.updateProfile(sysUserUpdateProfileDto);
         return ApiResult.result(flag);
@@ -166,9 +166,22 @@ public class SysUserController {
      */
     @PostMapping("/updatePassword")
     @Operation(summary = "修改用户密码")
-    @Permission("sys:user:update-password")
     public ApiResult updatePassword(@Valid @RequestBody SysUserUpdatePasswordDto sysUserUpdatePasswordDto) throws Exception {
         boolean flag = sysUserService.updatePassword(sysUserUpdatePasswordDto);
+        return ApiResult.result(flag);
+    }
+
+    /**
+     * 导入Excel用户数据
+     *
+     * @param multipartFile
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/importExcel")
+    @Operation(summary = "导入Excel用户数据")
+    public ApiResult importExcel( MultipartFile multipartFile) throws Exception {
+        boolean flag = sysUserService.importExcel(multipartFile);
         return ApiResult.result(flag);
     }
 

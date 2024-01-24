@@ -1,5 +1,8 @@
 package io.geekidea.boot.common.enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 系统类型
  *
@@ -19,21 +22,36 @@ public enum SystemType {
         this.desc = desc;
     }
 
-    public static SystemType getSystemType(Integer code) {
-        for (SystemType systemType : values()) {
-            if (systemType.getCode().equals(code)) {
-                return systemType;
-            }
-        }
-        return null;
-    }
-
     public Integer getCode() {
         return code;
     }
 
     public String getDesc() {
         return desc;
+    }
+
+    private static final Map<Integer, SystemType> map = new HashMap<>();
+
+    static {
+        for (SystemType type : values()) {
+            map.put(type.code, type);
+        }
+    }
+
+    public static SystemType get(Integer code) {
+        SystemType type = map.get(code);
+        if (type == null) {
+            return null;
+        }
+        return type;
+    }
+
+    public static String getDesc(Integer code) {
+        SystemType type = get(code);
+        if (type == null) {
+            return null;
+        }
+        return type.getDesc();
     }
 
 }

@@ -1,8 +1,6 @@
 package io.geekidea.boot.system.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -44,9 +42,6 @@ public class SysUser implements Serializable {
     @Schema(description = "电子邮件")
     private String email;
 
-    @Schema(description = "性别，0：未知，1：男，2：女，默认0")
-    private Integer gender;
-
     @Schema(description = "头像")
     private String head;
 
@@ -59,10 +54,20 @@ public class SysUser implements Serializable {
     @Schema(description = "是否是超管 0：否，1：是")
     private Boolean isAdmin;
 
+    @Schema(description = "创建人ID")
+    @TableField(fill = FieldFill.INSERT)
+    private Long createId;
+
     @Schema(description = "创建时间")
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
+    @Schema(description = "修改人ID")
+    @TableField(fill = FieldFill.UPDATE)
+    private Long updateId;
+
     @Schema(description = "修改时间")
+    @TableField(fill = FieldFill.UPDATE)
     private Date updateTime;
 
 }

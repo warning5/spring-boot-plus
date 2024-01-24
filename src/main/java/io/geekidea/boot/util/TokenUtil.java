@@ -33,7 +33,7 @@ public class TokenUtil {
      */
     public static String generateAdminToken(Long userId) throws Exception {
         String userMd5 = DigestUtils.md5Hex(userId.toString());
-        String adminToken = LoginConstant.ADMIN_TOKEN_PREFIX + userMd5 + "." + IdWorker.getIdStr();
+        String adminToken = LoginConstant.ADMIN_TOKEN_PREFIX + userMd5 + "." + UUIDUtil.getUuid();
         return adminToken;
     }
 
@@ -46,7 +46,7 @@ public class TokenUtil {
      */
     public static String generateAppToken(Long userId) throws Exception {
         String userMd5 = DigestUtils.md5Hex(userId.toString());
-        String appToken = LoginConstant.APP_TOKEN_PREFIX + userMd5 + "." + IdWorker.getIdStr();
+        String appToken = LoginConstant.APP_TOKEN_PREFIX + userMd5 + "." + UUIDUtil.getUuid();
         return appToken;
     }
 

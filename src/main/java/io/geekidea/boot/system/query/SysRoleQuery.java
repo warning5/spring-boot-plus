@@ -15,11 +15,8 @@ import lombok.Data;
 public class SysRoleQuery extends BasePageQuery {
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "角色名称")
-    private String name;
-
-    @Schema(description = "角色编码")
-    private String code;
+    @Schema(description = "是否系统内置角色 1：是，0：否")
+    private Boolean isSystem;
 
 }
 

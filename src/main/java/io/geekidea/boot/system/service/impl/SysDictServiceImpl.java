@@ -11,7 +11,7 @@ import io.geekidea.boot.system.mapper.SysDictMapper;
 import io.geekidea.boot.system.query.SysDictAppQuery;
 import io.geekidea.boot.system.query.SysDictQuery;
 import io.geekidea.boot.system.service.SysDictService;
-import io.geekidea.boot.system.vo.SysDictAppVo;
+import io.geekidea.boot.system.vo.AppSysDictVo;
 import io.geekidea.boot.system.vo.SysDictVo;
 import io.geekidea.boot.util.PagingUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,7 +56,6 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
             throw new BusinessException("字典数据不存在");
         }
         BeanUtils.copyProperties(dto, sysDict);
-        sysDict.setUpdateTime(new Date());
         return updateById(sysDict);
     }
 
@@ -81,10 +79,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     }
 
     @Override
-    public Map<String, List<SysDictAppVo>> getAppSysDictList(SysDictAppQuery query) throws Exception {
-        List<SysDictAppVo> list = sysDictMapper.getAppSysDictList(query);
+    public Map<String, List<AppSysDictVo>> getAppSysDictList(SysDictAppQuery query) throws Exception {
+        List<AppSysDictVo> list = sysDictMapper.getAppSysDictList(query);
         if (CollectionUtils.isNotEmpty(list)) {
-            Map<String, List<SysDictAppVo>> map = list.stream().collect(Collectors.groupingBy(SysDictAppVo::getDictCode));
+            Map<String, List<AppSysDictVo>> map = list.stream().collect(Collectors.groupingBy(AppSysDictVo::getDictCode));
             return map;
         }
         return null;

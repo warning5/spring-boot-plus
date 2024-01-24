@@ -7,6 +7,7 @@ import io.geekidea.boot.system.vo.SysMenuTreeVo;
 import io.geekidea.boot.system.vo.SysMenuVo;
 import io.geekidea.boot.system.vo.SysNavMenuTreeVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -60,8 +61,18 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
 
     /**
      * 获取角色权限ID集合
+     *
      * @param roleId
      * @return
      */
     List<Long> getMenuIdsByRoleId(Long roleId);
+
+    /**
+     * 根据父菜单ID获取所有的子菜单ID集合
+     *
+     * @param parentIds
+     * @return
+     */
+    List<Long> getChildrenMenuIds(@Param("parentIds") List<Long> parentIds);
+
 }

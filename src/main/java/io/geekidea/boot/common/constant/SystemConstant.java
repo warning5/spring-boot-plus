@@ -8,4 +8,8 @@ package io.geekidea.boot.common.constant;
  **/
 public interface SystemConstant {
 
+    /**
+     * 根菜单ID默认为0
+     */
+    Long ROOT_MENU_ID = 0L;
 }

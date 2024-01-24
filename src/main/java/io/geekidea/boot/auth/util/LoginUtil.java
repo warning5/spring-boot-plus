@@ -74,6 +74,20 @@ public class LoginUtil {
     }
 
     /**
+     * 获取登录用户ID字符串
+     *
+     * @return
+     * @throws Exception
+     */
+    public static String getUserIdString() throws Exception {
+        Long userId = getUserId();
+        if (userId == null) {
+            return null;
+        }
+        return userId.toString();
+    }
+
+    /**
      * 获取登录用户名
      *
      * @return
@@ -129,7 +143,7 @@ public class LoginUtil {
     public static void checkAdmin() throws Exception {
         boolean admin = isAdmin();
         if (!admin) {
-            throw new BusinessException("不是管理员，无权限");
+            throw new BusinessException("不是管理员，无权限" );
         }
     }
 

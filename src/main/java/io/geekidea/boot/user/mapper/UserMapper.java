@@ -2,10 +2,10 @@ package io.geekidea.boot.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.geekidea.boot.user.entity.User;
-import io.geekidea.boot.user.query.UserAppQuery;
 import io.geekidea.boot.user.query.UserQuery;
-import io.geekidea.boot.user.vo.UserAppVo;
 import io.geekidea.boot.user.vo.UserVo;
+import io.geekidea.boot.user.query.AppUserQuery;
+import io.geekidea.boot.user.vo.AppUserVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param id
      * @return
      */
-    UserAppVo getAppUserById(Long id);
+    AppUserVo getAppUserById(Long id);
 
     /**
      * App用户信息分页列表
@@ -49,6 +49,6 @@ public interface UserMapper extends BaseMapper<User> {
      * @param query
      * @return
      */
-    List<UserAppVo> getAppUserPage(UserAppQuery query);
+    List<AppUserVo> getAppUserPage(AppUserQuery query);
 
 }

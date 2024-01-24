@@ -13,11 +13,12 @@
         select *
         from sys_role
         <where>
-            <if test="name!=null and name !=''">
-                name like concat('%',#{name},'%')
+            <if test="isSystem != null">
+                and is_system = #{isSystem}
             </if>
-            <if test="code!=null and code !=''">
-                and code like concat('%',#{code},'%')
+            <if test="keyword !=null and keyword !=''">
+                and (name like concat('%',#{keyword},'%')
+                or code like concat('%',#{keyword},'%'))
             </if>
         </where>
     </select>

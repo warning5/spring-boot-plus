@@ -28,20 +28,22 @@
         select *
         from sys_menu
         <where>
-            <if test="name != null and name != ''">
-                name like concat('%',#{name},'%')
-            </if>
-            <if test="code != null and code != ''">
-                and code like concat('%',#{code},'%')
-            </if>
-            <if test="routeUrl != null and routeUrl != ''">
-                and route_url like concat('%',#{routeUrl},'%')
-            </if>
             <if test="type != null">
                 and type = #{type}
             </if>
             <if test="status != null">
                 and status = #{status}
+            </if>
+            <if test="isShow != null">
+                and is_show = #{isShow}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%',#{keyword},'%')
+                or code like concat('%',#{keyword},'%')
+                or route_url like concat('%',#{keyword},'%')
+                or component_path like concat('%',#{keyword},'%')
+                or route_redirect like concat('%',#{keyword},'%')
+                )
             </if>
         </where>
         order by sort
@@ -81,6 +83,15 @@
         where m.status = 1
           and rm.is_choice = 1
           and r.id = #{roleId}
+    </select>
+
+    <select id="getChildrenMenuIds" resultType="java.lang.Long">
+        select id
+        from sys_menu
+        where parent_id in
+        <foreach collection="parentIds" item="parentId" open="(" close=")" separator=",">
+            #{parentId}
+        </foreach>
     </select>
 
 </mapper>

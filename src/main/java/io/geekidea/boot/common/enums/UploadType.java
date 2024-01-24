@@ -1,7 +1,9 @@
 package io.geekidea.boot.common.enums;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文件上传业务类型
@@ -34,15 +36,6 @@ public enum UploadType {
         this.desc = desc;
     }
 
-    public static UploadType getUploadType(String type) {
-        for (UploadType uploadType : values()) {
-            if (uploadType.getType().equals(type)) {
-                return uploadType;
-            }
-        }
-        return null;
-    }
-
     public String getType() {
         return type;
     }
@@ -57,6 +50,30 @@ public enum UploadType {
 
     public String getDesc() {
         return desc;
+    }
+
+    private static final Map<String, UploadType> map = new HashMap<>();
+
+    static {
+        for (UploadType uploadType : values()) {
+            map.put(uploadType.type, uploadType);
+        }
+    }
+
+    public static UploadType get(String code) {
+        UploadType uploadType = map.get(code);
+        if (uploadType == null) {
+            return null;
+        }
+        return uploadType;
+    }
+
+    public static String getDesc(String code) {
+        UploadType uploadType = get(code);
+        if (uploadType == null) {
+            return null;
+        }
+        return uploadType.getDesc();
     }
 
 }

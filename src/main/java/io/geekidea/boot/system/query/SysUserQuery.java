@@ -33,10 +33,10 @@ public class SysUserQuery extends BasePageQuery {
     private Boolean status;
 
     @Schema(description = "创建开始时间")
-    private Date createStartTime;
+    private Date startCreateTime;
 
     @Schema(description = "创建结束时间")
-    private Date createEndTime;
+    private Date endCreateTime;
 
 }
 

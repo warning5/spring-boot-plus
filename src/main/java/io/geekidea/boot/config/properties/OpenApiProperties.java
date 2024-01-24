@@ -2,6 +2,7 @@ package io.geekidea.boot.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * Swagger属性配置
@@ -10,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @date 2022/03/15
  **/
 @Data
+@Component
 @ConfigurationProperties(prefix = "openapi")
 public class OpenApiProperties {
 

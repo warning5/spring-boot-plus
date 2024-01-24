@@ -109,7 +109,7 @@ public class LoginServiceImpl implements LoginService {
     public LoginVo getLoginUserInfo() throws Exception {
         LoginVo loginVo = LoginUtil.getLoginVo();
         if (loginVo == null) {
-            throw new LoginException("清先登录");
+            throw new LoginException("请先登录");
         }
         // 根据用户ID获取用户信息
         Long userId = loginVo.getUserId();
@@ -127,9 +127,13 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public void logout() throws Exception {
-        // 获取token
-        String token = TokenUtil.getToken();
-        // 删除缓存
-        loginRedisService.deleteLoginVo(token);
+        try {
+            // 获取token
+            String token = TokenUtil.getToken();
+            // 删除缓存
+            loginRedisService.deleteLoginVo(token);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

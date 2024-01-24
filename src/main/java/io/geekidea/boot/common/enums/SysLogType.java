@@ -1,5 +1,8 @@
 package io.geekidea.boot.common.enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 系统日志类型
  * 0:访问日志,1:新增,2:修改,3:删除,4:详情,5:所有列表,6:分页列表,7:其它查询,8:上传文件,9:登录,10:退出
@@ -29,24 +32,36 @@ public enum SysLogType {
         this.desc = desc;
     }
 
-    public static SysLogType getSysLogType(Integer code) {
-        if (code == null) {
-            return OTHER;
-        }
-        for (SysLogType sysLogType : values()) {
-            if (sysLogType.getCode().equals(code)) {
-                return sysLogType;
-            }
-        }
-        return OTHER;
-    }
-
     public Integer getCode() {
         return code;
     }
 
     public String getDesc() {
         return desc;
+    }
+
+    private static final Map<Integer, SysLogType> map = new HashMap<>();
+
+    static {
+        for (SysLogType type : values()) {
+            map.put(type.code, type);
+        }
+    }
+
+    public static SysLogType get(Integer code) {
+        SysLogType type = map.get(code);
+        if (type == null) {
+            return null;
+        }
+        return type;
+    }
+
+    public static String getDesc(Integer code) {
+        SysLogType type = get(code);
+        if (type == null) {
+            return null;
+        }
+        return type.getDesc();
     }
 
 }

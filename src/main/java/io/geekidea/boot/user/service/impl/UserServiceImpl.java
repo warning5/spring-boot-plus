@@ -1,17 +1,21 @@
 package io.geekidea.boot.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.geekidea.boot.auth.util.AppLoginUtil;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.OrderByItem;
 import io.geekidea.boot.framework.page.Paging;
+import io.geekidea.boot.user.dto.AppUserHeadDto;
+import io.geekidea.boot.user.dto.AppUserNicknameDto;
 import io.geekidea.boot.user.dto.UserDto;
 import io.geekidea.boot.user.entity.User;
 import io.geekidea.boot.user.mapper.UserMapper;
-import io.geekidea.boot.user.query.UserAppQuery;
+import io.geekidea.boot.user.query.AppUserQuery;
 import io.geekidea.boot.user.query.UserQuery;
 import io.geekidea.boot.user.service.UserService;
-import io.geekidea.boot.user.vo.UserAppVo;
+import io.geekidea.boot.user.vo.AppUserVo;
 import io.geekidea.boot.user.vo.UserVo;
 import io.geekidea.boot.util.PagingUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,7 +70,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("用户信息不存在");
         }
         BeanUtils.copyProperties(userDto, user);
-        user.setUpdateTime(new Date());
         return updateById(user);
     }
 
@@ -91,16 +93,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public UserAppVo getAppUserById(Long id) throws Exception {
-        return userMapper.getAppUserById(id);
+    public AppUserVo getProfile() throws Exception {
+        Long userId = AppLoginUtil.getUserId();
+        return userMapper.getAppUserById(userId);
     }
 
     @Override
-    public Paging<UserAppVo> getAppUserPage(UserAppQuery query) throws Exception {
-        PagingUtil.handlePage(query, OrderByItem.desc("id"));
-        List<UserAppVo> list = userMapper.getAppUserPage(query);
-        Paging<UserAppVo> paging = new Paging<>(list);
-        return paging;
+    public boolean updateHead(AppUserHeadDto dto) throws Exception {
+        Long userId = AppLoginUtil.getUserId();
+        LambdaUpdateWrapper<User> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.set(User::getHead, dto.getHead());
+        wrapper.eq(User::getId, userId);
+        return update(new User(), wrapper);
+    }
+
+    @Override
+    public boolean updateNickname(AppUserNicknameDto dto) throws Exception {
+        Long userId = AppLoginUtil.getUserId();
+        LambdaUpdateWrapper<User> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.set(User::getNickname, dto.getNickname());
+        wrapper.eq(User::getId, userId);
+        return update(new User(), wrapper);
     }
 
 }

@@ -2,11 +2,13 @@ package io.geekidea.boot.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.geekidea.boot.framework.page.Paging;
+import io.geekidea.boot.user.dto.AppUserHeadDto;
+import io.geekidea.boot.user.dto.AppUserNicknameDto;
 import io.geekidea.boot.user.dto.UserDto;
 import io.geekidea.boot.user.entity.User;
-import io.geekidea.boot.user.query.UserAppQuery;
+import io.geekidea.boot.user.query.AppUserQuery;
 import io.geekidea.boot.user.query.UserQuery;
-import io.geekidea.boot.user.vo.UserAppVo;
+import io.geekidea.boot.user.vo.AppUserVo;
 import io.geekidea.boot.user.vo.UserVo;
 
 
@@ -29,6 +31,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 根据账号获取用户
+     *
      * @param username
      * @return
      * @throws Exception
@@ -81,21 +84,28 @@ public interface UserService extends IService<User> {
     Paging<UserVo> getUserPage(UserQuery query) throws Exception;
 
     /**
-     * App用户信息详情
-     *
-     * @param id
+     * 获取App用户信息
      * @return
      * @throws Exception
      */
-    UserAppVo getAppUserById(Long id) throws Exception;
+    AppUserVo getProfile() throws Exception;
 
     /**
-     * App用户信息分页列表
+     * 修改用户头像
      *
-     * @param query
+     * @param dto
      * @return
      * @throws Exception
      */
-    Paging<UserAppVo> getAppUserPage(UserAppQuery query) throws Exception;
+    boolean updateHead(AppUserHeadDto dto) throws Exception;
+
+    /**
+     * 修改用户昵称
+     *
+     * @param dto
+     * @return
+     * @throws Exception
+     */
+    boolean updateNickname(AppUserNicknameDto dto) throws Exception;
 
 }

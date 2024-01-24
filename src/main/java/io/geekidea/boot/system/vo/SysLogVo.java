@@ -87,8 +87,17 @@ public class SysLogVo implements Serializable {
     @Schema(description = "浏览器名称")
     private String browserName;
 
+    @Schema(description = "创建人ID")
+    private Long createId;
+
     @Schema(description = "创建时间")
     private Date createTime;
+
+    @Schema(description = "修改人ID")
+    private Long updateId;
+
+    @Schema(description = "修改时间")
+    private Date updateTime;
 
 
 }

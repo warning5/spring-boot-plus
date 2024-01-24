@@ -2,6 +2,7 @@ package io.geekidea.boot.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * 本地文件属性配置
@@ -10,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @date 2023/06/18
  **/
 @Data
+@Component
 @ConfigurationProperties(prefix = "file.local")
 public class LocalFileProperties {
 

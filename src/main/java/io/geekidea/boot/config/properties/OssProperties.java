@@ -2,6 +2,7 @@ package io.geekidea.boot.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * 阿里云OSS配置
@@ -10,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @date 2023/11/26
  **/
 @Data
+@Component
 @ConfigurationProperties(prefix = "file.oss")
 public class OssProperties {
 

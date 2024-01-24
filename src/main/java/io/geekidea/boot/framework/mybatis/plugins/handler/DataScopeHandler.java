@@ -3,7 +3,7 @@ package io.geekidea.boot.framework.mybatis.plugins.handler;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.handler.DataPermissionHandler;
 import io.geekidea.boot.auth.annotation.DataScope;
-import io.geekidea.boot.auth.util.LoginAppUtil;
+import io.geekidea.boot.auth.util.AppLoginUtil;
 import io.geekidea.boot.auth.util.LoginUtil;
 import io.geekidea.boot.common.enums.SystemType;
 import io.geekidea.boot.util.SystemTypeUtil;
@@ -72,7 +72,7 @@ public class DataScopeHandler implements DataPermissionHandler {
             } else if (SystemType.APP == systemType) {
                 // APP移动端数据权限处理
                 // 获取当前登录用户ID
-                Long userId = LoginAppUtil.getUserId();
+                Long userId = AppLoginUtil.getUserId();
                 // 增加数据范围sql
                 dataScopeSql = userColumnName + " = " + userId;
             }

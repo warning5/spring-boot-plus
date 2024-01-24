@@ -1,6 +1,6 @@
 package io.geekidea.boot.generator.handler;
 
-import io.geekidea.boot.generator.constant.GenerateConstant;
+import io.geekidea.boot.generator.constant.GeneratorConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -31,54 +31,54 @@ public class RenameHandler {
         log.info("targetPackageName:" + targetPackageName);
         log.info("targetArtifactId:" + targetArtifactId);
         if (StringUtils.isBlank(currentPackageName)) {
-            throw new RuntimeException("当前包名称不能为空");
+            throw new RuntimeException("当前包名称不能为空" );
         }
         if (StringUtils.isBlank(targetPackageName)) {
-            throw new RuntimeException("目标包名称不能为空");
+            throw new RuntimeException("目标包名称不能为空" );
         }
         if (StringUtils.isBlank(targetArtifactId)) {
-            targetArtifactId = GenerateConstant.DEFAULT_PROJECT_NAME;
+            targetArtifactId = GeneratorConstant.DEFAULT_PROJECT_NAME;
         }
         // 校验包名格式
         if (currentPackageName.equals(targetPackageName)) {
-            throw new RuntimeException("包名称一致，无须修改");
+            throw new RuntimeException("包名称一致，无须修改" );
         }
-        String projectPath = System.getProperty("user.dir");
+        String projectPath = System.getProperty("user.dir" );
         log.info("projectPath = " + projectPath);
         String currentPackagePath = currentPackageName.replaceAll("\\.", File.separator);
         String targetPackagePath = targetPackageName.replaceAll("\\.", File.separator);
         log.info("currentPackagePath = " + currentPackagePath);
 
         // 替换pom.xml内容
-        log.info("替换pom.xml内容开始");
-        String pomXmlPath = projectPath + "/" + GenerateConstant.POM_XML;
+        log.info("替换pom.xml内容开始" );
+        String pomXmlPath = projectPath + "/" + GeneratorConstant.POM_XML;
         File pomXmlFile = new File(pomXmlPath);
         replacePomXml(pomXmlFile, targetPackageName, targetArtifactId);
-        log.info("替换pom.xml内容结束");
+        log.info("替换pom.xml内容结束" );
 
         // 替换application.yml内容
-        log.info("替换application.yml内容开始");
-        String applicationYmlPath = projectPath + "/" + GenerateConstant.APPLICATION_YML;
+        log.info("替换application.yml内容开始" );
+        String applicationYmlPath = projectPath + "/" + GeneratorConstant.APPLICATION_YML;
         File applicationYmlFile = new File(applicationYmlPath);
         replaceApplicationYml(applicationYmlFile, targetArtifactId);
-        log.info("替换application.yml内容结束");
+        log.info("替换application.yml内容结束" );
 
         // 替换xml中的包名称
-        log.info("替换xml中的包名称开始");
-        String mapperDir = projectPath + GenerateConstant.SRC_MAIN_RESOURCES_MAPPER;
+        log.info("替换xml中的包名称开始" );
+        String mapperDir = projectPath + GeneratorConstant.SRC_MAIN_RESOURCES_MAPPER;
         File mapperXmlParentFile = new File(mapperDir);
-        recursionReplacePackageName(mapperXmlParentFile, currentPackageName, targetPackageName, GenerateConstant.DOT_XML);
-        log.info("替换xml中的包名称结束");
+        recursionReplacePackageName(mapperXmlParentFile, currentPackageName, targetPackageName, GeneratorConstant.DOT_XML);
+        log.info("替换xml中的包名称结束" );
 
         // 重命名main包名称
-        log.info("重命名main包名称开始");
+        log.info("重命名main包名称开始" );
         File targetMainParentFile = renameMainJavaPackage(projectPath, currentPackagePath, targetPackagePath);
-        log.info("重命名main包名称结束");
-        recursionReplacePackageName(targetMainParentFile, currentPackageName, targetPackageName, GenerateConstant.DOT_JAVA);
+        log.info("重命名main包名称结束" );
+        recursionReplacePackageName(targetMainParentFile, currentPackageName, targetPackageName, GeneratorConstant.DOT_JAVA);
 
         // 重命名test包名称
         File targetTestParentFile = renameTestJavaPackage(projectPath, currentPackagePath, targetPackagePath);
-        recursionReplacePackageName(targetTestParentFile, currentPackageName, targetPackageName, GenerateConstant.DOT_JAVA);
+        recursionReplacePackageName(targetTestParentFile, currentPackageName, targetPackageName, GeneratorConstant.DOT_JAVA);
 
     }
 
@@ -92,8 +92,8 @@ public class RenameHandler {
      * @throws Exception
      */
     public static File renameMainJavaPackage(String projectPath, String currentPackagePath, String targetPackagePath) throws Exception {
-        String srcParentPackage = projectPath + GenerateConstant.SRC_MAIN_JAVA + currentPackagePath;
-        String targetSrcParentPackage = projectPath + GenerateConstant.SRC_MAIN_JAVA + targetPackagePath;
+        String srcParentPackage = projectPath + GeneratorConstant.SRC_MAIN_JAVA + currentPackagePath;
+        String targetSrcParentPackage = projectPath + GeneratorConstant.SRC_MAIN_JAVA + targetPackagePath;
         return renameJavaPackage(srcParentPackage, targetSrcParentPackage);
     }
 
@@ -107,8 +107,8 @@ public class RenameHandler {
      * @throws Exception
      */
     public static File renameTestJavaPackage(String projectPath, String currentPackagePath, String targetPackagePath) throws Exception {
-        String srcParentPackage = projectPath + GenerateConstant.SRC_TEST_JAVA + currentPackagePath;
-        String targetSrcParentPackage = projectPath + GenerateConstant.SRC_TEST_JAVA + targetPackagePath;
+        String srcParentPackage = projectPath + GeneratorConstant.SRC_TEST_JAVA + currentPackagePath;
+        String targetSrcParentPackage = projectPath + GeneratorConstant.SRC_TEST_JAVA + targetPackagePath;
         return renameJavaPackage(srcParentPackage, targetSrcParentPackage);
     }
 
@@ -133,7 +133,7 @@ public class RenameHandler {
         if (flag) {
             log.info("重命名目录成功：" + targetSrcParentFile);
         } else {
-            throw new RuntimeException("目录替换失败");
+            throw new RuntimeException("目录替换失败" );
         }
         return targetSrcParentFile;
     }
@@ -181,11 +181,11 @@ public class RenameHandler {
      * @throws Exception
      */
     public static void replaceAllPackageName(File file, String currentPackageName, String targetPackageName) throws Exception {
-        String content = FileUtils.readFileToString(file, GenerateConstant.UTF8);
+        String content = FileUtils.readFileToString(file, GeneratorConstant.UTF8);
         if (StringUtils.isNotBlank(content)) {
             content = content.replaceAll(currentPackageName, targetPackageName);
             // 重写文件内容
-            FileUtils.writeStringToFile(file, content, GenerateConstant.UTF8, false);
+            FileUtils.writeStringToFile(file, content, GeneratorConstant.UTF8, false);
         }
     }
 
@@ -198,7 +198,7 @@ public class RenameHandler {
      * @throws Exception
      */
     public static void replacePomXml(File file, String targetPackageName, String targetArtifactId) throws Exception {
-        List<String> lines = FileUtils.readLines(file, GenerateConstant.UTF8);
+        List<String> lines = FileUtils.readLines(file, GeneratorConstant.UTF8);
         if (CollectionUtils.isNotEmpty(lines)) {
             String groupIdElement = "\t<groupId>" + targetPackageName + "</groupId>";
             String artifactIdElement = "\t<artifactId>" + targetArtifactId + "</artifactId>";
@@ -207,8 +207,8 @@ public class RenameHandler {
             lines.set(12, artifactIdElement);
             lines.set(15, nameElement);
             // 重写文件内容
-            FileUtils.writeLines(file, GenerateConstant.UTF8, lines, System.lineSeparator(), false);
-            log.info("pom.xml文件内容替换成功");
+            FileUtils.writeLines(file, GeneratorConstant.UTF8, lines, System.lineSeparator(), false);
+            log.info("pom.xml文件内容替换成功" );
         }
     }
 
@@ -220,19 +220,19 @@ public class RenameHandler {
      * @throws Exception
      */
     public static void replaceApplicationYml(File file, String targetArtifactId) throws Exception {
-        List<String> lines = FileUtils.readLines(file, GenerateConstant.UTF8);
+        List<String> lines = FileUtils.readLines(file, GeneratorConstant.UTF8);
         List<String> targetLines = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(lines)) {
             for (String line : lines) {
                 String trimLine = line.trim();
-                if (trimLine.startsWith("projectPrefix")) {
+                if (trimLine.startsWith("projectPrefix" )) {
                     line = "    projectPrefix: " + targetArtifactId;
                 }
                 targetLines.add(line);
             }
             // 重写文件内容
-            FileUtils.writeLines(file, GenerateConstant.UTF8, targetLines, System.lineSeparator(), false);
-            log.info("pom.xml文件内容替换成功");
+            FileUtils.writeLines(file, GeneratorConstant.UTF8, targetLines, System.lineSeparator(), false);
+            log.info("pom.xml文件内容替换成功" );
         }
     }
 

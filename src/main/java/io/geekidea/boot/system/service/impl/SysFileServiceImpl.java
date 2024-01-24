@@ -42,7 +42,6 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
             throw new BusinessException("系统文件不存在");
         }
         BeanUtils.copyProperties(dto, sysFile);
-        sysFile.setUpdateTime(new Date());
         return updateById(sysFile);
     }
 

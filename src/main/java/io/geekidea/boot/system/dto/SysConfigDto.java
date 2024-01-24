@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @since 2023-11-27
  */
 @Data
-@Schema(description = "修改系统配置参数")
+@Schema(description = "系统配置参数")
 public class SysConfigDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
