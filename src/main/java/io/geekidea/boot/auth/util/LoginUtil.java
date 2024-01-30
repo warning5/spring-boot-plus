@@ -27,9 +27,9 @@ public class LoginUtil {
      *
      * @param token
      * @return
-     * @throws Exception
+     * @
      */
-    public static LoginVo getLoginVo(String token) throws Exception {
+    public static LoginVo getLoginVo(String token) {
         if (StringUtils.isBlank(token)) {
             return null;
         }
@@ -42,7 +42,7 @@ public class LoginUtil {
      *
      * @return
      */
-    public static LoginVo getLoginVo() throws Exception {
+    public static LoginVo getLoginVo() {
         return LoginCache.get();
     }
 
@@ -51,7 +51,7 @@ public class LoginUtil {
      *
      * @return
      */
-    public static List<String> getPermissions() throws Exception {
+    public static List<String> getPermissions() {
         LoginVo loginVo = getLoginVo();
         if (loginVo != null) {
             return loginVo.getPermissions();
@@ -64,7 +64,7 @@ public class LoginUtil {
      *
      * @return
      */
-    public static Long getUserId() throws Exception {
+    public static Long getUserId() {
         LoginVo loginVo = getLoginVo();
         if (loginVo != null) {
             Long userId = loginVo.getUserId();
@@ -77,9 +77,9 @@ public class LoginUtil {
      * 获取登录用户ID字符串
      *
      * @return
-     * @throws Exception
+     * @
      */
-    public static String getUserIdString() throws Exception {
+    public static String getUserIdString() {
         Long userId = getUserId();
         if (userId == null) {
             return null;
@@ -92,7 +92,7 @@ public class LoginUtil {
      *
      * @return
      */
-    public static String getUsername() throws Exception {
+    public static String getUsername() {
         LoginVo loginVo = getLoginVo();
         if (loginVo != null) {
             return loginVo.getUsername();
@@ -105,7 +105,7 @@ public class LoginUtil {
      *
      * @return
      */
-    public static Long getRoleId() throws Exception {
+    public static Long getRoleId() {
         LoginVo loginVo = getLoginVo();
         if (loginVo != null) {
             return loginVo.getRoleId();
@@ -117,9 +117,9 @@ public class LoginUtil {
      * 判断是否是管理员
      *
      * @return
-     * @throws Exception
+     * @
      */
-    public static boolean isAdmin() throws Exception {
+    public static boolean isAdmin() {
         LoginVo loginVo = getLoginVo();
         if (loginVo != null) {
             return loginVo.isAdmin();
@@ -131,19 +131,19 @@ public class LoginUtil {
      * 判断不是管理员
      *
      * @return
-     * @throws Exception
+     * @
      */
-    public static boolean isNotAdmin() throws Exception {
+    public static boolean isNotAdmin() {
         return !isAdmin();
     }
 
     /**
      * 检查是否是管理员
      */
-    public static void checkAdmin() throws Exception {
+    public static void checkAdmin() {
         boolean admin = isAdmin();
         if (!admin) {
-            throw new BusinessException("不是管理员，无权限" );
+            throw new BusinessException("不是管理员，无权限");
         }
     }
 

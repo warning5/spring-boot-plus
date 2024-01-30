@@ -20,7 +20,7 @@ public interface LoginService {
      * @return
      * @throws Exception
      */
-    LoginTokenVo login(LoginDto dto) throws Exception;
+    LoginTokenVo login(LoginDto dto);
 
     /**
      * 处理登录用户信息
@@ -31,7 +31,7 @@ public interface LoginService {
      * @return
      * @throws Exception
      */
-    LoginVo refreshLoginInfo(SysUser sysUser, String token, Date loginTime) throws Exception;
+    LoginVo refreshLoginInfo(SysUser sysUser, String token, Date loginTime);
 
     /**
      * 获取登录用户信息
@@ -39,13 +39,13 @@ public interface LoginService {
      * @return
      * @throws Exception
      */
-    LoginVo getLoginUserInfo() throws Exception;
+    LoginVo getLoginUserInfo();
 
     /**
      * 登出
      *
      * @throws Exception
      */
-    void logout() throws Exception;
+    void logout();
 
 }

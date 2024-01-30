@@ -41,7 +41,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addSysDict(SysDictDto dto) throws Exception {
+    public boolean addSysDict(SysDictDto dto) {
         SysDict sysDict = new SysDict();
         BeanUtils.copyProperties(dto, sysDict);
         return save(sysDict);
@@ -49,7 +49,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateSysDict(SysDictDto dto) throws Exception {
+    public boolean updateSysDict(SysDictDto dto) {
         Long id = dto.getId();
         SysDict sysDict = getById(id);
         if (sysDict == null) {
@@ -61,17 +61,17 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean deleteSysDict(Long id) throws Exception {
+    public boolean deleteSysDict(Long id) {
         return removeById(id);
     }
 
     @Override
-    public SysDictVo getSysDictById(Long id) throws Exception {
+    public SysDictVo getSysDictById(Long id) {
         return sysDictMapper.getSysDictById(id);
     }
 
     @Override
-    public Paging<SysDictVo> getSysDictPage(SysDictQuery query) throws Exception {
+    public Paging<SysDictVo> getSysDictPage(SysDictQuery query) {
         PagingUtil.handlePage(query, OrderByItem.orderBy("status desc,id desc"));
         List<SysDictVo> list = sysDictMapper.getSysDictPage(query);
         Paging<SysDictVo> paging = new Paging<>(list);
@@ -79,7 +79,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     }
 
     @Override
-    public Map<String, List<AppSysDictVo>> getAppSysDictList(SysDictAppQuery query) throws Exception {
+    public Map<String, List<AppSysDictVo>> getAppSysDictList(SysDictAppQuery query) {
         List<AppSysDictVo> list = sysDictMapper.getAppSysDictList(query);
         if (CollectionUtils.isNotEmpty(list)) {
             Map<String, List<AppSysDictVo>> map = list.stream().collect(Collectors.groupingBy(AppSysDictVo::getDictCode));
@@ -89,7 +89,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     }
 
     @Override
-    public List<SysDict> getSysDictList(String dictCode) throws Exception {
+    public List<SysDict> getSysDictList(String dictCode) {
         LambdaQueryWrapper<SysDict> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysDict::getDictCode, dictCode);
         wrapper.eq(SysDict::getStatus, true);
@@ -98,7 +98,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     }
 
     @Override
-    public SysDict getSysDictByValue(String dictCode, Serializable value) throws Exception {
+    public SysDict getSysDictByValue(String dictCode, Serializable value) {
         LambdaQueryWrapper<SysDict> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysDict::getDictCode, dictCode);
         wrapper.eq(SysDict::getValue, value);
@@ -107,7 +107,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     }
 
     @Override
-    public String getSysDictLabelByValue(String dictCode, Serializable value) throws Exception {
+    public String getSysDictLabelByValue(String dictCode, Serializable value) {
         SysDict sysDict = getSysDictByValue(dictCode, value);
         if (sysDict != null) {
             return sysDict.getLabel();

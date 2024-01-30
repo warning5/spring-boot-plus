@@ -43,7 +43,7 @@ public class SysDictTypeController {
     @PostMapping("/addSysDictType")
     @Operation(summary = "添加字典类型")
     @Permission("sys:dict:type:add")
-    public ApiResult addSysDictType(@Valid @RequestBody SysDictTypeDto dto) throws Exception {
+    public ApiResult addSysDictType(@Valid @RequestBody SysDictTypeDto dto) {
         boolean flag = sysDictTypeService.addSysDictType(dto);
         return ApiResult.result(flag);
     }
@@ -59,7 +59,7 @@ public class SysDictTypeController {
     @PostMapping("/updateSysDictType")
     @Operation(summary = "修改字典类型")
     @Permission("sys:dict:type:update")
-    public ApiResult updateSysDictType(@Valid @RequestBody SysDictTypeDto dto) throws Exception {
+    public ApiResult updateSysDictType(@Valid @RequestBody SysDictTypeDto dto) {
         boolean flag = sysDictTypeService.updateSysDictType(dto);
         return ApiResult.result(flag);
     }
@@ -75,7 +75,7 @@ public class SysDictTypeController {
     @PostMapping("/deleteSysDictType/{id}")
     @Operation(summary = "删除字典类型")
     @Permission("sys:dict:type:delete")
-    public ApiResult deleteSysDictType(@PathVariable Long id) throws Exception {
+    public ApiResult deleteSysDictType(@PathVariable Long id) {
         boolean flag = sysDictTypeService.deleteSysDictType(id);
         return ApiResult.result(flag);
     }
@@ -90,7 +90,7 @@ public class SysDictTypeController {
     @PostMapping("/getSysDictType/{id}")
     @Operation(summary = "字典类型详情")
     @Permission("sys:dict:type:info")
-    public ApiResult<SysDictTypeVo> getSysDictType(@PathVariable Long id) throws Exception {
+    public ApiResult<SysDictTypeVo> getSysDictType(@PathVariable Long id) {
         SysDictTypeVo sysDictTypeVo = sysDictTypeService.getSysDictTypeById(id);
         return ApiResult.success(sysDictTypeVo);
     }
@@ -105,7 +105,7 @@ public class SysDictTypeController {
     @PostMapping("/getSysDictTypeList")
     @Operation(summary = "字典类型列表")
     @Permission("sys:dict:type:list")
-    public ApiResult<SysDictTypeVo> getSysDictTypeList(@Valid @RequestBody SysDictTypeQuery query) throws Exception {
+    public ApiResult<SysDictTypeVo> getSysDictTypeList(@Valid @RequestBody SysDictTypeQuery query) {
         List<SysDictTypeVo> list = sysDictTypeService.getSysDictTypeList(query);
         return ApiResult.success(list);
     }

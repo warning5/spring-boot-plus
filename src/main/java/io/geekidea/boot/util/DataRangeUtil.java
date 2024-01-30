@@ -18,7 +18,7 @@ public class DataRangeUtil {
      *
      * @param dataRangeQuery
      */
-    public static void handleAdminLogin(DataRangeQuery dataRangeQuery) throws Exception {
+    public static void handleAdminLogin(DataRangeQuery dataRangeQuery) {
         LoginVo loginVo = LoginUtil.getLoginVo();
         if (loginVo != null) {
             Long userId = loginVo.getUserId();
@@ -35,7 +35,7 @@ public class DataRangeUtil {
      *
      * @param dataRangeQuery
      */
-    public static void handleAppLogin(DataRangeQuery dataRangeQuery) throws Exception {
+    public static void handleAppLogin(DataRangeQuery dataRangeQuery) {
         AppLoginVo appLoginVo = AppLoginUtil.getLoginVo();
         if (appLoginVo != null) {
             Long userId = appLoginVo.getUserId();
@@ -51,7 +51,7 @@ public class DataRangeUtil {
      *
      * @param dataRangeQuery
      */
-    public static void handleCommonLogin(DataRangeQuery dataRangeQuery) throws Exception {
+    public static void handleCommonLogin(DataRangeQuery dataRangeQuery) {
         // 判断token是那个端
         SystemType systemType = SystemTypeUtil.getSystemTypeByToken();
         if (SystemType.ADMIN == systemType) {

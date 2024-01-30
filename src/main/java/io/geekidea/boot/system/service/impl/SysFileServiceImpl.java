@@ -3,6 +3,7 @@ package io.geekidea.boot.system.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.OrderByItem;
+import io.geekidea.boot.framework.page.OrderMapping;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.system.dto.SysFileDto;
 import io.geekidea.boot.system.entity.SysFile;
@@ -17,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,7 +35,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateSysFile(SysFileDto dto) throws Exception {
+    public boolean updateSysFile(SysFileDto dto) {
         Long id = dto.getId();
         SysFile sysFile = getById(id);
         if (sysFile == null) {
@@ -47,18 +47,20 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean deleteSysFile(Long id) throws Exception {
+    public boolean deleteSysFile(Long id) {
         return removeById(id);
     }
 
     @Override
-    public SysFileVo getSysFileById(Long id) throws Exception {
+    public SysFileVo getSysFileById(Long id) {
         return sysFileMapper.getSysFileById(id);
     }
 
     @Override
-    public Paging<SysFileVo> getSysFilePage(SysFileQuery query) throws Exception {
-        PagingUtil.handlePage(query, OrderByItem.desc("id"));
+    public Paging<SysFileVo> getSysFilePage(SysFileQuery query) {
+        OrderMapping orderMapping = new OrderMapping();
+        orderMapping.put("createTime", "create_time");
+        PagingUtil.handlePage(query, orderMapping, OrderByItem.desc("id"));
         List<SysFileVo> list = sysFileMapper.getSysFilePage(query);
         Paging<SysFileVo> paging = new Paging<>(list);
         return paging;

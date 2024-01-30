@@ -41,8 +41,8 @@ public class SysDictAppController {
      */
     @PostMapping("/getAppSysDictList")
     @Operation(summary = "App字典数据列表")
-    public ApiResult<AppSysDictVo> getAppSysDictList(@Valid @RequestBody SysDictAppQuery query) throws Exception {
-        Map<String,List<AppSysDictVo>> map = sysDictService.getAppSysDictList(query);
+    public ApiResult<AppSysDictVo> getAppSysDictList(@Valid @RequestBody SysDictAppQuery query) {
+        Map<String, List<AppSysDictVo>> map = sysDictService.getAppSysDictList(query);
         return ApiResult.success(map);
     }
 

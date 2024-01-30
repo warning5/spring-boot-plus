@@ -6,7 +6,6 @@ import io.geekidea.boot.user.dto.AppUserHeadDto;
 import io.geekidea.boot.user.dto.AppUserNicknameDto;
 import io.geekidea.boot.user.dto.UserDto;
 import io.geekidea.boot.user.entity.User;
-import io.geekidea.boot.user.query.AppUserQuery;
 import io.geekidea.boot.user.query.UserQuery;
 import io.geekidea.boot.user.vo.AppUserVo;
 import io.geekidea.boot.user.vo.UserVo;
@@ -27,7 +26,7 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    User getUserByOpenid(String openid) throws Exception;
+    User getUserByOpenid(String openid);
 
     /**
      * 根据账号获取用户
@@ -36,7 +35,7 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    User getUserByUsername(String username) throws Exception;
+    User getUserByUsername(String username);
 
     /**
      * 添加用户信息
@@ -45,7 +44,7 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    boolean addUser(UserDto userDto) throws Exception;
+    boolean addUser(UserDto userDto);
 
     /**
      * 修改用户信息
@@ -54,7 +53,7 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    boolean updateUser(UserDto userDto) throws Exception;
+    boolean updateUser(UserDto userDto);
 
     /**
      * 删除用户信息
@@ -63,7 +62,7 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    boolean deleteUser(Long id) throws Exception;
+    boolean deleteUser(Long id);
 
     /**
      * 用户信息详情
@@ -72,7 +71,7 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    UserVo getUserById(Long id) throws Exception;
+    UserVo getUserById(Long id);
 
     /**
      * 用户信息分页列表
@@ -81,14 +80,15 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    Paging<UserVo> getUserPage(UserQuery query) throws Exception;
+    Paging<UserVo> getUserPage(UserQuery query);
 
     /**
      * 获取App用户信息
+     *
      * @return
      * @throws Exception
      */
-    AppUserVo getProfile() throws Exception;
+    AppUserVo getProfile();
 
     /**
      * 修改用户头像
@@ -97,7 +97,7 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    boolean updateHead(AppUserHeadDto dto) throws Exception;
+    boolean updateHead(AppUserHeadDto dto);
 
     /**
      * 修改用户昵称
@@ -106,6 +106,6 @@ public interface UserService extends IService<User> {
      * @return
      * @throws Exception
      */
-    boolean updateNickname(AppUserNicknameDto dto) throws Exception;
+    boolean updateNickname(AppUserNicknameDto dto);
 
 }

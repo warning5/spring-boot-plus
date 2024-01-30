@@ -45,7 +45,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addSysMenu(SysMenuDto dto) throws Exception {
+    public boolean addSysMenu(SysMenuDto dto) {
         SysMenu sysMenu = new SysMenu();
         BeanUtils.copyProperties(dto, sysMenu);
         Long parentId = dto.getParentId();
@@ -57,7 +57,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateSysMenu(SysMenuDto dto) throws Exception {
+    public boolean updateSysMenu(SysMenuDto dto) {
         Long id = dto.getId();
         SysMenu sysMenu = getById(id);
         if (sysMenu == null) {
@@ -69,7 +69,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean deleteSysMenu(Long id) throws Exception {
+    public boolean deleteSysMenu(Long id) {
         // 获取菜单
         SysMenu sysMenu = getById(id);
         if (sysMenu == null) {
@@ -102,12 +102,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     @Override
-    public SysMenuVo getSysMenuById(Long id) throws Exception {
+    public SysMenuVo getSysMenuById(Long id) {
         return sysMenuMapper.getSysMenuById(id);
     }
 
     @Override
-    public List<SysMenuTreeVo> getAllSysMenuTreeList(SysMenuQuery query) throws Exception {
+    public List<SysMenuTreeVo> getAllSysMenuTreeList(SysMenuQuery query) {
         List<SysMenuTreeVo> list = sysMenuMapper.getSysMenuTreeList(query);
         if (CollectionUtils.isEmpty(list)) {
             return null;
@@ -122,7 +122,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     @Override
-    public List<SysMenuTreeVo> getSysMenuTreeList() throws Exception {
+    public List<SysMenuTreeVo> getSysMenuTreeList() {
         SysMenuQuery query = new SysMenuQuery();
         query.setStatus(true);
         List<SysMenuTreeVo> list = sysMenuMapper.getSysMenuTreeList(query);
@@ -134,7 +134,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     @Override
-    public List<SysNavMenuTreeVo> getNavMenuTreeList() throws Exception {
+    public List<SysNavMenuTreeVo> getNavMenuTreeList() {
         Long userId = LoginUtil.getUserId();
         // 如果是管理员，则查询所有可用菜单，否则获取当前用户所有可用的菜单
         boolean isAdmin = LoginUtil.isAdmin();
@@ -149,7 +149,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     @Override
-    public List<Long> getMenuIdsByRoleId(Long roleId) throws Exception {
+    public List<Long> getMenuIdsByRoleId(Long roleId) {
         return sysMenuMapper.getMenuIdsByRoleId(roleId);
     }
 

@@ -26,7 +26,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    boolean addSysUser(SysUserDto dto) throws Exception;
+    boolean addSysUser(SysUserDto dto);
 
     /**
      * 修改系统用户
@@ -35,7 +35,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    boolean updateSysUser(SysUserDto dto) throws Exception;
+    boolean updateSysUser(SysUserDto dto);
 
     /**
      * 删除系统用户
@@ -44,7 +44,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    boolean deleteSysUser(Long id) throws Exception;
+    boolean deleteSysUser(Long id);
 
     /**
      * 系统用户详情
@@ -53,7 +53,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    SysUserVo getSysUserById(Long id) throws Exception;
+    SysUserVo getSysUserById(Long id);
 
     /**
      * 系统用户分页列表
@@ -62,7 +62,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    Paging<SysUserVo> getSysUserPage(SysUserQuery query) throws Exception;
+    Paging<SysUserVo> getSysUserPage(SysUserQuery query);
 
     /**
      * 重置系统用户密码
@@ -71,7 +71,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    boolean resetSysUserPassword(SysUserResetPasswordDto sysUserResetPasswordDto) throws Exception;
+    boolean resetSysUserPassword(SysUserResetPasswordDto sysUserResetPasswordDto);
 
     /**
      * 修改个人信息
@@ -80,7 +80,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    boolean updateProfile(SysUserUpdateProfileDto sysUserUpdateProfileDto) throws Exception;
+    boolean updateProfile(SysUserUpdateProfileDto sysUserUpdateProfileDto);
 
     /**
      * 修改系统用户密码
@@ -89,7 +89,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    boolean updatePassword(SysUserUpdatePasswordDto sysUserUpdatePasswordDto) throws Exception;
+    boolean updatePassword(SysUserUpdatePasswordDto sysUserUpdatePasswordDto);
 
     /**
      * 检查username是否存在
@@ -98,7 +98,7 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      * @throws Exception
      */
-    void checkUsernameExists(String username) throws Exception;
+    void checkUsernameExists(String username);
 
     /**
      * 导入Excel用户数据

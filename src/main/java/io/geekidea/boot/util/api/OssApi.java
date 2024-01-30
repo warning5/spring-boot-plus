@@ -52,7 +52,7 @@ public class OssApi {
         }
     }
 
-    public static String upload(InputStream inputStream, String dirName, String fileName) throws Exception {
+    public static String upload(InputStream inputStream, String dirName, String fileName) {
         try {
             String rootDir = ossProperties.getRootDir();
             String fileKey = "";

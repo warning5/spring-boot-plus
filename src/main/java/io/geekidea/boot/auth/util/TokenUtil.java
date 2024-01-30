@@ -1,10 +1,13 @@
-package io.geekidea.boot.util;
+package io.geekidea.boot.auth.util;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.geekidea.boot.auth.cache.TokenCache;
 import io.geekidea.boot.common.constant.LoginConstant;
 import io.geekidea.boot.common.enums.SystemType;
 import io.geekidea.boot.framework.exception.LoginTokenException;
+import io.geekidea.boot.util.CookieUtil;
+import io.geekidea.boot.util.HttpServletRequestUtil;
+import io.geekidea.boot.util.SystemTypeUtil;
+import io.geekidea.boot.util.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -31,7 +34,7 @@ public class TokenUtil {
      * @return
      * @throws Exception
      */
-    public static String generateAdminToken(Long userId) throws Exception {
+    public static String generateAdminToken(Long userId) {
         String userMd5 = DigestUtils.md5Hex(userId.toString());
         String adminToken = LoginConstant.ADMIN_TOKEN_PREFIX + userMd5 + "." + UUIDUtil.getUuid();
         return adminToken;
@@ -44,7 +47,7 @@ public class TokenUtil {
      * @return
      * @throws Exception
      */
-    public static String generateAppToken(Long userId) throws Exception {
+    public static String generateAppToken(Long userId) {
         String userMd5 = DigestUtils.md5Hex(userId.toString());
         String appToken = LoginConstant.APP_TOKEN_PREFIX + userMd5 + "." + UUIDUtil.getUuid();
         return appToken;
@@ -57,7 +60,7 @@ public class TokenUtil {
      * @return
      * @throws Exception
      */
-    public static String getShortId(Long userId) throws Exception {
+    public static String getShortId(Long userId) {
         // 将数字转换成数字加字母变为更短的字符串
         // 36 表示基数(10 位数字 + 26 个字符)
         String string = Long.toString(userId, 36);
@@ -71,7 +74,7 @@ public class TokenUtil {
      * @return
      * @throws Exception
      */
-    public static Long parseShortId(String shorUserId) throws Exception {
+    public static Long parseShortId(String shorUserId) {
         long userId = Long.parseLong(shorUserId, 36);
         return userId;
     }
@@ -81,7 +84,7 @@ public class TokenUtil {
      *
      * @return
      */
-    public static String getToken() throws Exception {
+    public static String getToken() {
         // 从当前线程获取
         return TokenCache.get();
     }
@@ -92,7 +95,7 @@ public class TokenUtil {
      * @param request
      * @return
      */
-    public static String getToken(HttpServletRequest request) throws Exception {
+    public static String getToken(HttpServletRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("request不能为空");
         }
@@ -133,7 +136,7 @@ public class TokenUtil {
      * @param request
      * @return
      */
-    public static String getTokenByCookie(HttpServletRequest request, SystemType systemType) throws Exception {
+    public static String getTokenByCookie(HttpServletRequest request, SystemType systemType) {
         Cookie[] cookies = request.getCookies();
         if (ArrayUtils.isEmpty(cookies)) {
             return null;
@@ -164,7 +167,7 @@ public class TokenUtil {
      * @param token
      * @throws Exception
      */
-    public static void checkAdminToken(String token) throws Exception {
+    public static void checkAdminToken(String token) {
         SystemType systemType = SystemTypeUtil.getSystemTypeByToken(token);
         if (SystemType.ADMIN != systemType) {
             throw new LoginTokenException("非管理后台token");
@@ -177,7 +180,7 @@ public class TokenUtil {
      * @param token
      * @throws Exception
      */
-    public static void checkAppToken(String token) throws Exception {
+    public static void checkAppToken(String token) {
         SystemType systemType = SystemTypeUtil.getSystemTypeByToken(token);
         if (SystemType.APP != systemType) {
             throw new LoginTokenException("非移动端token");

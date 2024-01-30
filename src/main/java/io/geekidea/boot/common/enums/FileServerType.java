@@ -38,6 +38,13 @@ public enum FileServerType {
         }
     }
 
+    public static Integer getCode(FileServerType type) {
+        if (type == null) {
+            return LOCAL.code;
+        }
+        return type.code;
+    }
+
     public static FileServerType get(Integer code) {
         FileServerType type = map.get(code);
         if (type == null) {

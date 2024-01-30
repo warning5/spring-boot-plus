@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.OrderByItem;
+import io.geekidea.boot.framework.page.OrderMapping;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.system.dto.RoleMenusDto;
 import io.geekidea.boot.system.dto.SysRoleDto;
@@ -52,7 +53,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addSysRole(SysRoleDto dto) throws Exception {
+    public boolean addSysRole(SysRoleDto dto) {
         checkCodeExists(dto.getCode());
         SysRole sysRole = new SysRole();
         BeanUtils.copyProperties(dto, sysRole);
@@ -61,7 +62,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateSysRole(SysRoleDto dto) throws Exception {
+    public boolean updateSysRole(SysRoleDto dto) {
         Long id = dto.getId();
         SysRole sysRole = getById(id);
         if (sysRole == null) {
@@ -75,7 +76,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean deleteSysRole(Long id) throws Exception {
+    public boolean deleteSysRole(Long id) {
         // 判断角色下是否存在用户，如果存在，则不能删除
         Integer count = sysUserMapper.getCountByRoleId(id);
         if (count > 0) {
@@ -85,20 +86,22 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     @Override
-    public SysRoleVo getSysRoleById(Long id) throws Exception {
+    public SysRoleVo getSysRoleById(Long id) {
         return sysRoleMapper.getSysRoleById(id);
     }
 
     @Override
-    public Paging<SysRoleVo> getSysRolePage(SysRoleQuery query) throws Exception {
-        PagingUtil.handlePage(query, OrderByItem.desc("id"));
+    public Paging<SysRoleVo> getSysRolePage(SysRoleQuery query) {
+        OrderMapping orderMapping = new OrderMapping();
+        orderMapping.put("createTime", "create_time");
+        PagingUtil.handlePage(query, orderMapping, OrderByItem.desc("id"));
         List<SysRoleVo> list = sysRoleMapper.getSysRolePage(query);
         Paging<SysRoleVo> paging = new Paging<>(list);
         return paging;
     }
 
     @Override
-    public List<SysRole> getSysRoleAllList() throws Exception {
+    public List<SysRole> getSysRoleAllList() {
         LambdaQueryWrapper<SysRole> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.orderByAsc(SysRole::getId);
         return list(lambdaQueryWrapper);
@@ -106,7 +109,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean setRoleMenus(RoleMenusDto roleMenusDto) throws Exception {
+    public boolean setRoleMenus(RoleMenusDto roleMenusDto) {
         Long roleId = roleMenusDto.getRoleId();
         List<Long> menuIds = roleMenusDto.getMenuIds();
         SysRole sysRole = getById(roleId);
@@ -143,7 +146,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     @Override
-    public void checkCodeExists(String code) throws Exception {
+    public void checkCodeExists(String code) {
         LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysRole::getCode, code);
         long count = count(wrapper);

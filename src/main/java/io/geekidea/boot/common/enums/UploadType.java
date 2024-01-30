@@ -60,6 +60,13 @@ public enum UploadType {
         }
     }
 
+    public static String getCode(UploadType type) {
+        if (type == null) {
+            return null;
+        }
+        return type.type;
+    }
+
     public static UploadType get(String code) {
         UploadType uploadType = map.get(code);
         if (uploadType == null) {

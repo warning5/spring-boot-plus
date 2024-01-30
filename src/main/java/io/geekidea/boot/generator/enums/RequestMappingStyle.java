@@ -42,6 +42,13 @@ public enum RequestMappingStyle {
         }
     }
 
+    public static Integer getCode(RequestMappingStyle type) {
+        if (type == null) {
+            return DEFAULT.code;
+        }
+        return type.code;
+    }
+
     public static RequestMappingStyle get(Integer code) {
         RequestMappingStyle style = map.get(code);
         if (style == null) {

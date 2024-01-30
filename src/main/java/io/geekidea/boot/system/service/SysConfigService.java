@@ -23,7 +23,7 @@ public interface SysConfigService extends IService<SysConfig> {
      * @return
      * @throws Exception
      */
-    boolean addSysConfig(SysConfigDto dto) throws Exception;
+    boolean addSysConfig(SysConfigDto dto);
 
     /**
      * 修改系统配置
@@ -32,7 +32,7 @@ public interface SysConfigService extends IService<SysConfig> {
      * @return
      * @throws Exception
      */
-    boolean updateSysConfig(SysConfigDto dto) throws Exception;
+    boolean updateSysConfig(SysConfigDto dto);
 
     /**
      * 删除系统配置
@@ -41,7 +41,7 @@ public interface SysConfigService extends IService<SysConfig> {
      * @return
      * @throws Exception
      */
-    boolean deleteSysConfig(Long id) throws Exception;
+    boolean deleteSysConfig(Long id);
 
     /**
      * 系统配置详情
@@ -50,7 +50,7 @@ public interface SysConfigService extends IService<SysConfig> {
      * @return
      * @throws Exception
      */
-    SysConfigVo getSysConfigById(Long id) throws Exception;
+    SysConfigVo getSysConfigById(Long id);
 
     /**
      * 系统配置分页列表
@@ -59,7 +59,7 @@ public interface SysConfigService extends IService<SysConfig> {
      * @return
      * @throws Exception
      */
-    Paging<SysConfigVo> getSysConfigPage(SysConfigQuery query) throws Exception;
+    Paging<SysConfigVo> getSysConfigPage(SysConfigQuery query);
 
     /**
      * 检查configKey是否存在
@@ -68,6 +68,6 @@ public interface SysConfigService extends IService<SysConfig> {
      * @return
      * @throws Exception
      */
-    void checkConfigKeyExists(String configKey) throws Exception;
+    void checkConfigKeyExists(String configKey);
 
 }

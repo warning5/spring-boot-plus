@@ -43,7 +43,7 @@ public class SysFileController {
     @PostMapping("/updateSysFile")
     @Operation(summary = "修改系统文件")
     @Permission("sys:file:update")
-    public ApiResult updateSysFile(@Valid @RequestBody SysFileDto dto) throws Exception {
+    public ApiResult updateSysFile(@Valid @RequestBody SysFileDto dto) {
         boolean flag = sysFileService.updateSysFile(dto);
         return ApiResult.result(flag);
     }
@@ -59,7 +59,7 @@ public class SysFileController {
     @PostMapping("/deleteSysFile/{id}")
     @Operation(summary = "删除系统文件")
     @Permission("sys:file:delete")
-    public ApiResult deleteSysFile(@PathVariable Long id) throws Exception {
+    public ApiResult deleteSysFile(@PathVariable Long id) {
         boolean flag = sysFileService.deleteSysFile(id);
         return ApiResult.result(flag);
     }
@@ -74,7 +74,7 @@ public class SysFileController {
     @PostMapping("/getSysFile/{id}")
     @Operation(summary = "系统文件详情")
     @Permission("sys:file:info")
-    public ApiResult<SysFileVo> getSysFile(@PathVariable Long id) throws Exception {
+    public ApiResult<SysFileVo> getSysFile(@PathVariable Long id) {
         SysFileVo sysFileVo = sysFileService.getSysFileById(id);
         return ApiResult.success(sysFileVo);
     }
@@ -89,7 +89,7 @@ public class SysFileController {
     @PostMapping("/getSysFilePage")
     @Operation(summary = "系统文件分页列表")
     @Permission("sys:file:page")
-    public ApiResult<SysFileVo> getSysFilePage(@Valid @RequestBody SysFileQuery query) throws Exception {
+    public ApiResult<SysFileVo> getSysFilePage(@Valid @RequestBody SysFileQuery query) {
         Paging<SysFileVo> paging = sysFileService.getSysFilePage(query);
         return ApiResult.success(paging);
     }

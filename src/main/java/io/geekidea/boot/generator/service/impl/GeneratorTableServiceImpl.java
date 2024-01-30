@@ -46,7 +46,7 @@ public class GeneratorTableServiceImpl extends ServiceImpl<GeneratorTableMapper,
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addGeneratorTable(String tableName) throws Exception {
+    public boolean addGeneratorTable(String tableName) {
         GeneratorTableDbVo generatorTableDbVo = generatorTableMapper.getDbTableByTableName(tableName);
         if (generatorTableDbVo == null) {
             throw new BusinessException("表不存在或不允许操作");
@@ -59,7 +59,7 @@ public class GeneratorTableServiceImpl extends ServiceImpl<GeneratorTableMapper,
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateGeneratorTable(GeneratorTableDto dto) throws Exception {
+    public boolean updateGeneratorTable(GeneratorTableDto dto) {
         Long id = dto.getId();
         GeneratorTable generatorTable = getById(id);
         if (generatorTable == null) {
@@ -79,7 +79,7 @@ public class GeneratorTableServiceImpl extends ServiceImpl<GeneratorTableMapper,
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public GeneratorTable getGeneratorTableInfo(String tableName) throws Exception {
+    public GeneratorTable getGeneratorTableInfo(String tableName) {
         GeneratorTable table = generatorTableMapper.getGeneratorTableByTableName(tableName);
         List<GeneratorColumn> columns;
         if (table == null) {
@@ -97,7 +97,7 @@ public class GeneratorTableServiceImpl extends ServiceImpl<GeneratorTableMapper,
     }
 
     @Override
-    public Paging<GeneratorTableDbVo> getDbTablePage(GeneratorTableQuery query) throws Exception {
+    public Paging<GeneratorTableDbVo> getDbTablePage(GeneratorTableQuery query) {
         PagingUtil.handlePage(query);
         List<GeneratorTableDbVo> list = generatorTableMapper.getDbTablePage(query);
         if (CollectionUtils.isNotEmpty(list)) {

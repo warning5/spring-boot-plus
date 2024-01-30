@@ -23,7 +23,7 @@ public interface GeneratorTableService extends IService<GeneratorTable> {
      * @return
      * @throws Exception
      */
-    boolean addGeneratorTable(String tableName) throws Exception;
+    boolean addGeneratorTable(String tableName);
 
     /**
      * 修改生成代码表
@@ -32,7 +32,7 @@ public interface GeneratorTableService extends IService<GeneratorTable> {
      * @return
      * @throws Exception
      */
-    boolean updateGeneratorTable(GeneratorTableDto dto) throws Exception;
+    boolean updateGeneratorTable(GeneratorTableDto dto);
 
     /**
      * 生成代码表详情
@@ -41,7 +41,7 @@ public interface GeneratorTableService extends IService<GeneratorTable> {
      * @return
      * @throws Exception
      */
-    GeneratorTable getGeneratorTableInfo(String tableName) throws Exception;
+    GeneratorTable getGeneratorTableInfo(String tableName);
 
     /**
      * 获取数据库表
@@ -50,6 +50,6 @@ public interface GeneratorTableService extends IService<GeneratorTable> {
      * @return
      * @throws Exception
      */
-    Paging<GeneratorTableDbVo> getDbTablePage(GeneratorTableQuery query) throws Exception;
+    Paging<GeneratorTableDbVo> getDbTablePage(GeneratorTableQuery query);
 
 }

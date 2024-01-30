@@ -39,7 +39,7 @@ public class VelocityUtil {
      * @return
      * @throws Exception
      */
-    public static String writer(String templatePath, Map<String, Object> dataMap) throws Exception {
+    public static String writer(String templatePath, Map<String, Object> dataMap) {
         VelocityEngine velocityEngine = new VelocityEngine(properties);
         StringWriter writer = new StringWriter();
         Template template = velocityEngine.getTemplate(templatePath, ConstVal.UTF8);

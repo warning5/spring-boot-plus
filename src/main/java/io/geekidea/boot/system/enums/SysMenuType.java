@@ -39,6 +39,13 @@ public enum SysMenuType {
         }
     }
 
+    public static Integer getCode(SysMenuType type) {
+        if (type == null) {
+            return null;
+        }
+        return type.code;
+    }
+
     public static SysMenuType get(Integer code) {
         SysMenuType type = map.get(code);
         if (type == null) {

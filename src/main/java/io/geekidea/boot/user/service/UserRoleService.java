@@ -2,6 +2,7 @@ package io.geekidea.boot.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.geekidea.boot.framework.page.Paging;
+import io.geekidea.boot.user.dto.UserRoleDto;
 import io.geekidea.boot.user.entity.UserRole;
 import io.geekidea.boot.user.query.UserRoleQuery;
 import io.geekidea.boot.user.vo.UserRoleVo;
@@ -21,7 +22,7 @@ public interface UserRoleService extends IService<UserRole> {
      * @return
      * @throws Exception
      */
-    boolean addUserRole(io.geekidea.boot.demo.dto.UserRoleDto dto) throws Exception;
+    boolean addUserRole(UserRoleDto dto);
 
     /**
      * 修改用户角色
@@ -30,7 +31,7 @@ public interface UserRoleService extends IService<UserRole> {
      * @return
      * @throws Exception
      */
-    boolean updateUserRole(io.geekidea.boot.demo.dto.UserRoleDto dto) throws Exception;
+    boolean updateUserRole(UserRoleDto dto);
 
     /**
      * 删除用户角色
@@ -39,7 +40,7 @@ public interface UserRoleService extends IService<UserRole> {
      * @return
      * @throws Exception
      */
-    boolean deleteUserRole(Long id) throws Exception;
+    boolean deleteUserRole(Long id);
 
     /**
      * 用户角色详情
@@ -48,7 +49,7 @@ public interface UserRoleService extends IService<UserRole> {
      * @return
      * @throws Exception
      */
-    UserRoleVo getUserRoleById(Long id) throws Exception;
+    UserRoleVo getUserRoleById(Long id);
 
     /**
      * 用户角色分页列表
@@ -57,6 +58,6 @@ public interface UserRoleService extends IService<UserRole> {
      * @return
      * @throws Exception
      */
-    Paging<UserRoleVo> getUserRolePage(UserRoleQuery query) throws Exception;
+    Paging<UserRoleVo> getUserRolePage(UserRoleQuery query);
 
 }

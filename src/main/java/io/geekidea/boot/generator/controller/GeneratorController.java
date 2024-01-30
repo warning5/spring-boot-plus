@@ -64,7 +64,7 @@ public class GeneratorController {
     @PostMapping("/getDbTablePage")
     @Operation(summary = "获取数据库表")
     @Permission("generator:db-table:page")
-    public ApiResult<GeneratorTableDbVo> getDbTablePage(@Valid @RequestBody GeneratorTableQuery query) throws Exception {
+    public ApiResult<GeneratorTableDbVo> getDbTablePage(@Valid @RequestBody GeneratorTableQuery query) {
         Paging<GeneratorTableDbVo> paging = generatorTableService.getDbTablePage(query);
         return ApiResult.success(paging);
     }
@@ -79,7 +79,7 @@ public class GeneratorController {
     @PostMapping("/getGeneratorTable/{tableName}")
     @Operation(summary = "生成代码表详情")
     @Permission("generator:table:info")
-    public ApiResult<GeneratorTable> getGeneratorTable(@PathVariable String tableName) throws Exception {
+    public ApiResult<GeneratorTable> getGeneratorTable(@PathVariable String tableName) {
         GeneratorTable generatorTable = generatorTableService.getGeneratorTableInfo(tableName);
         return ApiResult.success(generatorTable);
     }
@@ -95,7 +95,7 @@ public class GeneratorController {
     @PostMapping("/updateGeneratorTable")
     @Operation(summary = "修改生成代码表")
     @Permission("generator:table:update")
-    public ApiResult updateGeneratorTable(@Valid @RequestBody GeneratorTableDto dto) throws Exception {
+    public ApiResult updateGeneratorTable(@Valid @RequestBody GeneratorTableDto dto) {
         boolean flag = generatorTableService.updateGeneratorTable(dto);
         return ApiResult.result(flag);
     }
@@ -110,7 +110,7 @@ public class GeneratorController {
     @PostMapping("/previewCode/{tableName}")
     @Operation(summary = "预览代码")
     @Permission("generator:preview-code")
-    public ApiResult<GeneratorCodeVo> previewCode(@PathVariable String tableName) throws Exception {
+    public ApiResult<GeneratorCodeVo> previewCode(@PathVariable String tableName) {
         List<GeneratorCodeVo> list = generatorService.previewCode(tableName);
         return ApiResult.success(list);
     }

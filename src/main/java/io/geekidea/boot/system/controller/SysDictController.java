@@ -43,7 +43,7 @@ public class SysDictController {
     @PostMapping("/addSysDict")
     @Operation(summary = "添加字典数据")
     @Permission("sys:dict:add")
-    public ApiResult addSysDict(@Valid @RequestBody SysDictDto dto) throws Exception {
+    public ApiResult addSysDict(@Valid @RequestBody SysDictDto dto) {
         boolean flag = sysDictService.addSysDict(dto);
         return ApiResult.result(flag);
     }
@@ -59,7 +59,7 @@ public class SysDictController {
     @PostMapping("/updateSysDict")
     @Operation(summary = "修改字典数据")
     @Permission("sys:dict:update")
-    public ApiResult updateSysDict(@Valid @RequestBody SysDictDto dto) throws Exception {
+    public ApiResult updateSysDict(@Valid @RequestBody SysDictDto dto) {
         boolean flag = sysDictService.updateSysDict(dto);
         return ApiResult.result(flag);
     }
@@ -75,7 +75,7 @@ public class SysDictController {
     @PostMapping("/deleteSysDict/{id}")
     @Operation(summary = "删除字典数据")
     @Permission("sys:dict:delete")
-    public ApiResult deleteSysDict(@PathVariable Long id) throws Exception {
+    public ApiResult deleteSysDict(@PathVariable Long id) {
         boolean flag = sysDictService.deleteSysDict(id);
         return ApiResult.result(flag);
     }
@@ -90,7 +90,7 @@ public class SysDictController {
     @PostMapping("/getSysDict/{id}")
     @Operation(summary = "字典数据详情")
     @Permission("sys:dict:info")
-    public ApiResult<SysDictVo> getSysDict(@PathVariable Long id) throws Exception {
+    public ApiResult<SysDictVo> getSysDict(@PathVariable Long id) {
         SysDictVo sysDictVo = sysDictService.getSysDictById(id);
         return ApiResult.success(sysDictVo);
     }
@@ -105,7 +105,7 @@ public class SysDictController {
     @PostMapping("/getSysDictPage")
     @Operation(summary = "字典数据分页列表")
     @Permission("sys:dict:page")
-    public ApiResult<SysDictVo> getSysDictPage(@Valid @RequestBody SysDictQuery query) throws Exception {
+    public ApiResult<SysDictVo> getSysDictPage(@Valid @RequestBody SysDictQuery query) {
         Paging<SysDictVo> paging = sysDictService.getSysDictPage(query);
         return ApiResult.success(paging);
     }

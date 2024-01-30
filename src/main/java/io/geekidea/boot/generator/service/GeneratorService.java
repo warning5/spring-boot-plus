@@ -20,7 +20,7 @@ public interface GeneratorService {
      * @return
      * @throws Exception
      */
-    List<GeneratorCodeVo> previewCode(String tableName) throws Exception;
+    List<GeneratorCodeVo> previewCode(String tableName);
 
     /**
      * 生成代码
@@ -38,6 +38,6 @@ public interface GeneratorService {
      * @return
      * @throws Exception
      */
-    Map<String, List<GeneratorCodeVo>> downloadCode(List<String> tableNames) throws Exception;
+    Map<String, List<GeneratorCodeVo>> downloadCode(List<String> tableNames);
 
 }

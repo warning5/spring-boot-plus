@@ -36,7 +36,7 @@ public class OpenApiConfig {
     /**
      * token请求头参数
      */
-    private Parameter tokenParameter = new HeaderParameter().name(TOKEN_NAME).schema(new StringSchema()._default("").name(TOKEN_NAME));
+    private Parameter tokenParameter = new HeaderParameter().name(TOKEN_NAME).required(false).schema(new StringSchema()._default("").name(TOKEN_NAME));
 
 
     @Bean

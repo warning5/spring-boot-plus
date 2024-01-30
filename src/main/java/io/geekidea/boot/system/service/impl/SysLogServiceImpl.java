@@ -2,6 +2,7 @@ package io.geekidea.boot.system.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.geekidea.boot.framework.page.OrderByItem;
+import io.geekidea.boot.framework.page.OrderMapping;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.system.entity.SysLog;
 import io.geekidea.boot.system.mapper.SysLogMapper;
@@ -29,13 +30,15 @@ public class SysLogServiceImpl extends ServiceImpl<SysLogMapper, SysLog> impleme
     private SysLogMapper sysLogMapper;
 
     @Override
-    public SysLogVo getSysLogById(Long id) throws Exception {
+    public SysLogVo getSysLogById(Long id) {
         return sysLogMapper.getSysLogById(id);
     }
 
     @Override
-    public Paging<SysLogVo> getSysLogPage(SysLogQuery query) throws Exception {
-        PagingUtil.handlePage(query, OrderByItem.desc("id"));
+    public Paging<SysLogVo> getSysLogPage(SysLogQuery query) {
+        OrderMapping orderMapping = new OrderMapping();
+        orderMapping.put("createTime", "create_time");
+        PagingUtil.handlePage(query, orderMapping, OrderByItem.desc("id"));
         List<SysLogVo> list = sysLogMapper.getSysLogPage(query);
         Paging<SysLogVo> paging = new Paging<>(list);
         return paging;

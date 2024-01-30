@@ -4,6 +4,7 @@ import io.geekidea.boot.auth.dto.LoginDto;
 import io.geekidea.boot.auth.service.LoginRedisService;
 import io.geekidea.boot.auth.service.LoginService;
 import io.geekidea.boot.auth.util.LoginUtil;
+import io.geekidea.boot.auth.util.TokenUtil;
 import io.geekidea.boot.auth.vo.LoginTokenVo;
 import io.geekidea.boot.auth.vo.LoginVo;
 import io.geekidea.boot.common.enums.SystemType;
@@ -15,7 +16,6 @@ import io.geekidea.boot.system.mapper.SysMenuMapper;
 import io.geekidea.boot.system.mapper.SysRoleMapper;
 import io.geekidea.boot.system.mapper.SysUserMapper;
 import io.geekidea.boot.util.PasswordUtil;
-import io.geekidea.boot.util.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class LoginServiceImpl implements LoginService {
 
 
     @Override
-    public LoginTokenVo login(LoginDto dto) throws Exception {
+    public LoginTokenVo login(LoginDto dto) {
         String username = dto.getUsername();
         SysUser sysUser = sysUserMapper.getSysUserByUsername(username);
         if (sysUser == null) {
@@ -73,7 +73,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public LoginVo refreshLoginInfo(SysUser sysUser, String token, Date loginTime) throws Exception {
+    public LoginVo refreshLoginInfo(SysUser sysUser, String token, Date loginTime) {
         // 用户ID
         Long userId = sysUser.getId();
         // 校验用户状态
@@ -106,7 +106,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public LoginVo getLoginUserInfo() throws Exception {
+    public LoginVo getLoginUserInfo() {
         LoginVo loginVo = LoginUtil.getLoginVo();
         if (loginVo == null) {
             throw new LoginException("请先登录");
@@ -126,7 +126,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void logout() throws Exception {
+    public void logout() {
         try {
             // 获取token
             String token = TokenUtil.getToken();

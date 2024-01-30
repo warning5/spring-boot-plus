@@ -2,7 +2,6 @@ package io.geekidea.boot.auth.util;
 
 import io.geekidea.boot.common.enums.SystemType;
 import io.geekidea.boot.util.SystemTypeUtil;
-import io.geekidea.boot.util.TokenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +17,9 @@ public class CommonLoginUtil {
      *
      * @param token
      * @return
-     * @throws Exception
+     * @
      */
-    public static Long getUserId(String token) throws Exception {
+    public static Long getUserId(String token) {
         if (StringUtils.isBlank(token)) {
             return null;
         }
@@ -32,9 +31,9 @@ public class CommonLoginUtil {
      * 获取用户ID
      *
      * @return
-     * @throws Exception
+     * @
      */
-    public static Long getUserId() throws Exception {
+    public static Long getUserId() {
         String token = TokenUtil.getToken();
         return getUserId(token);
     }
@@ -43,9 +42,9 @@ public class CommonLoginUtil {
      * 获取登录用户ID字符串
      *
      * @return
-     * @throws Exception
+     * @
      */
-    public static String getUserIdString() throws Exception {
+    public static String getUserIdString() {
         Long userId = getUserId();
         if (userId == null) {
             return null;
@@ -58,9 +57,9 @@ public class CommonLoginUtil {
      *
      * @param systemType
      * @return
-     * @throws Exception
+     * @
      */
-    public static Long getUserId(SystemType systemType) throws Exception {
+    public static Long getUserId(SystemType systemType) {
         try {
             if (SystemType.ADMIN == systemType) {
                 return LoginUtil.getUserId();

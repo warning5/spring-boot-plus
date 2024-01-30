@@ -23,7 +23,7 @@ public interface GeneratorColumnService extends IService<GeneratorColumn> {
      * @return
      * @throws Exception
      */
-    boolean addGeneratorColumn(String tableName) throws Exception;
+    boolean addGeneratorColumn(String tableName);
 
     /**
      * 修改生成代码列
@@ -32,7 +32,7 @@ public interface GeneratorColumnService extends IService<GeneratorColumn> {
      * @return
      * @throws Exception
      */
-    boolean updateGeneratorColumn(GeneratorColumnDto dto) throws Exception;
+    boolean updateGeneratorColumn(GeneratorColumnDto dto);
 
     /**
      * 根据表名称获取数据库原生列集合
@@ -41,7 +41,7 @@ public interface GeneratorColumnService extends IService<GeneratorColumn> {
      * @return
      * @throws Exception
      */
-    List<GeneratorColumnDbVo> getDbColumnListByTableName(String tableName) throws Exception;
+    List<GeneratorColumnDbVo> getDbColumnListByTableName(String tableName);
 
     /**
      * 根据表名称获取生成列集合
@@ -50,6 +50,6 @@ public interface GeneratorColumnService extends IService<GeneratorColumn> {
      * @return
      * @throws Exception
      */
-    List<GeneratorColumn> getGeneratorColumnList(String tableName) throws Exception;
+    List<GeneratorColumn> getGeneratorColumnList(String tableName);
 
 }

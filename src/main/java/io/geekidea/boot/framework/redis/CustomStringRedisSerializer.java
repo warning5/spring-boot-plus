@@ -6,6 +6,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * 自定义RedisKey前缀
+ *
  * @author geekidea
  * @date 2023/11/17
  **/
@@ -21,8 +22,8 @@ public class CustomStringRedisSerializer extends StringRedisSerializer {
 
     @Override
     public byte[] serialize(String string) {
-        if (StringUtils.isNotBlank(redisKeyPrefix)) {
-            string = string == null ? null : redisKeyPrefix + "." + string;
+        if (StringUtils.isNotBlank(redisKeyPrefix) && string != null && !string.startsWith(redisKeyPrefix)) {
+            string = redisKeyPrefix + "." + string;
         }
         return super.serialize(string);
     }
@@ -30,8 +31,8 @@ public class CustomStringRedisSerializer extends StringRedisSerializer {
     @Override
     public String deserialize(byte[] bytes) {
         String string = super.deserialize(bytes);
-        if (StringUtils.isNotBlank(redisKeyPrefix)) {
-            return string == null ? null : redisKeyPrefix + "." + string;
+        if (StringUtils.isNotBlank(redisKeyPrefix) && string != null && !string.startsWith(redisKeyPrefix)) {
+            string = redisKeyPrefix + "." + string;
         }
         return string;
     }

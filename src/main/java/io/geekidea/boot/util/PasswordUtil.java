@@ -11,7 +11,7 @@ public class PasswordUtil {
 
     private static int MD5_PWD_LENGTH = 32;
 
-    public static String encrypt(String password, String salt) throws Exception {
+    public static String encrypt(String password, String salt) {
         if (StringUtils.isBlank(password)) {
             throw new IllegalArgumentException("密码不能为空");
         }

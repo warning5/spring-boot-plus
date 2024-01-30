@@ -43,7 +43,7 @@ public class SysConfigController {
     @PostMapping("/addSysConfig")
     @Operation(summary = "添加系统配置")
     @Permission("sys:config:add")
-    public ApiResult addSysConfig(@Valid @RequestBody SysConfigDto dto) throws Exception {
+    public ApiResult addSysConfig(@Valid @RequestBody SysConfigDto dto) {
         boolean flag = sysConfigService.addSysConfig(dto);
         return ApiResult.result(flag);
     }
@@ -59,7 +59,7 @@ public class SysConfigController {
     @PostMapping("/updateSysConfig")
     @Operation(summary = "修改系统配置")
     @Permission("sys:config:update")
-    public ApiResult updateSysConfig(@Valid @RequestBody SysConfigDto dto) throws Exception {
+    public ApiResult updateSysConfig(@Valid @RequestBody SysConfigDto dto) {
         boolean flag = sysConfigService.updateSysConfig(dto);
         return ApiResult.result(flag);
     }
@@ -75,7 +75,7 @@ public class SysConfigController {
     @PostMapping("/deleteSysConfig/{id}")
     @Operation(summary = "删除系统配置")
     @Permission("sys:config:delete")
-    public ApiResult deleteSysConfig(@PathVariable Long id) throws Exception {
+    public ApiResult deleteSysConfig(@PathVariable Long id) {
         boolean flag = sysConfigService.deleteSysConfig(id);
         return ApiResult.result(flag);
     }
@@ -90,7 +90,7 @@ public class SysConfigController {
     @PostMapping("/getSysConfig/{id}")
     @Operation(summary = "系统配置详情")
     @Permission("sys:config:info")
-    public ApiResult<SysConfigVo> getSysConfig(@PathVariable Long id) throws Exception {
+    public ApiResult<SysConfigVo> getSysConfig(@PathVariable Long id) {
         SysConfigVo sysConfigVo = sysConfigService.getSysConfigById(id);
         return ApiResult.success(sysConfigVo);
     }
@@ -105,7 +105,7 @@ public class SysConfigController {
     @PostMapping("/getSysConfigPage")
     @Operation(summary = "系统配置分页列表")
     @Permission("sys:config:page")
-    public ApiResult<SysConfigVo> getSysConfigPage(@Valid @RequestBody SysConfigQuery query) throws Exception {
+    public ApiResult<SysConfigVo> getSysConfigPage(@Valid @RequestBody SysConfigQuery query) {
         Paging<SysConfigVo> paging = sysConfigService.getSysConfigPage(query);
         return ApiResult.success(paging);
     }

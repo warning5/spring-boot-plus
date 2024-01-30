@@ -39,6 +39,13 @@ public enum GeneratorType {
         }
     }
 
+    public static Integer getCode(GeneratorType type) {
+        if (type == null) {
+            return ZIP.code;
+        }
+        return type.code;
+    }
+
     public static GeneratorType get(Integer code) {
         GeneratorType type = map.get(code);
         if (type == null) {

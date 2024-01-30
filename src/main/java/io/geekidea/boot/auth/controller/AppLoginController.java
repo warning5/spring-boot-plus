@@ -46,7 +46,7 @@ public class AppLoginController {
      */
     @PostMapping("/login")
     @Operation(summary = "APP小程序登录")
-    public ApiResult<LoginTokenVo> login(@Valid @RequestBody AppLoginDto appLoginDto, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ApiResult<LoginTokenVo> login(@Valid @RequestBody AppLoginDto appLoginDto, HttpServletRequest request, HttpServletResponse response) {
         LoginTokenVo loginTokenVo = appLoginService.login(appLoginDto);
         // 输出token到cookie
         addCookie(loginTokenVo.getToken(), request, response);
@@ -63,7 +63,7 @@ public class AppLoginController {
      */
     @PostMapping("/accountLogin")
     @Operation(summary = "APP账号密码登录")
-    public ApiResult<LoginTokenVo> accountLogin(@Valid @RequestBody AppAccountLoginDto loginAccountAppDto, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ApiResult<LoginTokenVo> accountLogin(@Valid @RequestBody AppAccountLoginDto loginAccountAppDto, HttpServletRequest request, HttpServletResponse response) {
         LoginTokenVo loginTokenVo = appLoginService.accountLogin(loginAccountAppDto);
         // 输出token到cookie
         addCookie(loginTokenVo.getToken(), request, response);
@@ -79,7 +79,7 @@ public class AppLoginController {
     @Login
     @PostMapping("/getLoginUserInfo")
     @Operation(summary = "获取APP登录用户信息")
-    public ApiResult<AppLoginVo> getLoginUserInfo() throws Exception {
+    public ApiResult<AppLoginVo> getLoginUserInfo() {
         AppLoginVo appLoginVo = appLoginService.getLoginUserInfo();
         return ApiResult.success(appLoginVo);
     }
@@ -93,7 +93,7 @@ public class AppLoginController {
     @Login
     @PostMapping("/logout")
     @Operation(summary = "APP退出")
-    public ApiResult<Boolean> logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ApiResult<Boolean> logout(HttpServletRequest request, HttpServletResponse response) {
         appLoginService.logout();
         // 从cookie中删除token
         CookieUtil.deleteCookie(LoginConstant.APP_COOKIE_TOKEN_NAME, request, response);

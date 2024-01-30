@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,7 +32,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addSysDictType(SysDictTypeDto dto) throws Exception {
+    public boolean addSysDictType(SysDictTypeDto dto) {
         checkCodeExists(dto.getCode());
         SysDictType sysDictType = new SysDictType();
         BeanUtils.copyProperties(dto, sysDictType);
@@ -42,7 +41,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateSysDictType(SysDictTypeDto dto) throws Exception {
+    public boolean updateSysDictType(SysDictTypeDto dto) {
         Long id = dto.getId();
         SysDictType sysDictType = getById(id);
         if (sysDictType == null) {
@@ -56,7 +55,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean deleteSysDictType(Long id) throws Exception {
+    public boolean deleteSysDictType(Long id) {
         SysDictType sysDictType = getById(id);
         if (sysDictType == null) {
             throw new BusinessException("系统字典类型不存在");
@@ -69,18 +68,18 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     }
 
     @Override
-    public SysDictTypeVo getSysDictTypeById(Long id) throws Exception {
+    public SysDictTypeVo getSysDictTypeById(Long id) {
         return sysDictTypeMapper.getSysDictTypeById(id);
     }
 
     @Override
-    public List<SysDictTypeVo> getSysDictTypeList(SysDictTypeQuery query) throws Exception {
+    public List<SysDictTypeVo> getSysDictTypeList(SysDictTypeQuery query) {
         List<SysDictTypeVo> list = sysDictTypeMapper.getSysDictTypeList(query);
         return list;
     }
 
     @Override
-    public void checkCodeExists(String code) throws Exception {
+    public void checkCodeExists(String code) {
         LambdaQueryWrapper<SysDictType> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysDictType::getCode, code);
         long count = count(wrapper);

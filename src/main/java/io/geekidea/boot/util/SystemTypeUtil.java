@@ -1,5 +1,6 @@
 package io.geekidea.boot.util;
 
+import io.geekidea.boot.auth.util.TokenUtil;
 import io.geekidea.boot.common.constant.LoginConstant;
 import io.geekidea.boot.common.enums.SystemType;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +20,7 @@ public class SystemTypeUtil {
      * @return
      * @throws Exception
      */
-    public static SystemType getSystemTypeByPath(HttpServletRequest request) throws Exception {
+    public static SystemType getSystemTypeByPath(HttpServletRequest request) {
         String servletPath = request.getServletPath();
         return getSystemTypeByPath(servletPath);
     }
@@ -31,7 +32,7 @@ public class SystemTypeUtil {
      * @return
      * @throws Exception
      */
-    public static SystemType getSystemTypeByPath(String servletPath) throws Exception {
+    public static SystemType getSystemTypeByPath(String servletPath) {
         if (StringUtils.isBlank(servletPath)) {
             return null;
         }
@@ -50,7 +51,7 @@ public class SystemTypeUtil {
      * @return
      * @throws Exception
      */
-    public static SystemType getSystemTypeByToken(String token) throws Exception {
+    public static SystemType getSystemTypeByToken(String token) {
         if (StringUtils.isBlank(token)) {
             return null;
         }
@@ -68,7 +69,7 @@ public class SystemTypeUtil {
      * @return
      * @throws Exception
      */
-    public static SystemType getSystemTypeByToken() throws Exception {
+    public static SystemType getSystemTypeByToken() {
         String token = TokenUtil.getToken();
         return getSystemTypeByToken(token);
     }
@@ -79,7 +80,7 @@ public class SystemTypeUtil {
      * @return
      * @throws Exception
      */
-    public static Integer getSystemTypeCodeByToken() throws Exception {
+    public static Integer getSystemTypeCodeByToken() {
         SystemType systemType = getSystemTypeByToken();
         if (systemType != null) {
             return systemType.getCode();
@@ -93,7 +94,7 @@ public class SystemTypeUtil {
      * @return
      * @throws Exception
      */
-    public static boolean isAdminSystem() throws Exception {
+    public static boolean isAdminSystem() {
         SystemType systemType = getSystemTypeByToken();
         if (SystemType.ADMIN == systemType) {
             return true;
@@ -107,7 +108,7 @@ public class SystemTypeUtil {
      * @return
      * @throws Exception
      */
-    public static boolean isAppSystem() throws Exception {
+    public static boolean isAppSystem() {
         SystemType systemType = getSystemTypeByToken();
         if (SystemType.APP == systemType) {
             return true;

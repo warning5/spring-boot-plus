@@ -24,9 +24,9 @@ public class AppLoginUtil {
      *
      * @param token
      * @return
-     * @throws Exception
+     * @
      */
-    public static AppLoginVo getLoginVo(String token) throws Exception {
+    public static AppLoginVo getLoginVo(String token) {
         if (StringUtils.isBlank(token)) {
             return null;
         }
@@ -39,7 +39,7 @@ public class AppLoginUtil {
      *
      * @return
      */
-    public static AppLoginVo getLoginVo() throws Exception {
+    public static AppLoginVo getLoginVo() {
         return AppLoginCache.get();
     }
 
@@ -48,7 +48,7 @@ public class AppLoginUtil {
      *
      * @return
      */
-    public static Long getUserId() throws Exception {
+    public static Long getUserId() {
         AppLoginVo appLoginVo = getLoginVo();
         if (appLoginVo != null) {
             return appLoginVo.getUserId();
@@ -60,9 +60,9 @@ public class AppLoginUtil {
      * 获取登录用户ID字符串
      *
      * @return
-     * @throws Exception
+     * @
      */
-    public static String getUserIdString() throws Exception {
+    public static String getUserIdString() {
         Long userId = getUserId();
         if (userId == null) {
             return null;
@@ -75,7 +75,7 @@ public class AppLoginUtil {
      *
      * @return
      */
-    public static String getUsername() throws Exception {
+    public static String getUsername() {
         AppLoginVo appLoginVo = getLoginVo();
         if (appLoginVo != null) {
             return appLoginVo.getUsername();
@@ -88,7 +88,7 @@ public class AppLoginUtil {
      *
      * @return
      */
-    public static Long getUserRoleId() throws Exception {
+    public static Long getUserRoleId() {
         AppLoginVo appLoginVo = getLoginVo();
         if (appLoginVo != null) {
             return appLoginVo.getUserRoleId();
@@ -101,7 +101,7 @@ public class AppLoginUtil {
      *
      * @return
      */
-    public static String getUserRoleCode() throws Exception {
+    public static String getUserRoleCode() {
         AppLoginVo appLoginVo = getLoginVo();
         if (appLoginVo != null) {
             return appLoginVo.getUserRoleCode();

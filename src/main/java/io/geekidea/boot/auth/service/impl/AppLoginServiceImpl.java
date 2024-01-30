@@ -5,6 +5,7 @@ import io.geekidea.boot.auth.dto.AppLoginDto;
 import io.geekidea.boot.auth.service.AppLoginRedisService;
 import io.geekidea.boot.auth.service.AppLoginService;
 import io.geekidea.boot.auth.util.AppLoginUtil;
+import io.geekidea.boot.auth.util.TokenUtil;
 import io.geekidea.boot.auth.vo.AppLoginVo;
 import io.geekidea.boot.auth.vo.LoginTokenVo;
 import io.geekidea.boot.common.constant.LoginConstant;
@@ -18,7 +19,6 @@ import io.geekidea.boot.user.service.UserService;
 import io.geekidea.boot.util.IpRegionUtil;
 import io.geekidea.boot.util.IpUtil;
 import io.geekidea.boot.util.PasswordUtil;
-import io.geekidea.boot.util.TokenUtil;
 import io.geekidea.boot.util.api.WxMpApi;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -46,7 +46,7 @@ public class AppLoginServiceImpl implements AppLoginService {
     private UserRoleService userRoleService;
 
     @Override
-    public LoginTokenVo login(AppLoginDto dto) throws Exception {
+    public LoginTokenVo login(AppLoginDto dto) {
         String code = dto.getCode();
         // 获取微信openid
         String openid = WxMpApi.getOpenid(code);
@@ -72,7 +72,7 @@ public class AppLoginServiceImpl implements AppLoginService {
             user.setUserRoleId(LoginConstant.APP_NORMAL_USER_ROLE);
             boolean flag = userService.save(user);
             if (!flag) {
-                throw new Exception("注册异常");
+                throw new BusinessException("注册异常");
             }
             // 获取用户ID
             Long userId = user.getId();
@@ -83,7 +83,7 @@ public class AppLoginServiceImpl implements AppLoginService {
     }
 
     @Override
-    public LoginTokenVo accountLogin(AppAccountLoginDto dto) throws Exception {
+    public LoginTokenVo accountLogin(AppAccountLoginDto dto) {
         String username = dto.getUsername();
         User user = userService.getUserByUsername(username);
         // 校验密码
@@ -98,7 +98,7 @@ public class AppLoginServiceImpl implements AppLoginService {
     }
 
     @Override
-    public LoginTokenVo login(User user) throws Exception {
+    public LoginTokenVo login(User user) {
         if (user == null) {
             throw new LoginException("用户信息不存在");
         }
@@ -129,7 +129,7 @@ public class AppLoginServiceImpl implements AppLoginService {
     }
 
     @Override
-    public AppLoginVo refreshLoginInfo(User user, String token, Date lastLoginTime) throws Exception {
+    public AppLoginVo refreshLoginInfo(User user, String token, Date lastLoginTime) {
         Long userId = user.getId();
         // 校验用户状态
         Boolean status = user.getStatus();
@@ -159,7 +159,7 @@ public class AppLoginServiceImpl implements AppLoginService {
     }
 
     @Override
-    public AppLoginVo getLoginUserInfo() throws Exception {
+    public AppLoginVo getLoginUserInfo() {
         AppLoginVo appLoginVo = AppLoginUtil.getLoginVo();
         if (appLoginVo == null) {
             throw new LoginException("请先登录");
@@ -174,7 +174,7 @@ public class AppLoginServiceImpl implements AppLoginService {
     }
 
     @Override
-    public void logout() throws Exception {
+    public void logout() {
         // 获取token
         String token = TokenUtil.getToken();
         // 删除缓存

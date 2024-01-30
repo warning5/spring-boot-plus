@@ -35,7 +35,7 @@ public class WxMpApi {
      * @return
      * @throws Exception
      */
-    public static String getOpenid(String code) throws Exception {
+    public static String getOpenid(String code) {
         log.info("微信小程序code：" + code);
         String url = "https://api.weixin.qq.com/sns/jscode2session";
         Map<String, Object> paramMap = new HashMap<>();

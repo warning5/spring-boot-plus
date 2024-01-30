@@ -47,7 +47,7 @@ public class SysRoleController {
     @PostMapping("/addSysRole")
     @Operation(summary = "添加系统角色")
     @Permission("sys:role:add")
-    public ApiResult addSysRole(@Valid @RequestBody SysRoleDto dto) throws Exception {
+    public ApiResult addSysRole(@Valid @RequestBody SysRoleDto dto) {
         boolean flag = sysRoleService.addSysRole(dto);
         return ApiResult.result(flag);
     }
@@ -62,7 +62,7 @@ public class SysRoleController {
     @PostMapping("/updateSysRole")
     @Operation(summary = "修改系统角色")
     @Permission("sys:role:update")
-    public ApiResult updateSysRole(@Valid @RequestBody SysRoleDto dto) throws Exception {
+    public ApiResult updateSysRole(@Valid @RequestBody SysRoleDto dto) {
         boolean flag = sysRoleService.updateSysRole(dto);
         return ApiResult.result(flag);
     }
@@ -77,7 +77,7 @@ public class SysRoleController {
     @PostMapping("/deleteSysRole/{id}")
     @Operation(summary = "删除系统角色")
     @Permission("sys:role:delete")
-    public ApiResult deleteSysRole(@PathVariable Long id) throws Exception {
+    public ApiResult deleteSysRole(@PathVariable Long id) {
         boolean flag = sysRoleService.deleteSysRole(id);
         return ApiResult.result(flag);
     }
@@ -92,7 +92,7 @@ public class SysRoleController {
     @PostMapping("/getSysRole/{id}")
     @Operation(summary = "系统角色详情")
     @Permission("sys:role:info")
-    public ApiResult<SysRoleVo> getSysRole(@PathVariable Long id) throws Exception {
+    public ApiResult<SysRoleVo> getSysRole(@PathVariable Long id) {
         SysRoleVo sysRoleVo = sysRoleService.getSysRoleById(id);
         return ApiResult.success(sysRoleVo);
     }
@@ -107,7 +107,7 @@ public class SysRoleController {
     @PostMapping("/getSysRolePage")
     @Operation(summary = "系统角色分页列表")
     @Permission("sys:role:page")
-    public ApiResult<SysRoleVo> getSysRolePage(@Valid @RequestBody SysRoleQuery query) throws Exception {
+    public ApiResult<SysRoleVo> getSysRolePage(@Valid @RequestBody SysRoleQuery query) {
         Paging<SysRoleVo> paging = sysRoleService.getSysRolePage(query);
         return ApiResult.success(paging);
     }
@@ -120,7 +120,7 @@ public class SysRoleController {
      */
     @PostMapping("/getSysRoleAllList")
     @Operation(summary = "系统所有角色列表")
-    public ApiResult<SysRole> getSysRoleAllList() throws Exception {
+    public ApiResult<SysRole> getSysRoleAllList() {
         List<SysRole> list = sysRoleService.getSysRoleAllList();
         return ApiResult.success(list);
     }
@@ -134,7 +134,7 @@ public class SysRoleController {
     @PostMapping("/setRoleMenus")
     @Operation(summary = "设置角色权限")
     @Permission("sys:role:set-role-menus")
-    public ApiResult setRoleMenus(@Valid @RequestBody RoleMenusDto roleMenusDto) throws Exception {
+    public ApiResult setRoleMenus(@Valid @RequestBody RoleMenusDto roleMenusDto) {
         boolean flag = sysRoleService.setRoleMenus(roleMenusDto);
         return ApiResult.success(flag);
     }
@@ -147,7 +147,7 @@ public class SysRoleController {
      */
     @PostMapping("/getMenuIdsByRoleId/{roleId}")
     @Operation(summary = "获取角色权限ID集合")
-    public ApiResult getMenuIdsByRoleId(@PathVariable Long roleId) throws Exception {
+    public ApiResult getMenuIdsByRoleId(@PathVariable Long roleId) {
         List<Long> list = sysMenuService.getMenuIdsByRoleId(roleId);
         return ApiResult.success(list);
     }

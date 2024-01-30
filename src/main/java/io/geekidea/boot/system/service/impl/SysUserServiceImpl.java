@@ -1,30 +1,27 @@
 package io.geekidea.boot.system.service.impl;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.PageReadListener;
-import com.alibaba.excel.read.listener.ReadListener;
-import com.alibaba.excel.util.ListUtils;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.geekidea.boot.auth.service.LoginRedisService;
 import io.geekidea.boot.auth.util.LoginUtil;
+import io.geekidea.boot.auth.util.TokenUtil;
 import io.geekidea.boot.common.constant.CommonConstant;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.OrderByItem;
+import io.geekidea.boot.framework.page.OrderMapping;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.system.dto.*;
 import io.geekidea.boot.system.entity.SysUser;
-import io.geekidea.boot.system.listener.SysUserImportListener;
 import io.geekidea.boot.system.mapper.SysUserMapper;
 import io.geekidea.boot.system.query.SysUserQuery;
 import io.geekidea.boot.system.service.SysUserService;
 import io.geekidea.boot.system.vo.SysUserVo;
 import io.geekidea.boot.util.PagingUtil;
 import io.geekidea.boot.util.PasswordUtil;
-import io.geekidea.boot.util.TokenUtil;
 import io.geekidea.boot.util.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -57,7 +54,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addSysUser(SysUserDto dto) throws Exception {
+    public boolean addSysUser(SysUserDto dto) {
         checkUsernameExists(dto.getUsername());
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(dto, sysUser);
@@ -72,7 +69,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateSysUser(SysUserDto dto) throws Exception {
+    public boolean updateSysUser(SysUserDto dto) {
         Long id = dto.getId();
         SysUser sysUser = getById(id);
         if (sysUser == null) {
@@ -84,19 +81,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean deleteSysUser(Long id) throws Exception {
+    public boolean deleteSysUser(Long id) {
         // 删除用户
         return removeById(id);
     }
 
     @Override
-    public SysUserVo getSysUserById(Long id) throws Exception {
+    public SysUserVo getSysUserById(Long id) {
         return sysUserMapper.getSysUserById(id);
     }
 
     @Override
-    public Paging<SysUserVo> getSysUserPage(SysUserQuery query) throws Exception {
-        PagingUtil.handlePage(query, OrderByItem.desc("id"));
+    public Paging<SysUserVo> getSysUserPage(SysUserQuery query) {
+        OrderMapping orderMapping = new OrderMapping();
+        orderMapping.put("createTime", "create_time");
+        PagingUtil.handlePage(query, orderMapping, OrderByItem.desc("id"));
         List<SysUserVo> list = sysUserMapper.getSysUserPage(query);
         Paging<SysUserVo> paging = new Paging<>(list);
         return paging;
@@ -104,7 +103,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean resetSysUserPassword(SysUserResetPasswordDto sysUserResetPasswordDto) throws Exception {
+    public boolean resetSysUserPassword(SysUserResetPasswordDto sysUserResetPasswordDto) {
         Long userId = sysUserResetPasswordDto.getUserId();
         log.info("管理员重置用户密码：" + userId);
         SysUser sysUser = getById(userId);
@@ -117,7 +116,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateProfile(SysUserUpdateProfileDto sysUserUpdateProfileDto) throws Exception {
+    public boolean updateProfile(SysUserUpdateProfileDto sysUserUpdateProfileDto) {
         Long id = LoginUtil.getUserId();
         SysUser sysUser = getById(id);
         if (sysUser == null) {
@@ -135,7 +134,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updatePassword(SysUserUpdatePasswordDto sysUserUpdatePasswordDto) throws Exception {
+    public boolean updatePassword(SysUserUpdatePasswordDto sysUserUpdatePasswordDto) {
         Long id = LoginUtil.getUserId();
         SysUser sysUser = getById(id);
         if (sysUser == null) {
@@ -164,7 +163,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public void checkUsernameExists(String username) throws Exception {
+    public void checkUsernameExists(String username) {
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysUser::getUsername, username);
         long count = count(wrapper);
@@ -187,7 +186,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             for (SysUserExcelDto demoData : dataList) {
                 log.info("读取到一条数据{}", JSON.toJSONString(demoData));
             }
-        },10)).sheet().doRead();
+        }, 10)).sheet().doRead();
 
 
         return false;
@@ -201,7 +200,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @return
      * @throws Exception
      */
-    private boolean handleUpdatePassword(Long id, String password) throws Exception {
+    private boolean handleUpdatePassword(Long id, String password) {
         // 生产新的盐值
         String newSalt = UUIDUtil.getUuid();
         String newPassword = PasswordUtil.encrypt(password, newSalt);

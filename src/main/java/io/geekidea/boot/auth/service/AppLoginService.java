@@ -21,7 +21,7 @@ public interface AppLoginService {
      * @return
      * @throws Exception
      */
-    LoginTokenVo login(AppLoginDto dto) throws Exception;
+    LoginTokenVo login(AppLoginDto dto);
 
     /**
      * APP账号密码登录
@@ -30,7 +30,7 @@ public interface AppLoginService {
      * @return
      * @throws Exception
      */
-    LoginTokenVo accountLogin(AppAccountLoginDto dto) throws Exception;
+    LoginTokenVo accountLogin(AppAccountLoginDto dto);
 
     /**
      * APP登录
@@ -39,7 +39,7 @@ public interface AppLoginService {
      * @return
      * @throws Exception
      */
-    LoginTokenVo login(User user) throws Exception;
+    LoginTokenVo login(User user);
 
     /**
      * 刷新登录信息
@@ -50,7 +50,7 @@ public interface AppLoginService {
      * @return
      * @throws Exception
      */
-    AppLoginVo refreshLoginInfo(User user, String token, Date lastLoginTime) throws Exception;
+    AppLoginVo refreshLoginInfo(User user, String token, Date lastLoginTime);
 
     /**
      * 获取登录用户信息
@@ -58,13 +58,13 @@ public interface AppLoginService {
      * @return
      * @throws Exception
      */
-    AppLoginVo getLoginUserInfo() throws Exception;
+    AppLoginVo getLoginUserInfo();
 
     /**
      * 登出
      *
      * @throws Exception
      */
-    void logout() throws Exception;
+    void logout();
 
 }

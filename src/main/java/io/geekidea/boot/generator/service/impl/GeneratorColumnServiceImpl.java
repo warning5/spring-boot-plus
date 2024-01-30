@@ -32,7 +32,7 @@ public class GeneratorColumnServiceImpl extends ServiceImpl<GeneratorColumnMappe
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addGeneratorColumn(String tableName) throws Exception {
+    public boolean addGeneratorColumn(String tableName) {
         List<GeneratorColumnDbVo> columnDbVos = getDbColumnListByTableName(tableName);
         if (CollectionUtils.isEmpty(columnDbVos)) {
             throw new BusinessException("没有列信息");
@@ -43,7 +43,7 @@ public class GeneratorColumnServiceImpl extends ServiceImpl<GeneratorColumnMappe
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateGeneratorColumn(GeneratorColumnDto dto) throws Exception {
+    public boolean updateGeneratorColumn(GeneratorColumnDto dto) {
         Long id = dto.getId();
         GeneratorColumn generatorColumn = getById(id);
         if (generatorColumn == null) {
@@ -54,12 +54,12 @@ public class GeneratorColumnServiceImpl extends ServiceImpl<GeneratorColumnMappe
     }
 
     @Override
-    public List<GeneratorColumnDbVo> getDbColumnListByTableName(String tableName) throws Exception {
+    public List<GeneratorColumnDbVo> getDbColumnListByTableName(String tableName) {
         return generatorColumnMapper.getDbColumnListByTableName(tableName);
     }
 
     @Override
-    public List<GeneratorColumn> getGeneratorColumnList(String tableName) throws Exception {
+    public List<GeneratorColumn> getGeneratorColumnList(String tableName) {
         return generatorColumnMapper.getGeneratorColumnList(tableName);
     }
 

@@ -24,7 +24,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * @return
      * @throws Exception
      */
-    boolean addSysDictType(SysDictTypeDto dto) throws Exception;
+    boolean addSysDictType(SysDictTypeDto dto);
 
     /**
      * 修改字典类型
@@ -33,7 +33,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * @return
      * @throws Exception
      */
-    boolean updateSysDictType(SysDictTypeDto dto) throws Exception;
+    boolean updateSysDictType(SysDictTypeDto dto);
 
     /**
      * 删除字典类型
@@ -42,7 +42,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * @return
      * @throws Exception
      */
-    boolean deleteSysDictType(Long id) throws Exception;
+    boolean deleteSysDictType(Long id);
 
     /**
      * 字典类型详情
@@ -51,7 +51,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * @return
      * @throws Exception
      */
-    SysDictTypeVo getSysDictTypeById(Long id) throws Exception;
+    SysDictTypeVo getSysDictTypeById(Long id);
 
     /**
      * 字典类型列表
@@ -60,7 +60,7 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * @return
      * @throws Exception
      */
-    List<SysDictTypeVo> getSysDictTypeList(SysDictTypeQuery query) throws Exception;
+    List<SysDictTypeVo> getSysDictTypeList(SysDictTypeQuery query);
 
     /**
      * 检查code是否存在
@@ -69,6 +69,6 @@ public interface SysDictTypeService extends IService<SysDictType> {
      * @return
      * @throws Exception
      */
-    void checkCodeExists(String code) throws Exception;
+    void checkCodeExists(String code);
 
 }

@@ -40,6 +40,13 @@ public enum SysFileType {
         }
     }
 
+    public static Integer getCode(SysFileType type) {
+        if (type == null) {
+            return null;
+        }
+        return type.code;
+    }
+
     public static SysFileType get(Integer code) {
         SysFileType type = map.get(code);
         if (type == null) {

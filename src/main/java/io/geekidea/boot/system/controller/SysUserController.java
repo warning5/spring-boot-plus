@@ -46,7 +46,7 @@ public class SysUserController {
     @PostMapping("/addSysUser")
     @Operation(summary = "添加系统用户")
     @Permission("sys:user:add")
-    public ApiResult addSysUser(@Valid @RequestBody SysUserDto dto) throws Exception {
+    public ApiResult addSysUser(@Valid @RequestBody SysUserDto dto) {
         boolean flag = sysUserService.addSysUser(dto);
         return ApiResult.result(flag);
     }
@@ -61,7 +61,7 @@ public class SysUserController {
     @PostMapping("/updateSysUser")
     @Operation(summary = "修改系统用户")
     @Permission("sys:user:update")
-    public ApiResult updateSysUser(@Valid @RequestBody SysUserDto dto) throws Exception {
+    public ApiResult updateSysUser(@Valid @RequestBody SysUserDto dto) {
         boolean flag = sysUserService.updateSysUser(dto);
         return ApiResult.result(flag);
     }
@@ -76,7 +76,7 @@ public class SysUserController {
     @PostMapping("/deleteSysUser/{id}")
     @Operation(summary = "删除系统用户")
     @Permission("sys:user:delete")
-    public ApiResult deleteSysUser(@PathVariable Long id) throws Exception {
+    public ApiResult deleteSysUser(@PathVariable Long id) {
         boolean flag = sysUserService.deleteSysUser(id);
         return ApiResult.result(flag);
     }
@@ -91,7 +91,7 @@ public class SysUserController {
     @PostMapping("/getSysUser/{id}")
     @Operation(summary = "系统用户详情")
     @Permission("sys:user:info")
-    public ApiResult<SysUserVo> getSysUser(@PathVariable Long id) throws Exception {
+    public ApiResult<SysUserVo> getSysUser(@PathVariable Long id) {
         SysUserVo sysUserVo = sysUserService.getSysUserById(id);
         return ApiResult.success(sysUserVo);
     }
@@ -106,7 +106,7 @@ public class SysUserController {
     @PostMapping("/getSysUserPage")
     @Operation(summary = "系统用户分页列表")
     @Permission("sys:user:page")
-    public ApiResult<SysUserVo> getSysUserPage(@Valid @RequestBody SysUserQuery query) throws Exception {
+    public ApiResult<SysUserVo> getSysUserPage(@Valid @RequestBody SysUserQuery query) {
         Paging<SysUserVo> paging = sysUserService.getSysUserPage(query);
         return ApiResult.success(paging);
     }
@@ -121,7 +121,7 @@ public class SysUserController {
     @PostMapping("/resetSysUserPassword")
     @Operation(summary = "重置系统用户密码")
     @Permission("sys:user:reset-password")
-    public ApiResult resetSysUserPassword(@Valid @RequestBody SysUserResetPasswordDto sysUserResetPasswordDto) throws Exception {
+    public ApiResult resetSysUserPassword(@Valid @RequestBody SysUserResetPasswordDto sysUserResetPasswordDto) {
         boolean flag = sysUserService.resetSysUserPassword(sysUserResetPasswordDto);
         return ApiResult.result(flag);
     }
@@ -134,7 +134,7 @@ public class SysUserController {
      */
     @PostMapping("/getProfile")
     @Operation(summary = "获取个人信息")
-    public ApiResult<SysUserVo> getProfile() throws Exception {
+    public ApiResult<SysUserVo> getProfile() {
         Long userId = LoginUtil.getUserId();
         if (userId == null) {
             throw new BusinessException("用户ID为空");
@@ -152,7 +152,7 @@ public class SysUserController {
      */
     @PostMapping("/updateProfile")
     @Operation(summary = "修改个人信息")
-    public ApiResult updateProfile(@Valid @RequestBody SysUserUpdateProfileDto sysUserUpdateProfileDto) throws Exception {
+    public ApiResult updateProfile(@Valid @RequestBody SysUserUpdateProfileDto sysUserUpdateProfileDto) {
         boolean flag = sysUserService.updateProfile(sysUserUpdateProfileDto);
         return ApiResult.result(flag);
     }
@@ -166,7 +166,7 @@ public class SysUserController {
      */
     @PostMapping("/updatePassword")
     @Operation(summary = "修改用户密码")
-    public ApiResult updatePassword(@Valid @RequestBody SysUserUpdatePasswordDto sysUserUpdatePasswordDto) throws Exception {
+    public ApiResult updatePassword(@Valid @RequestBody SysUserUpdatePasswordDto sysUserUpdatePasswordDto) {
         boolean flag = sysUserService.updatePassword(sysUserUpdatePasswordDto);
         return ApiResult.result(flag);
     }
@@ -180,7 +180,7 @@ public class SysUserController {
      */
     @PostMapping("/importExcel")
     @Operation(summary = "导入Excel用户数据")
-    public ApiResult importExcel( MultipartFile multipartFile) throws Exception {
+    public ApiResult importExcel(MultipartFile multipartFile) throws Exception {
         boolean flag = sysUserService.importExcel(multipartFile);
         return ApiResult.result(flag);
     }

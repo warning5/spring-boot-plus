@@ -1,17 +1,18 @@
 package io.geekidea.boot.user.controller;
 
-import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.framework.response.ApiResult;
 import io.geekidea.boot.user.dto.AppUserHeadDto;
 import io.geekidea.boot.user.dto.AppUserNicknameDto;
-import io.geekidea.boot.user.query.AppUserQuery;
 import io.geekidea.boot.user.service.UserService;
 import io.geekidea.boot.user.vo.AppUserVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -38,7 +39,7 @@ public class AppUserController {
      */
     @PostMapping("/getProfile")
     @Operation(summary = "获取App用户信息")
-    public ApiResult<AppUserVo> getProfile() throws Exception {
+    public ApiResult<AppUserVo> getProfile() {
         AppUserVo appUserVo = userService.getProfile();
         return ApiResult.success(appUserVo);
     }
@@ -52,7 +53,7 @@ public class AppUserController {
      */
     @PostMapping("/updateHead")
     @Operation(summary = "修改用户头像")
-    public ApiResult<Boolean> updateHead(@Valid @RequestBody AppUserHeadDto dto) throws Exception {
+    public ApiResult<Boolean> updateHead(@Valid @RequestBody AppUserHeadDto dto) {
         boolean flag = userService.updateHead(dto);
         return ApiResult.result(flag);
     }
@@ -66,7 +67,7 @@ public class AppUserController {
      */
     @PostMapping("/updateNickname")
     @Operation(summary = "修改昵称")
-    public ApiResult<AppUserVo> updateNickname(@Valid @RequestBody AppUserNicknameDto dto) throws Exception {
+    public ApiResult<AppUserVo> updateNickname(@Valid @RequestBody AppUserNicknameDto dto) {
         boolean flag = userService.updateNickname(dto);
         return ApiResult.result(flag);
     }

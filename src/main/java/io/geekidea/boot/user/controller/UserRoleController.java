@@ -5,6 +5,7 @@ import io.geekidea.boot.common.enums.SysLogType;
 import io.geekidea.boot.framework.annotation.Log;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.framework.response.ApiResult;
+import io.geekidea.boot.user.dto.UserRoleDto;
 import io.geekidea.boot.user.query.UserRoleQuery;
 import io.geekidea.boot.user.service.UserRoleService;
 import io.geekidea.boot.user.vo.UserRoleVo;
@@ -42,7 +43,7 @@ public class UserRoleController {
     @Operation(summary = "添加用户角色")
     @PostMapping("/addUserRole")
     @Permission("user:role:add")
-    public ApiResult addUserRole(@Valid @RequestBody io.geekidea.boot.demo.dto.UserRoleDto dto) throws Exception {
+    public ApiResult addUserRole(@Valid @RequestBody UserRoleDto dto) {
         log.info("添加用户角色：{}", dto);
         boolean flag = userRoleService.addUserRole(dto);
         return ApiResult.result(flag);
@@ -59,7 +60,7 @@ public class UserRoleController {
     @Operation(summary = "修改用户角色")
     @PostMapping("/updateUserRole")
     @Permission("user:role:update")
-    public ApiResult updateUserRole(@Valid @RequestBody io.geekidea.boot.demo.dto.UserRoleDto dto) throws Exception {
+    public ApiResult updateUserRole(@Valid @RequestBody UserRoleDto dto) {
         log.info("修改用户角色：{}", dto);
         boolean flag = userRoleService.updateUserRole(dto);
         return ApiResult.result(flag);
@@ -76,7 +77,7 @@ public class UserRoleController {
     @Operation(summary = "删除用户角色")
     @PostMapping("/deleteUserRole/{id}")
     @Permission("user:role:delete")
-    public ApiResult deleteUserRole(@PathVariable Long id) throws Exception {
+    public ApiResult deleteUserRole(@PathVariable Long id) {
         log.info("删除用户角色：{}", id);
         boolean flag = userRoleService.deleteUserRole(id);
         return ApiResult.result(flag);
@@ -92,7 +93,7 @@ public class UserRoleController {
     @Operation(summary = "用户角色详情")
     @PostMapping("/getUserRole/{id}")
     @Permission("user:role:info")
-    public ApiResult<UserRoleVo> getUserRole(@PathVariable Long id) throws Exception {
+    public ApiResult<UserRoleVo> getUserRole(@PathVariable Long id) {
         log.info("用户角色详情：{}", id);
         UserRoleVo userRoleVo = userRoleService.getUserRoleById(id);
         return ApiResult.success(userRoleVo);
@@ -108,7 +109,7 @@ public class UserRoleController {
     @Operation(summary = "用户角色分页列表")
     @PostMapping("/getUserRolePage")
     @Permission("user:role:page")
-    public ApiResult<UserRoleVo> getUserRolePage(@Valid @RequestBody UserRoleQuery query) throws Exception {
+    public ApiResult<UserRoleVo> getUserRolePage(@Valid @RequestBody UserRoleQuery query) {
         log.info("用户角色分页列表：{}", query);
         Paging<UserRoleVo> paging = userRoleService.getUserRolePage(query);
         return ApiResult.success(paging);

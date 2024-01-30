@@ -18,16 +18,14 @@ import io.geekidea.boot.framework.annotation.Log;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.BasePageQuery;
 import io.geekidea.boot.framework.page.OrderByItem;
+import io.geekidea.boot.framework.page.OrderMapping;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.framework.response.ApiResult;
 import io.geekidea.boot.generator.bean.GeneratorColumnMapping;
 import io.geekidea.boot.generator.constant.GeneratorConstant;
 import io.geekidea.boot.generator.entity.GeneratorColumn;
 import io.geekidea.boot.generator.entity.GeneratorTable;
-import io.geekidea.boot.generator.enums.GeneratorFormType;
-import io.geekidea.boot.generator.enums.GeneratorQueryType;
-import io.geekidea.boot.generator.enums.GeneratorTemplateType;
-import io.geekidea.boot.generator.enums.RequestMappingStyle;
+import io.geekidea.boot.generator.enums.*;
 import io.geekidea.boot.generator.exception.GeneratorException;
 import io.geekidea.boot.generator.vo.GeneratorCodeVo;
 import io.geekidea.boot.generator.vo.GeneratorColumnDbVo;
@@ -144,7 +142,7 @@ public class GeneratorUtil {
      * @param generatorTable
      * @throws Exception
      */
-    public static void generatorCode(String tableName, GeneratorTable generatorTable) throws Exception {
+    public static void generatorCode(String tableName, GeneratorTable generatorTable) throws Exception{
         List<GeneratorCodeVo> generatorCodeVos = GeneratorUtil.generatorCodeData(tableName, generatorTable);
         if (CollectionUtils.isNotEmpty(generatorCodeVos)) {
             for (GeneratorCodeVo generatorCodeVo : generatorCodeVos) {
@@ -164,7 +162,7 @@ public class GeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static List<GeneratorCodeVo> generatorCodeData(String tableName, GeneratorTable table) throws Exception {
+    public static List<GeneratorCodeVo> generatorCodeData(String tableName, GeneratorTable table) {
         // 根据表名称获取列集合
         if (StringUtils.isBlank(tableName)) {
             throw new GeneratorException("表名称不能为空");
@@ -233,7 +231,7 @@ public class GeneratorUtil {
         // 设置主键ID生成策略
         table.setIdType(config.getIdType().name());
         // 设置请求路径风格
-        table.setRequestMappingStyle(config.getRequestMappingStyle().getCode());
+        table.setRequestMappingStyle(RequestMappingStyle.getCode(config.getRequestMappingStyle()));
         // 设置父菜单ID
         Long parentMenuId = config.getParentMenuId();
         if (parentMenuId == null) {
@@ -241,9 +239,9 @@ public class GeneratorUtil {
         }
         table.setParentMenuId(parentMenuId);
         // 设置表单布局方式
-        table.setFormLayout(config.getFormLayout().getCode());
+        table.setFormLayout(GeneratorFormLayout.getCode(config.getFormLayout()));
         // 设置代码生成方式
-        table.setGeneratorType(config.getGeneratorType().getCode());
+        table.setGeneratorType(GeneratorType.getCode(config.getGeneratorType()));
     }
 
     /**
@@ -271,7 +269,7 @@ public class GeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static List<GeneratorColumn> getGeneratorColumns(String tableName, List<GeneratorColumnDbVo> columnDbVos) throws Exception {
+    public static List<GeneratorColumn> getGeneratorColumns(String tableName, List<GeneratorColumnDbVo> columnDbVos) {
         if (StringUtils.isBlank(tableName)) {
             throw new GeneratorException("表名称不能为空");
         }
@@ -491,7 +489,7 @@ public class GeneratorUtil {
      * @param generatorTemplateType
      * @throws Exception
      */
-    public static void renderTemplateData(GeneratorTable table, List<GeneratorCodeVo> generatorCodeVos, Map<String, Object> dataMap, Map<String, String> templateMap, GeneratorTemplateType generatorTemplateType) throws Exception {
+    public static void renderTemplateData(GeneratorTable table, List<GeneratorCodeVo> generatorCodeVos, Map<String, Object> dataMap, Map<String, String> templateMap, GeneratorTemplateType generatorTemplateType) {
         // 获取后端模板
         for (Map.Entry<String, String> entry : templateMap.entrySet()) {
             String templateName = entry.getKey();
@@ -510,9 +508,7 @@ public class GeneratorUtil {
             generatorCodeVo.setFile(file);
             generatorCodeVo.setFileName(fileName);
             generatorCodeVo.setFileContent(fileContent);
-            if (generatorTemplateType != null) {
-                generatorCodeVo.setTemplateType(generatorTemplateType.getCode());
-            }
+            generatorCodeVo.setTemplateType(GeneratorTemplateType.getCode(generatorTemplateType));
             generatorCodeVos.add(generatorCodeVo);
         }
     }
@@ -523,7 +519,7 @@ public class GeneratorUtil {
      * @param tableName
      * @param table
      */
-    public static Map<String, Object> getTemplateDataMap(String tableName, GeneratorTable table) throws Exception {
+    public static Map<String, Object> getTemplateDataMap(String tableName, GeneratorTable table) {
         Map<String, Object> dataMap = new HashMap<>();
         // 设置表信息
         String tableComment = table.getTableComment();
@@ -740,6 +736,7 @@ public class GeneratorUtil {
         dataMap.put("pagingUtilPackagePath", PagingUtil.class.getName());
         dataMap.put("superPageQueryPackagePath", BasePageQuery.class.getName());
         dataMap.put("parameterObjectPackagePath", ParameterObject.class.getName());
+        dataMap.put("orderMappingPackagePath", OrderMapping.class.getName());
 
         // controller请求映射路径及请求方式
         handleRequestMapping(requestMappingStyle, dataMap, pkIdPropertyName, entity, entityObjectName);
@@ -809,6 +806,7 @@ public class GeneratorUtil {
         boolean existsTimeType = false;
         boolean existsRequired = false;
         boolean existsValidate = false;
+        boolean existsCreateTime = false;
         for (GeneratorColumn column : columns) {
             String propertyType = column.getPropertyType();
             if (GeneratorConstant.JAVA_BIG_DECIMAL.equals(propertyType)) {
@@ -827,12 +825,16 @@ public class GeneratorUtil {
                     }
                 }
             }
+            if (GeneratorConstant.CREATE_TIME_FIELD.equals(column.getPropertyName())) {
+                existsCreateTime = true;
+            }
         }
         dataMap.put("existsBigDecimalType", existsBigDecimalType);
         dataMap.put("existsDateType", existsDateType);
         dataMap.put("existsTimeType", existsTimeType);
         dataMap.put("existsRequired", existsRequired);
         dataMap.put("existsValidate", existsValidate);
+        dataMap.put("existsCreateTime", existsCreateTime);
 
         // 前端相关
         String vueApiPath = String.format(GeneratorConstant.VUE_API_PATH, moduleName + "/" + entityObjectName);
@@ -1630,7 +1632,7 @@ public class GeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static Map<String, String> getBackendEntityTemplateMap() throws Exception {
+    public static Map<String, String> getBackendEntityTemplateMap() {
         return BACKEND_ENTITY_TEMPLATE_MAP;
     }
 
@@ -1640,7 +1642,7 @@ public class GeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static Map<String, String> getBackendTemplateMap() throws Exception {
+    public static Map<String, String> getBackendTemplateMap() {
         return BACKEND_TEMPLATE_MAP;
     }
 
@@ -1650,7 +1652,7 @@ public class GeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static Map<String, String> getAppBackendTemplateMap() throws Exception {
+    public static Map<String, String> getAppBackendTemplateMap() {
         return APP_BACKEND_TEMPLATE_MAP;
     }
 
@@ -1660,7 +1662,7 @@ public class GeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static Map<String, String> getFrontendTemplateMap() throws Exception {
+    public static Map<String, String> getFrontendTemplateMap() {
         return FRONTEND_TEMPLATE_MAP;
     }
 
@@ -1671,7 +1673,7 @@ public class GeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static Map<String, String> getMenuTemplateMap() throws Exception {
+    public static Map<String, String> getMenuTemplateMap() {
         return MENU_TEMPLATE_MAP;
     }
 

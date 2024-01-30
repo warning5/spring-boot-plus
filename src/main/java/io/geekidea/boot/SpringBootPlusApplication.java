@@ -2,7 +2,6 @@ package io.geekidea.boot;
 
 import io.geekidea.boot.util.IpUtil;
 import org.apache.commons.collections4.CollectionUtils;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -18,8 +17,7 @@ import java.util.List;
  * @date 2022-3-16
  */
 @EnableAsync
-@SpringBootApplication(scanBasePackages = {"io.geekidea.boot", "com.hwtx.form"})
-@MapperScan(basePackages = {"com.hwtx.form.persistence","io.geekidea.boot.*.mapper"})
+@SpringBootApplication
 public class SpringBootPlusApplication {
 
     private static final String BACKSLASH = "/";
@@ -28,6 +26,12 @@ public class SpringBootPlusApplication {
         ConfigurableApplicationContext context = SpringApplication.run(SpringBootPlusApplication.class, args);
         // 打印项目信息
         printlnProjectInfo(context);
+        System.out.println("  _____ _______       _____ _______    _____ _    _  _____ _____ ______  _____ _____ \n" +
+                " / ____|__   __|/\\   |  __ \\__   __|  / ____| |  | |/ ____/ ____|  ____|/ ____/ ____|\n" +
+                "| (___    | |  /  \\  | |__) | | |    | (___ | |  | | |   | |    | |__  | (___| (___  \n" +
+                " \\___ \\   | | / /\\ \\ |  _  /  | |     \\___ \\| |  | | |   | |    |  __|  \\___ \\\\___ \\ \n" +
+                " ____) |  | |/ ____ \\| | \\ \\  | |     ____) | |__| | |___| |____| |____ ____) |___) |\n" +
+                "|_____/   |_/_/    \\_\\_|  \\_\\ |_|    |_____/ \\____/ \\_____\\_____|______|_____/_____/ \n");
     }
 
     /**

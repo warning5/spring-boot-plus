@@ -23,7 +23,7 @@ public interface SysFileService extends IService<SysFile> {
      * @return
      * @throws Exception
      */
-    boolean updateSysFile(SysFileDto dto) throws Exception;
+    boolean updateSysFile(SysFileDto dto);
 
     /**
      * 删除系统文件
@@ -32,7 +32,7 @@ public interface SysFileService extends IService<SysFile> {
      * @return
      * @throws Exception
      */
-    boolean deleteSysFile(Long id) throws Exception;
+    boolean deleteSysFile(Long id);
 
     /**
      * 系统文件详情
@@ -41,7 +41,7 @@ public interface SysFileService extends IService<SysFile> {
      * @return
      * @throws Exception
      */
-    SysFileVo getSysFileById(Long id) throws Exception;
+    SysFileVo getSysFileById(Long id);
 
     /**
      * 系统文件分页列表
@@ -50,6 +50,6 @@ public interface SysFileService extends IService<SysFile> {
      * @return
      * @throws Exception
      */
-    Paging<SysFileVo> getSysFilePage(SysFileQuery query) throws Exception;
+    Paging<SysFileVo> getSysFilePage(SysFileQuery query);
 
 }

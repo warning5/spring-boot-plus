@@ -11,9 +11,9 @@ import java.util.Map;
  **/
 public enum GeneratorTemplateType {
 
-    BACKEND(1, "后台代码" ),
-    FRONTEND(2, "前端代码" ),
-    MENU(3, "菜单SQL" );
+    BACKEND(1, "后台代码"),
+    FRONTEND(2, "前端代码"),
+    MENU(3, "菜单SQL");
 
     private Integer code;
 
@@ -38,6 +38,13 @@ public enum GeneratorTemplateType {
         for (GeneratorTemplateType type : values()) {
             map.put(type.code, type);
         }
+    }
+
+    public static Integer getCode(GeneratorTemplateType type) {
+        if (type == null) {
+            return null;
+        }
+        return type.code;
     }
 
     public static GeneratorTemplateType get(Integer code) {

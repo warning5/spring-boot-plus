@@ -39,7 +39,7 @@ public class SysLogController {
     @PostMapping("/getSysLog/{id}")
     @Operation(summary = "系统日志详情")
     @Permission("sys:log:info")
-    public ApiResult<SysLogVo> getSysLog(@PathVariable Long id) throws Exception {
+    public ApiResult<SysLogVo> getSysLog(@PathVariable Long id) {
         SysLogVo sysLogVo = sysLogService.getSysLogById(id);
         return ApiResult.success(sysLogVo);
     }
@@ -54,7 +54,7 @@ public class SysLogController {
     @PostMapping("/getSysLogPage")
     @Operation(summary = "系统日志分页列表")
     @Permission("sys:log:page")
-    public ApiResult<SysLogVo> getSysLogPage(@Valid @RequestBody SysLogQuery query) throws Exception {
+    public ApiResult<SysLogVo> getSysLogPage(@Valid @RequestBody SysLogQuery query) {
         Paging<SysLogVo> paging = sysLogService.getSysLogPage(query);
         return ApiResult.success(paging);
     }

@@ -37,7 +37,7 @@ public class ServerInfoController {
     @PostMapping("/getServerInfo")
     @Operation(summary = "服务信息详情")
     @Permission("server:info")
-    public ApiResult<ServerInfo> getServerInfo() throws Exception {
+    public ApiResult<ServerInfo> getServerInfo() {
         ServerInfo serverInfo = ServerInfoUtil.getServerInfo();
         // 获取项目信息
         // 项目名称

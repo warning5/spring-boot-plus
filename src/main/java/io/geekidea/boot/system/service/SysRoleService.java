@@ -25,7 +25,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @return
      * @throws Exception
      */
-    boolean addSysRole(SysRoleDto dto) throws Exception;
+    boolean addSysRole(SysRoleDto dto);
 
     /**
      * 修改系统角色
@@ -34,7 +34,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @return
      * @throws Exception
      */
-    boolean updateSysRole(SysRoleDto dto) throws Exception;
+    boolean updateSysRole(SysRoleDto dto);
 
     /**
      * 删除系统角色
@@ -43,7 +43,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @return
      * @throws Exception
      */
-    boolean deleteSysRole(Long id) throws Exception;
+    boolean deleteSysRole(Long id);
 
     /**
      * 系统角色详情
@@ -52,7 +52,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @return
      * @throws Exception
      */
-    SysRoleVo getSysRoleById(Long id) throws Exception;
+    SysRoleVo getSysRoleById(Long id);
 
     /**
      * 系统角色分页列表
@@ -61,7 +61,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @return
      * @throws Exception
      */
-    Paging<SysRoleVo> getSysRolePage(SysRoleQuery query) throws Exception;
+    Paging<SysRoleVo> getSysRolePage(SysRoleQuery query);
 
     /**
      * 获取所有角色列表
@@ -69,7 +69,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @return
      * @throws Exception
      */
-    List<SysRole> getSysRoleAllList() throws Exception;
+    List<SysRole> getSysRoleAllList();
 
     /**
      * 设置角色权限
@@ -78,7 +78,7 @@ public interface SysRoleService extends IService<SysRole> {
      * @return
      * @throws Exception
      */
-    boolean setRoleMenus(RoleMenusDto roleMenusDto) throws Exception;
+    boolean setRoleMenus(RoleMenusDto roleMenusDto);
 
     /**
      * 检查code是否存在
@@ -87,6 +87,6 @@ public interface SysRoleService extends IService<SysRole> {
      * @return
      * @throws Exception
      */
-    void checkCodeExists(String code) throws Exception;
+    void checkCodeExists(String code);
 
 }

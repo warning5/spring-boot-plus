@@ -43,7 +43,7 @@ public class UserController {
     @PostMapping("/addUser")
     @Operation(summary = "添加用户信息")
     @Permission("user:add")
-    public ApiResult addUser(@Valid @RequestBody UserDto userDto) throws Exception {
+    public ApiResult addUser(@Valid @RequestBody UserDto userDto) {
         boolean flag = userService.addUser(userDto);
         return ApiResult.result(flag);
     }
@@ -59,7 +59,7 @@ public class UserController {
     @PostMapping("/updateUser")
     @Operation(summary = "修改用户信息")
     @Permission("user:update")
-    public ApiResult updateUser(@Valid @RequestBody UserDto userDto) throws Exception {
+    public ApiResult updateUser(@Valid @RequestBody UserDto userDto) {
         boolean flag = userService.updateUser(userDto);
         return ApiResult.result(flag);
     }
@@ -75,7 +75,7 @@ public class UserController {
     @PostMapping("/deleteUser/{id}")
     @Operation(summary = "删除用户信息")
     @Permission("user:delete")
-    public ApiResult deleteUser(@PathVariable Long id) throws Exception {
+    public ApiResult deleteUser(@PathVariable Long id) {
         boolean flag = userService.deleteUser(id);
         return ApiResult.result(flag);
     }
@@ -90,7 +90,7 @@ public class UserController {
     @PostMapping("/getUser/{id}")
     @Operation(summary = "用户信息详情")
     @Permission("user:info")
-    public ApiResult<UserVo> getUser(@PathVariable Long id) throws Exception {
+    public ApiResult<UserVo> getUser(@PathVariable Long id) {
         UserVo userVo = userService.getUserById(id);
         return ApiResult.success(userVo);
     }
@@ -105,7 +105,7 @@ public class UserController {
     @PostMapping("/getUserPage")
     @Operation(summary = "用户信息分页列表")
     @Permission("user:page")
-    public ApiResult<UserVo> getUserPage(@Valid @RequestBody UserQuery query) throws Exception {
+    public ApiResult<UserVo> getUserPage(@Valid @RequestBody UserQuery query) {
         Paging<UserVo> paging = userService.getUserPage(query);
         return ApiResult.success(paging);
     }

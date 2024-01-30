@@ -166,7 +166,15 @@ xss:
 
 # redis项目前缀
 redis:
-  projectPrefix: boot
+  # 指定当前项目所有redisKey的前缀，注意：其它key不要以这个开头
+  # 目的为了区分多个项目在同一个db下的redisKey，避免混淆
+  # 例如：_boot_，表示当前项目所有的key都以此开头
+  # 如加上前缀后，当前项目下的所有key都将自动加上：_boot_.前缀
+  # 建议使用下划线开头和结束，目的是和其它key区分开
+  # 注意每个项目的前缀应保持唯一
+  # 可以不指定前缀，此时跟redis默认操作一样
+  # 如之前未指定前缀，后面指定了，则需要将之前的key清空，反之亦然
+  projectPrefix:
 
 # file上传配置
 file:

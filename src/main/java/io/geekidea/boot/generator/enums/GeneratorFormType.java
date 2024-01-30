@@ -48,6 +48,13 @@ public enum GeneratorFormType {
         }
     }
 
+    public static Integer getCode(GeneratorFormType type) {
+        if (type == null) {
+            return INPUT.code;
+        }
+        return type.code;
+    }
+
     public static GeneratorFormType get(Integer code) {
         GeneratorFormType type = map.get(code);
         if (type == null) {

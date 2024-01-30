@@ -46,7 +46,7 @@ public class CookieUtil {
      * @return
      * @throws Exception
      */
-    public static String getCookieValueByName(HttpServletRequest request, String cookieName) throws Exception {
+    public static String getCookieValueByName(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
         return getCookieValueByName(cookies, cookieName);
     }
@@ -59,7 +59,7 @@ public class CookieUtil {
      * @return
      * @throws Exception
      */
-    public static String getCookieValueByName(Cookie[] cookies, String cookieName) throws Exception {
+    public static String getCookieValueByName(Cookie[] cookies, String cookieName) {
         for (Cookie cookie : cookies) {
             String name = cookie.getName();
             if (name.equals(cookieName)) {

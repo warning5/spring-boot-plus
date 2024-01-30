@@ -38,6 +38,13 @@ public enum SystemType {
         }
     }
 
+    public static Integer getCode(SystemType type) {
+        if (type == null) {
+            return null;
+        }
+        return type.code;
+    }
+
     public static SystemType get(Integer code) {
         SystemType type = map.get(code);
         if (type == null) {

@@ -25,7 +25,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return
      * @throws Exception
      */
-    boolean addSysMenu(SysMenuDto dto) throws Exception;
+    boolean addSysMenu(SysMenuDto dto);
 
     /**
      * 修改系统菜单
@@ -34,7 +34,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return
      * @throws Exception
      */
-    boolean updateSysMenu(SysMenuDto dto) throws Exception;
+    boolean updateSysMenu(SysMenuDto dto);
 
     /**
      * 删除系统菜单
@@ -43,7 +43,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return
      * @throws Exception
      */
-    boolean deleteSysMenu(Long id) throws Exception;
+    boolean deleteSysMenu(Long id);
 
     /**
      * 系统菜单详情
@@ -52,7 +52,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return
      * @throws Exception
      */
-    SysMenuVo getSysMenuById(Long id) throws Exception;
+    SysMenuVo getSysMenuById(Long id);
 
     /**
      * 获取所有的系统菜单树形列表
@@ -61,7 +61,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return
      * @throws Exception
      */
-    List<SysMenuTreeVo> getAllSysMenuTreeList(SysMenuQuery query) throws Exception;
+    List<SysMenuTreeVo> getAllSysMenuTreeList(SysMenuQuery query);
 
     /**
      * 获取启用的系统菜单树形列表
@@ -69,7 +69,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return
      * @throws Exception
      */
-    List<SysMenuTreeVo> getSysMenuTreeList() throws Exception;
+    List<SysMenuTreeVo> getSysMenuTreeList();
 
     /**
      * 获取当前登录用户导航菜单树形列表
@@ -77,7 +77,7 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return
      * @throws Exception
      */
-    List<SysNavMenuTreeVo> getNavMenuTreeList() throws Exception;
+    List<SysNavMenuTreeVo> getNavMenuTreeList();
 
     /**
      * 获取角色权限ID集合
@@ -86,6 +86,6 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return
      * @throws Exception
      */
-    List<Long> getMenuIdsByRoleId(Long roleId) throws Exception;
+    List<Long> getMenuIdsByRoleId(Long roleId);
 
 }

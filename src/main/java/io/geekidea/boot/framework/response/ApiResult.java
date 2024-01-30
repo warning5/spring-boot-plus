@@ -45,8 +45,6 @@ public class ApiResult<T> implements Serializable {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date time;
-    @Schema(description = "响应结果 0：成功，非0：失败")
-    private int status;
 
     @Schema(description = "日志链路ID")
     private String traceId;
@@ -113,7 +111,6 @@ public class ApiResult<T> implements Serializable {
                 .code(code)
                 .msg(outMessage)
                 .data(data)
-                .status(success ? 0 : 422)
                 .success(success)
                 .time(new Date())
                 .traceId(traceId)

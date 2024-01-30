@@ -21,7 +21,7 @@ public interface SysLogService extends IService<SysLog> {
      * @return
      * @throws Exception
      */
-    SysLogVo getSysLogById(Long id) throws Exception;
+    SysLogVo getSysLogById(Long id);
 
     /**
      * 系统日志分页列表
@@ -30,6 +30,6 @@ public interface SysLogService extends IService<SysLog> {
      * @return
      * @throws Exception
      */
-    Paging<SysLogVo> getSysLogPage(SysLogQuery query) throws Exception;
+    Paging<SysLogVo> getSysLogPage(SysLogQuery query);
 
 }

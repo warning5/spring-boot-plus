@@ -48,6 +48,13 @@ public enum SysLogType {
         }
     }
 
+    public static Integer getCode(SysLogType type) {
+        if (type == null) {
+            return null;
+        }
+        return type.code;
+    }
+
     public static SysLogType get(Integer code) {
         SysLogType type = map.get(code);
         if (type == null) {

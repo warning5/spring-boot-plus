@@ -29,7 +29,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    boolean addSysDict(SysDictDto dto) throws Exception;
+    boolean addSysDict(SysDictDto dto);
 
     /**
      * 修改字典数据
@@ -38,7 +38,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    boolean updateSysDict(SysDictDto dto) throws Exception;
+    boolean updateSysDict(SysDictDto dto);
 
     /**
      * 删除字典数据
@@ -47,7 +47,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    boolean deleteSysDict(Long id) throws Exception;
+    boolean deleteSysDict(Long id);
 
     /**
      * 字典数据详情
@@ -56,7 +56,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    SysDictVo getSysDictById(Long id) throws Exception;
+    SysDictVo getSysDictById(Long id);
 
     /**
      * 字典数据分页列表
@@ -65,7 +65,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    Paging<SysDictVo> getSysDictPage(SysDictQuery query) throws Exception;
+    Paging<SysDictVo> getSysDictPage(SysDictQuery query);
 
     /**
      * App字典数据列表
@@ -74,7 +74,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    Map<String, List<AppSysDictVo>> getAppSysDictList(SysDictAppQuery query) throws Exception;
+    Map<String, List<AppSysDictVo>> getAppSysDictList(SysDictAppQuery query);
 
     /**
      * 根据字典编码获取字典列表
@@ -83,7 +83,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    List<SysDict> getSysDictList(String dictCode) throws Exception;
+    List<SysDict> getSysDictList(String dictCode);
 
     /**
      * 根据字典编码和label获取字典对象
@@ -93,7 +93,7 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    SysDict getSysDictByValue(String dictCode, Serializable value) throws Exception;
+    SysDict getSysDictByValue(String dictCode, Serializable value);
 
     /**
      * 根据字典编码和label获取字典值
@@ -103,6 +103,6 @@ public interface SysDictService extends IService<SysDict> {
      * @return
      * @throws Exception
      */
-    String getSysDictLabelByValue(String dictCode, Serializable value) throws Exception;
+    String getSysDictLabelByValue(String dictCode, Serializable value);
 
 }

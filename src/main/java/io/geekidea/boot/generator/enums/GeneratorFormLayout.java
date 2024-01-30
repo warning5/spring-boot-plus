@@ -39,6 +39,13 @@ public enum GeneratorFormLayout {
         }
     }
 
+    public static Integer getCode(GeneratorFormLayout type) {
+        if (type == null) {
+            return TWO.code;
+        }
+        return type.code;
+    }
+
     public static GeneratorFormLayout get(Integer code) {
         GeneratorFormLayout type = map.get(code);
         if (type == null) {

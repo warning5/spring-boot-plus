@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.geekidea.boot.framework.exception.BusinessException;
 import io.geekidea.boot.framework.page.OrderByItem;
+import io.geekidea.boot.framework.page.OrderMapping;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.system.dto.SysConfigDto;
 import io.geekidea.boot.system.entity.SysConfig;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addSysConfig(SysConfigDto dto) throws Exception {
+    public boolean addSysConfig(SysConfigDto dto) {
         checkConfigKeyExists(dto.getConfigKey());
         SysConfig sysConfig = new SysConfig();
         BeanUtils.copyProperties(dto, sysConfig);
@@ -45,7 +45,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateSysConfig(SysConfigDto dto) throws Exception {
+    public boolean updateSysConfig(SysConfigDto dto) {
         Long id = dto.getId();
         SysConfig sysConfig = getById(id);
         if (sysConfig == null) {
@@ -57,25 +57,27 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean deleteSysConfig(Long id) throws Exception {
+    public boolean deleteSysConfig(Long id) {
         return removeById(id);
     }
 
     @Override
-    public SysConfigVo getSysConfigById(Long id) throws Exception {
+    public SysConfigVo getSysConfigById(Long id) {
         return sysConfigMapper.getSysConfigById(id);
     }
 
     @Override
-    public Paging<SysConfigVo> getSysConfigPage(SysConfigQuery query) throws Exception {
-        PagingUtil.handlePage(query, OrderByItem.desc("id"));
+    public Paging<SysConfigVo> getSysConfigPage(SysConfigQuery query) {
+        OrderMapping orderMapping = new OrderMapping();
+        orderMapping.put("createTime", "create_time");
+        PagingUtil.handlePage(query, orderMapping, OrderByItem.desc("id"));
         List<SysConfigVo> list = sysConfigMapper.getSysConfigPage(query);
         Paging<SysConfigVo> paging = new Paging<>(list);
         return paging;
     }
 
     @Override
-    public void checkConfigKeyExists(String configKey) throws Exception {
+    public void checkConfigKeyExists(String configKey) {
         LambdaQueryWrapper<SysConfig> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysConfig::getConfigKey, configKey);
         long count = count(wrapper);

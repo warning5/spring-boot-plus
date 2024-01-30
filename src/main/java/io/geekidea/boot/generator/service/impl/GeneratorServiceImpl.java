@@ -25,7 +25,7 @@ public class GeneratorServiceImpl implements GeneratorService {
     private GeneratorTableService generatorTableService;
 
     @Override
-    public List<GeneratorCodeVo> previewCode(String tableName) throws Exception {
+    public List<GeneratorCodeVo> previewCode(String tableName) {
         GeneratorTable generatorTable = generatorTableService.getGeneratorTableInfo(tableName);
         return GeneratorUtil.generatorCodeData(tableName, generatorTable);
     }
@@ -39,7 +39,7 @@ public class GeneratorServiceImpl implements GeneratorService {
     }
 
     @Override
-    public Map<String, List<GeneratorCodeVo>> downloadCode(List<String> tableNames) throws Exception {
+    public Map<String, List<GeneratorCodeVo>> downloadCode(List<String> tableNames) {
         Map<String, List<GeneratorCodeVo>> map = new LinkedHashMap<>();
         for (String tableName : tableNames) {
             GeneratorTable generatorTable = generatorTableService.getGeneratorTableInfo(tableName);

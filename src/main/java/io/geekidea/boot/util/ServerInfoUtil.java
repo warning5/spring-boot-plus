@@ -31,7 +31,7 @@ public class ServerInfoUtil {
      *
      * @return
      */
-    public static ServerInfo getServerInfo() throws Exception {
+    public static ServerInfo getServerInfo() {
         Cpu cpu = getCpu();
         Memory memory = getMemory();
         Jvm jvm = getJvm();
