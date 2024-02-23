@@ -10,12 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -110,17 +113,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return filterRegistrationBean;
     }
 
+    @Resource
+    private ApplicationContext applicationContext;
+
     /**
      * XssFilter配置
      *
      * @return
      */
     @Bean
+    @DependsOn("xssProperties")
     public FilterRegistrationBean xssFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         filterRegistrationBean.setFilter(new XssFilter());
         filterRegistrationBean.setEnabled(xssProperties.isEnable());
-        filterRegistrationBean.addUrlPatterns(xssProperties.getUrlPatterns());
+        filterRegistrationBean.addUrlPatterns("/*");
         filterRegistrationBean.setOrder(xssProperties.getOrder());
         filterRegistrationBean.setAsyncSupported(xssProperties.isAsync());
         return filterRegistrationBean;

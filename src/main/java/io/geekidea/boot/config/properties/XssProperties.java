@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
  * @author geekidea
  * @date 2023/7/9
  **/
-@Data
 @Component
+@Data
 @ConfigurationProperties(prefix = "xss")
 public class XssProperties {
 
@@ -17,6 +17,10 @@ public class XssProperties {
      * 是否启用
      */
     private boolean enable;
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
 
     /**
      * 过滤的路径

@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -18,6 +19,7 @@ import java.util.List;
  * @date 2022-3-16
  */
 @EnableAsync
+@EnableConfigurationProperties
 @SpringBootApplication(scanBasePackages = {"io.geekidea.boot", "com.hwtx.form"})
 @MapperScan(basePackages = {"com.hwtx.form.persistence","io.geekidea.boot.*.mapper"})
 public class SpringBootPlusApplication {

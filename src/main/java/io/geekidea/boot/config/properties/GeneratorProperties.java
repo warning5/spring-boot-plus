@@ -20,9 +20,9 @@ import java.util.List;
  * @date 2023/12/31
  **/
 @Data
-@Component
-@PropertySource(value = {"classpath:generator.yml"})
-@ConfigurationProperties(prefix = "generator")
+//@Component
+//@PropertySource(value = {"classpath:generator.yml"})
+//@ConfigurationProperties(prefix = "generator")
 public class GeneratorProperties {
 
     /**
