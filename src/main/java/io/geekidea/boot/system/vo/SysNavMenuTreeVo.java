@@ -55,6 +55,9 @@ public class SysNavMenuTreeVo {
     @Schema(description = "是否缓存，0：否 1：是")
     private Boolean isCache;
 
+    @Schema(description = "是否关闭，0：否 1：是")
+    private Boolean close;
+
     @Schema(description = "创建人ID")
     private Long createId;
 

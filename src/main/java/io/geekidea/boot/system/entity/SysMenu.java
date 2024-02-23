@@ -57,6 +57,9 @@ public class SysMenu implements Serializable {
     @Schema(description = "是否显示,0：不显示，1：显示")
     private Boolean isShow;
 
+    @Schema(description = "是否关闭,0：不关闭，1：关闭")
+    private Boolean close;
+
     @Schema(description = "是否缓存，0：否 1：是")
     private Boolean isCache;
 

@@ -2,6 +2,7 @@ package io.geekidea.boot;
 
 import io.geekidea.boot.util.IpUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -17,7 +18,8 @@ import java.util.List;
  * @date 2022-3-16
  */
 @EnableAsync
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"io.geekidea.boot", "com.hwtx.form"})
+@MapperScan(basePackages = {"com.hwtx.form.persistence","io.geekidea.boot.*.mapper"})
 public class SpringBootPlusApplication {
 
     private static final String BACKSLASH = "/";

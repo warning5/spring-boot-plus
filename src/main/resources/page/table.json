@@ -1,0 +1,230 @@
+{
+  "type": "page",
+  "body": {
+    "title": "Hwtx-admin：这是 AMIS 表格页面示例",
+    "remark": "嘿，不保证数据准确性",
+    "type": "crud",
+    "draggable": true,
+    "syncLocation": false,
+    "bordered": true,
+    "api": "http://localhost:8888/api/form/list?formId=2",
+    "keepItemSelectionOnPageChange": true,
+    "perPageField": "size",
+    "defaultParams": {
+      "perPage": 5
+    },
+    "filter": {
+      "title": "",
+      "mode": "inline",
+      "wrapWithPanel": true,
+      "submitText": "",
+      "body": [
+        {
+          "type": "input-text",
+          "name": "keywords",
+          "placeholder": "通过关键字搜索",
+          "addOn": {
+            "label": "搜索",
+            "type": "submit",
+            "className": "btn-success"
+          },
+          "clearable": true
+        }
+      ],
+      "className": "m-b-sm"
+    },
+    "bulkActions": [
+      {
+        "type": "button",
+        "label": "批量删除",
+        "actionType": "ajax",
+        "api": "http://localhost:8888/api/form/remove?formId=2&valueIds=${ids|raw}",
+        "confirmText": "确定要批量删除?"
+      },
+      {
+        "type": "button",
+        "label": "批量修改",
+        "actionType": "dialog",
+        "dialog": {
+          "title": "批量编辑",
+          "name": "sample-bulk-edit",
+          "body": {
+            "type": "form",
+            "api": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/mock2/sample/bulkUpdate2",
+            "body": [
+              {
+                "type": "hidden",
+                "name": "ids"
+              },
+              {
+                "type": "input-text",
+                "name": "engine",
+                "label": "Engine"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "quickSaveApi": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/mock2/sample/bulkUpdate",
+    "quickSaveItemApi": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/mock2/sample/$id",
+    "filterTogglable": true,
+    "headerToolbar": [
+      "filter-toggler",
+      {
+        "type": "button",
+        "actionType": "dialog",
+        "label": "新增",
+        "icon": "fa fa-plus pull-left",
+        "dialog": {
+          "title": "新增",
+          "closeOnEsc": true,
+          "body": {
+            "type": "service",
+            "schemaApi": "get:http://127.0.0.1:8888/api/form/load/2"
+          }
+        }
+      },
+      "bulkActions",
+      {
+        "type": "button",
+        "label": "重置测试数据",
+        "actionType": "ajax",
+        "size": "sm",
+        "api": "https://3xsw4ap8wah59.cfc-execute.bj.baidubce.com/api/amis-mock/mock2/sample/reset"
+      },
+      "export-excel",
+      {
+        "type": "columns-toggler",
+        "align": "right",
+        "draggable": true
+      },
+      {
+        "type": "drag-toggler",
+        "align": "right"
+      }
+    ],
+    "footerToolbar": [
+      {
+        "type": "tpl",
+        "tpl": "一共有 ${count} 行数据。",
+        "className": "v-middle"
+      },
+      {
+        "type": "pagination",
+        "layout": "total,perPage,pager,go",
+        "mode": "normal",
+        "maxButtons": 7,
+        "showPerPage": true,
+        "perPageAvailable": [
+          5,
+          10,
+          20
+        ],
+        "showPageInput": true,
+        "disabled": false
+      }
+    ],
+    "columns": [
+      {
+        "name": "id",
+        "label": "ID",
+        "width": 20,
+        "sortable": true,
+        "type": "text",
+        "searchable": {
+          "type": "input-text",
+          "name": "id",
+          "label": "主键",
+          "placeholder": "输入id"
+        }
+      },
+      {
+        "name": "engine",
+        "label": "引擎",
+        "type": "text",
+        "en-US": {
+          "label": "engine"
+        }
+      },
+      {
+        "name": "browser",
+        "label": "Browser",
+        "searchable": {
+          "type": "select",
+          "name": "browser",
+          "label": "浏览器",
+          "placeholder": "选择浏览器",
+          "options": [
+            {
+              "label": "Internet Explorer ",
+              "value": "ie"
+            },
+            {
+              "label": "AOL browser",
+              "value": "aol"
+            },
+            {
+              "label": "Firefox",
+              "value": "firefox"
+            }
+          ]
+        }
+      },
+      {
+        "name": "platform",
+        "label": "平台",
+        "popOver": {
+          "trigger": "hover",
+          "body": {
+            "type": "tpl",
+            "tpl": "就是为了演示有个叫 popOver 的功能"
+          }
+        },
+        "sortable": true,
+        "type": "text"
+      },
+      {
+        "name": "grade",
+        "label": "CSS 等级",
+        "quickEdit": {
+          "type": "select",
+          "options": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "X"
+          ],
+          "saveImmediately": true
+        }
+      },
+      {
+        "type": "operation",
+        "label": "操作",
+        "buttons": [
+          {
+            "type": "button",
+            "actionType": "ajax",
+            "label": "删除",
+            "confirmText": "您确认要删除?",
+            "api": "http://localhost:8888/api/form/remove?valueIds=${id}&formId=2"
+          },
+          {
+            "label": "详情",
+            "type": "button",
+            "actionType": "dialog",
+            "dialog": {
+              "title": "查看详情",
+              "closeOnEsc": true,
+              "body": {
+                "type": "service",
+                "schemaApi": "get:http://127.0.0.1:8888/api/form/load/2"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
