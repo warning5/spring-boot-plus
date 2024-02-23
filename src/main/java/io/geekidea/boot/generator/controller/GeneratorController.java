@@ -6,11 +6,9 @@ import io.geekidea.boot.common.enums.SysLogType;
 import io.geekidea.boot.framework.annotation.Log;
 import io.geekidea.boot.framework.page.Paging;
 import io.geekidea.boot.framework.response.ApiResult;
-import io.geekidea.boot.generator.constant.GeneratorConstant;
 import io.geekidea.boot.generator.dto.GeneratorCodeDto;
 import io.geekidea.boot.generator.dto.GeneratorTableDto;
 import io.geekidea.boot.generator.entity.GeneratorTable;
-import io.geekidea.boot.generator.enums.GeneratorTemplateType;
 import io.geekidea.boot.generator.query.GeneratorTableQuery;
 import io.geekidea.boot.generator.service.GeneratorService;
 import io.geekidea.boot.generator.service.GeneratorTableService;
@@ -30,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -126,8 +123,10 @@ public class GeneratorController {
     @Operation(summary = "生成代码")
     @Permission("generator:generator-code")
     public ApiResult<GeneratorCodeVo> generatorCode(@Valid @RequestBody GeneratorCodeDto dto) throws Exception {
+        log.info("生成代码开始：" + dto);
         List<String> tableNames = dto.getTableNames();
         generatorService.generatorCode(tableNames);
+        log.info("生成代码结束：" + dto);
         return ApiResult.success();
     }
 
@@ -142,6 +141,7 @@ public class GeneratorController {
     @Operation(summary = "下载代码")
     @Permission("generator:download-code")
     public void downloadCode(@Valid @RequestBody GeneratorCodeDto dto, HttpServletResponse response) throws Exception {
+        log.info("下载代码开始：" + dto);
         List<String> tableNames = dto.getTableNames();
         Map<String, List<GeneratorCodeVo>> map = generatorService.downloadCode(tableNames);
         if (MapUtils.isNotEmpty(map)) {
@@ -152,34 +152,13 @@ public class GeneratorController {
                 List<GeneratorCodeVo> codeVos = entry.getValue();
                 if (CollectionUtils.isNotEmpty(codeVos)) {
                     for (GeneratorCodeVo codeVo : codeVos) {
-                        File file = codeVo.getFile();
-                        String filePath = file.getPath();
-                        Integer templateType = codeVo.getTemplateType();
-                        GeneratorTemplateType generatorTemplateType = GeneratorTemplateType.get(templateType);
-                        if (generatorTemplateType == null) {
-                            log.error("未搜索到相关模板类型，跳过");
-                            continue;
-                        }
-                        int indexOf = -1;
-                        String zipSubFilePath = null;
-                        if (GeneratorTemplateType.BACKEND == generatorTemplateType) {
-                            indexOf = filePath.indexOf(GeneratorConstant.SRC_MAIN);
-                            zipSubFilePath = GeneratorConstant.JAVA_DIR + filePath.substring(indexOf);
-                        } else if (GeneratorTemplateType.FRONTEND == generatorTemplateType) {
-                            indexOf = filePath.indexOf(GeneratorConstant.VUE_SRC);
-                            zipSubFilePath = filePath.substring(indexOf);
-                        } else if (GeneratorTemplateType.MENU == generatorTemplateType) {
-                            indexOf = filePath.indexOf(GeneratorConstant.MENU_SQL_PATH);
-                            zipSubFilePath = filePath.substring(indexOf);
-                        }
-                        if (indexOf == -1) {
-                            log.error("未搜索到相关文件，跳过");
-                            continue;
-                        }
+                        String fileName = codeVo.getFileName();
+                        String zipFilePath = codeVo.getZipFilePath();
                         String fileContent = codeVo.getFileContent();
+                        log.info("generatorFileName：" + fileName);
+                        log.info("generatorZipFilePath：" + zipFilePath);
                         // 添加到zip
-                        log.info("zipSubFilePath：" + zipSubFilePath);
-                        zipOutputStream.putNextEntry(new ZipEntry(zipSubFilePath));
+                        zipOutputStream.putNextEntry(new ZipEntry(zipFilePath));
                         IOUtils.write(fileContent, zipOutputStream, CharsetUtil.CHARSET_UTF_8);
                         zipOutputStream.flush();
                         zipOutputStream.closeEntry();
@@ -194,13 +173,15 @@ public class GeneratorController {
             } else {
                 zipFileName = tableNames.get(0) + "-code.zip";
             }
-            System.out.println("zipFileName = " + zipFileName);
+            log.info("downloadZipFileName = " + zipFileName);
             response.reset();
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipFileName);
             response.addHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(bytes.length));
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
             IOUtils.write(bytes, response.getOutputStream());
+            log.info("downloadZipFile完成");
         }
+        log.info("下载代码结束：" + dto);
     }
 
 }

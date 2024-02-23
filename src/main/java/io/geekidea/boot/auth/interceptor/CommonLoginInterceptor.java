@@ -1,6 +1,5 @@
 package io.geekidea.boot.auth.interceptor;
 
-import io.geekidea.boot.auth.annotation.Login;
 import io.geekidea.boot.auth.cache.AppLoginCache;
 import io.geekidea.boot.auth.cache.LoginCache;
 import io.geekidea.boot.auth.util.AppLoginUtil;
@@ -49,8 +48,8 @@ public class CommonLoginInterceptor extends BaseExcludeMethodInterceptor {
             }
         }
         // 如果不存在@Login注解，则跳过
-        Login loginAnnotation = getLoginAnnotation(handlerMethod);
-        if (loginAnnotation == null) {
+        boolean existsLoginAnnotation = existsLoginAnnotation(handlerMethod);
+        if (!existsLoginAnnotation) {
             return true;
         }
         if (StringUtils.isBlank(token)) {

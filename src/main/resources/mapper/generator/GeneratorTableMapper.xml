@@ -22,7 +22,8 @@
                it.TABLE_COMMENT,
                it.CREATE_TIME,
                gt.class_name,
-               gt.update_time
+               gt.update_time,
+               gt.generator_type
         from information_schema.TABLES it
                  left join generator_table gt
                            on it.TABLE_NAME = gt.table_name

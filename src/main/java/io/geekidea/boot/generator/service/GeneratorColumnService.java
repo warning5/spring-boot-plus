@@ -20,10 +20,11 @@ public interface GeneratorColumnService extends IService<GeneratorColumn> {
      * 添加生成代码列
      *
      * @param tableName
+     * @param validateField
      * @return
      * @throws Exception
      */
-    boolean addGeneratorColumn(String tableName);
+    boolean addGeneratorColumn(String tableName, Boolean validateField);
 
     /**
      * 修改生成代码列

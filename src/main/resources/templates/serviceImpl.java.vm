@@ -3,6 +3,7 @@ package $!{serviceImplPackage};
 import $!{superServiceImplPackagePath};
 import $!{businessExceptionPackagePath};
 import $!{orderByItemPackagePath};
+import $!{orderMappingPackagePath};
 import $!{pagingPackagePath};
 import $!{dtoPackagePath};
 import $!{entityPackagePath};
@@ -42,7 +43,7 @@ public class $!{serviceImplName} extends $!{superServiceImplName}<$!{mapperName}
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean $!{addMethodName}($!{dtoName} $!{dtoObjectName}) throws Exception {
+    public boolean $!{addMethodName}($!{dtoName} $!{dtoObjectName}) {
         $!{entity} $!{entityObjectName} = new $!{entity}();
         BeanUtils.copyProperties($!{dtoObjectName}, $!{entityObjectName});
         return save($!{entityObjectName});
@@ -50,7 +51,7 @@ public class $!{serviceImplName} extends $!{superServiceImplName}<$!{mapperName}
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean $!{updateMethodName}($!{dtoName} $!{dtoObjectName}) throws Exception {
+    public boolean $!{updateMethodName}($!{dtoName} $!{dtoObjectName}) {
         $!{pkIdPropertyType} $!{pkIdPropertyName} = $!{dtoObjectName}.get$!{pascalPkIdPropertyName}();
         $!{entity} $!{entityObjectName} = getById($!{pkIdPropertyName});
         if ($!{entityObjectName} == null) {
@@ -62,21 +63,25 @@ public class $!{serviceImplName} extends $!{superServiceImplName}<$!{mapperName}
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean $!{deleteMethodName}($!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception {
+    public boolean $!{deleteMethodName}($!{pkIdPropertyType} $!{pkIdPropertyName}) {
         return removeById($!{pkIdPropertyName});
     }
 
     @Override
-    public $!{voName} $!{infoMethodName}ById($!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception {
+    public $!{voName} $!{infoMethodName}ById($!{pkIdPropertyType} $!{pkIdPropertyName}) {
         return $!{mapperObjectName}.$!{infoMethodName}ById($!{pkIdPropertyName});
     }
 
     @Override
-    public Paging<$!{voName}> $!{pageMethodName}($!{queryName} $!{queryObjectName}) throws Exception {
+    public Paging<$!{voName}> $!{pageMethodName}($!{queryName} $!{queryObjectName}) {
+        OrderMapping orderMapping = new OrderMapping();
+        #if($!{existsCreateTime})
+        orderMapping.put("createTime", "create_time");
+        #end
         #if($!{defaultOrderColumnName})
-        PagingUtil.handlePage(query, OrderByItem.desc("$!{defaultOrderColumnName}"));
+        PagingUtil.handlePage(query, orderMapping, OrderByItem.desc("$!{defaultOrderColumnName}"));
         #else
-        PagingUtil.handlePage(query);
+        PagingUtil.handlePage(query, orderMapping);
         #end
         List<$!{voName}> list = $!{mapperObjectName}.$!{pageMethodName}(query);
         Paging<$!{voName}> paging = new Paging<>(list);
@@ -85,16 +90,20 @@ public class $!{serviceImplName} extends $!{superServiceImplName}<$!{mapperName}
 
 #if($!{generatorAppBackend})
     @Override
-    public $!{appVoName} $!{appInfoMethodName}ById($!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception {
+    public $!{appVoName} $!{appInfoMethodName}ById($!{pkIdPropertyType} $!{pkIdPropertyName}) {
         return $!{mapperObjectName}.$!{appInfoMethodName}ById($!{pkIdPropertyName});
     }
 
     @Override
-    public Paging<$!{appVoName}> $!{appPageMethodName}($!{appQueryName} $!{queryObjectName}) throws Exception {
+    public Paging<$!{appVoName}> $!{appPageMethodName}($!{appQueryName} $!{queryObjectName}) {
+        OrderMapping orderMapping = new OrderMapping();
+        #if($!{existsCreateTime})
+        orderMapping.put("createTime", "create_time");
+        #end
         #if($!{defaultOrderColumnName})
-        PagingUtil.handlePage(query, OrderByItem.desc("$!{defaultOrderColumnName}"));
+        PagingUtil.handlePage(query, orderMapping, OrderByItem.desc("$!{defaultOrderColumnName}"));
         #else
-        PagingUtil.handlePage(query);
+        PagingUtil.handlePage(query, orderMapping);
         #end
         List<$!{appVoName}> list = $!{mapperObjectName}.$!{appPageMethodName}(query);
         Paging<$!{appVoName}> paging = new Paging<>(list);

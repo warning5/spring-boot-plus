@@ -30,7 +30,7 @@
           <el-form-item label="$!{column.columnCustomComment}">
             <el-radio-group v-model="form.$!{column.propertyName}">
             #foreach($option in $!{column.options})
-              <el-radio label="$!{option.value}" border>$!{option.label}</el-radio>
+              <el-radio :label="$!{option.value}" border>$!{option.label}</el-radio>
             #end
             </el-radio-group>
           </el-form-item>
@@ -105,9 +105,9 @@ const rules = reactive<FormRules>({
 #if(!$!{column.isPk} && $!{column.isRequired})
   $!{column.propertyName}: [
 #if($!{column.formType} == 1 || $!{column.formType} == 2 || $!{column.formType} == 3 || $!{column.formType} == 11)
-    {required: true, message: '请输入$!{column.propertyName}', trigger: 'blur'},
+    {required: true, message: '请输入$!{column.columnCustomComment}', trigger: 'blur'},
 #else
-    {required: true, message: '请选择$!{column.propertyName}', trigger: 'blur'},
+    {required: true, message: '请选择$!{column.columnCustomComment}', trigger: 'blur'},
 #end
   ],
 #end

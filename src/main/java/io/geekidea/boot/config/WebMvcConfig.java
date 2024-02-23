@@ -167,7 +167,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         boolean enableAppInterceptor = loginAppProperties.isEnable();
         if (enableAppInterceptor) {
             List<String> appIncludePaths = loginAppProperties.getIncludePaths();
-            registry.addInterceptor(loginAppInterceptor()).addPathPatterns(appIncludePaths);
+            List<String> excludePaths = loginAppProperties.getExcludePaths();
+            registry.addInterceptor(loginAppInterceptor()).addPathPatterns(appIncludePaths).excludePathPatterns(excludePaths);
         }
         // 刷新token拦截器
         registry.addInterceptor(refreshTokenInterceptor());

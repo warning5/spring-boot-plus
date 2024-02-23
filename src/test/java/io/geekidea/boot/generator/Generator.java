@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import io.geekidea.boot.common.constant.SystemConstant;
 import io.geekidea.boot.config.properties.GeneratorProperties;
 import io.geekidea.boot.generator.enums.GeneratorFormLayout;
-import io.geekidea.boot.generator.enums.GeneratorType;
 import io.geekidea.boot.generator.enums.RequestMappingStyle;
 import io.geekidea.boot.generator.handler.GeneratorHandler;
 
@@ -39,7 +38,7 @@ public class Generator {
         // 生成ID类型枚举类型
         config.setIdType(IdType.ASSIGN_ID);
         // 生成的表名称
-        List<String> tableNames = Arrays.asList("test_data_demo");
+        List<String> tableNames = Arrays.asList("");
         // 排除的表前缀
         config.setTablePrefixes(Arrays.asList("tb_", "b_", "c_", "test_"));
         // 是否生成后台代码
@@ -54,6 +53,9 @@ public class Generator {
         config.setEnableLog(true);
         // 是否生成权限编码
         config.setEnablePermission(true);
+        // 是否显示默认查询条件
+        config.setShowDefaultQuery(true);
+        config.setKeywordFields(Arrays.asList("name"));
         // 请求映射风格 DEFAULT、RESTFUL、SMALL_LETTER、HYPHEN、UNDERLINE
         config.setRequestMappingStyle(RequestMappingStyle.DEFAULT);
         // 设置默认降序排列名称，如id、create_time，如果为空，则不指定默认排序
@@ -63,9 +65,9 @@ public class Generator {
         // 设置前端表单布局方式 1：一行一列，2：一行两列
         config.setFormLayout(GeneratorFormLayout.TWO);
         // 前端自定义代码生成绝对路径，默认为当前项目下的vue目录，可配置如：/Users/mrliu/geekidea/spring-boot-plus-vue3
-        config.setCustomFrontendPath(null);
+        config.setCustomFrontendPath("/");
         // 设置是否只生成或覆盖实体类
-        config.setOnlyGeneratorEntity(true);
+        config.setOnlyGeneratorEntity(false);
         // 生成代码
         GeneratorHandler.generatorCode(config, tableNames);
     }

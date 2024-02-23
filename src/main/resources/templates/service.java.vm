@@ -30,7 +30,7 @@ public interface $!{serviceName} extends $!{superServiceName}<$!{entity}> {
      * @return
      * @throws Exception
      */
-    boolean $!{addMethodName}($!{dtoName} $!{dtoObjectName}) throws Exception;
+    boolean $!{addMethodName}($!{dtoName} $!{dtoObjectName});
 
     /**
      * 修改$!{tableComment}
@@ -39,7 +39,7 @@ public interface $!{serviceName} extends $!{superServiceName}<$!{entity}> {
      * @return
      * @throws Exception
      */
-    boolean $!{updateMethodName}($!{dtoName} $!{dtoObjectName}) throws Exception;
+    boolean $!{updateMethodName}($!{dtoName} $!{dtoObjectName});
 
     /**
      * 删除$!{tableComment}
@@ -48,7 +48,7 @@ public interface $!{serviceName} extends $!{superServiceName}<$!{entity}> {
      * @return
      * @throws Exception
      */
-    boolean $!{deleteMethodName}($!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception;
+    boolean $!{deleteMethodName}($!{pkIdPropertyType} $!{pkIdPropertyName});
 
     /**
      * $!{tableComment}详情
@@ -57,7 +57,7 @@ public interface $!{serviceName} extends $!{superServiceName}<$!{entity}> {
      * @return
      * @throws Exception
      */
-    $!{voName} $!{infoMethodName}ById($!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception;
+    $!{voName} $!{infoMethodName}ById($!{pkIdPropertyType} $!{pkIdPropertyName});
 
     /**
      * $!{tableComment}分页列表
@@ -66,7 +66,7 @@ public interface $!{serviceName} extends $!{superServiceName}<$!{entity}> {
      * @return
      * @throws Exception
      */
-    Paging<$!{voName}> $!{pageMethodName}($!{queryName} $!{queryObjectName}) throws Exception;
+    Paging<$!{voName}> $!{pageMethodName}($!{queryName} $!{queryObjectName});
 
 #if($!{generatorAppBackend})
     /**
@@ -76,7 +76,7 @@ public interface $!{serviceName} extends $!{superServiceName}<$!{entity}> {
      * @return
      * @throws Exception
      */
-    $!{appVoName} $!{appInfoMethodName}ById($!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception;
+    $!{appVoName} $!{appInfoMethodName}ById($!{pkIdPropertyType} $!{pkIdPropertyName});
 
     /**
      * $!{appTableComment}分页列表
@@ -85,7 +85,7 @@ public interface $!{serviceName} extends $!{superServiceName}<$!{entity}> {
      * @return
      * @throws Exception
      */
-    Paging<$!{appVoName}> $!{appPageMethodName}($!{appQueryName} $!{queryObjectName}) throws Exception;
+    Paging<$!{appVoName}> $!{appPageMethodName}($!{appQueryName} $!{queryObjectName});
 
 #end
 }

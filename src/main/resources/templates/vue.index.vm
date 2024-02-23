@@ -69,7 +69,7 @@
     </div>
     <el-table v-loading="tableLoading.status" :data="tableData.data" border row-key="id" @sort-change="sortChange">
       <el-table-column prop="_tableIndex" label="序号" align="center" width="50px"/>
-    #foreach($column in $!{columns})
+    #foreach($column in $!{tableColumns})
     #if($!{column.formType} == 4)
       <el-table-column prop="$!{column.propertyName}" label="$!{column.columnCustomComment}" align="center">
         <template #default="scope">

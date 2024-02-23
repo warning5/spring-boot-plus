@@ -57,7 +57,7 @@ public class $!{controllerName} {
     #if($!{enablePermission})
     @Permission("$!{addPermissionCode}")
     #end
-    public ApiResult $!{addMethodName}(@Valid @RequestBody $!{dtoName} $!{dtoObjectName}) throws Exception {
+    public ApiResult $!{addMethodName}(@Valid @RequestBody $!{dtoName} $!{dtoObjectName}) {
         log.info("$!{addCnComment}：{}", $!{dtoObjectName});
         boolean flag = $!{serviceObjectName}.$!{addMethodName}($!{dtoObjectName});
         return ApiResult.result(flag);
@@ -78,7 +78,7 @@ public class $!{controllerName} {
     #if($!{enablePermission})
     @Permission("$!{updatePermissionCode}")
     #end
-    public ApiResult $!{updateMethodName}(@Valid @RequestBody $!{dtoName} $!{dtoObjectName}) throws Exception {
+    public ApiResult $!{updateMethodName}(@Valid @RequestBody $!{dtoName} $!{dtoObjectName}) {
         log.info("$!{updateCnComment}：{}", $!{dtoObjectName});
         boolean flag = $!{serviceObjectName}.$!{updateMethodName}($!{dtoObjectName});
         return ApiResult.result(flag);
@@ -99,7 +99,7 @@ public class $!{controllerName} {
     #if($!{enablePermission})
     @Permission("$!{deletePermissionCode}")
     #end
-    public ApiResult $!{deleteMethodName}(@PathVariable $!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception {
+    public ApiResult $!{deleteMethodName}(@PathVariable $!{pkIdPropertyType} $!{pkIdPropertyName}) {
         log.info("$!{deleteCnComment}：{}", $!{pkIdPropertyName});
         boolean flag = $!{serviceObjectName}.$!{deleteMethodName}($!{pkIdPropertyName});
         return ApiResult.result(flag);
@@ -117,7 +117,7 @@ public class $!{controllerName} {
     #if($!{enablePermission})
     @Permission("$!{infoPermissionCode}")
     #end
-    public ApiResult<$!{voName}> $!{infoMethodName}(@PathVariable $!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception {
+    public ApiResult<$!{voName}> $!{infoMethodName}(@PathVariable $!{pkIdPropertyType} $!{pkIdPropertyName}) {
         log.info("$!{infoCnComment}：{}", $!{pkIdPropertyName});
         $!{voName} $!{voObjectName} = $!{serviceObjectName}.$!{infoMethodName}ById($!{pkIdPropertyName});
         return ApiResult.success($!{voObjectName});
@@ -135,7 +135,7 @@ public class $!{controllerName} {
     #if($!{enablePermission})
     @Permission("$!{pagePermissionCode}")
     #end
-    public ApiResult<$!{voName}> $!{pageMethodName}(@Valid $!{pageParamAnnotation} $!{queryName} $!{queryObjectName}) throws Exception {
+    public ApiResult<$!{voName}> $!{pageMethodName}(@Valid $!{pageParamAnnotation} $!{queryName} $!{queryObjectName}) {
         log.info("$!{pageCnComment}：{}", $!{queryObjectName});
         Paging<$!{voName}> paging = $!{serviceObjectName}.$!{pageMethodName}($!{queryObjectName});
         return ApiResult.success(paging);

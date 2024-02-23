@@ -55,14 +55,14 @@ public interface LoginConstant {
     String COMMON_URL_PREFIX = "/common";
 
     /**
-     * admin默认的token过期时间 60分钟
+     * admin默认的token过期时间 120分钟
      */
-    Integer ADMIN_TOKEN_EXPIRE_MINUTES = 60;
+    Integer ADMIN_TOKEN_EXPIRE_MINUTES = 120;
 
     /**
-     * app默认的token过期时间 30天
+     * app默认的token过期时间 7天
      */
-    Integer APP_TOKEN_EXPIRE_DAYS = 30;
+    Integer APP_TOKEN_EXPIRE_DAYS = 7;
 
     /**
      * 管理员角色编码

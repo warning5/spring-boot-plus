@@ -4,11 +4,9 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
-import com.github.yitter.idgen.YitIdHelper;
 import com.google.common.base.CaseFormat;
 import io.geekidea.boot.auth.annotation.Permission;
 import io.geekidea.boot.common.constant.SystemConstant;
@@ -32,6 +30,7 @@ import io.geekidea.boot.generator.vo.GeneratorColumnDbVo;
 import io.geekidea.boot.generator.vo.GeneratorOptionVo;
 import io.geekidea.boot.generator.vo.GeneratorTableDbVo;
 import io.geekidea.boot.system.entity.SysMenu;
+import io.geekidea.boot.util.IdUtil;
 import io.geekidea.boot.util.PagingUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -142,11 +141,15 @@ public class GeneratorUtil {
      * @param generatorTable
      * @throws Exception
      */
-    public static void generatorCode(String tableName, GeneratorTable generatorTable) throws Exception{
+    public static void generatorCode(String tableName, GeneratorTable generatorTable) throws Exception {
         List<GeneratorCodeVo> generatorCodeVos = GeneratorUtil.generatorCodeData(tableName, generatorTable);
         if (CollectionUtils.isNotEmpty(generatorCodeVos)) {
             for (GeneratorCodeVo generatorCodeVo : generatorCodeVos) {
-                File file = generatorCodeVo.getFile();
+                String fileName = generatorCodeVo.getFileName();
+                String customFilePath = generatorCodeVo.getCustomFilePath();
+                log.info("generatorFileName：" + fileName);
+                log.info("generatorCustomFilePath：" + customFilePath);
+                File file = new File(customFilePath);
                 String fileContent = generatorCodeVo.getFileContent();
                 // 写数据到文件
                 FileUtils.writeStringToFile(file, fileContent, GeneratorConstant.UTF8);
@@ -269,7 +272,7 @@ public class GeneratorUtil {
      * @return
      * @throws Exception
      */
-    public static List<GeneratorColumn> getGeneratorColumns(String tableName, List<GeneratorColumnDbVo> columnDbVos) {
+    public static List<GeneratorColumn> getGeneratorColumns(String tableName, List<GeneratorColumnDbVo> columnDbVos, Boolean validateField) {
         if (StringUtils.isBlank(tableName)) {
             throw new GeneratorException("表名称不能为空");
         }
@@ -307,9 +310,18 @@ public class GeneratorUtil {
             column.setPropertyType(propertyType);
             Boolean isPk = columnDbVo.getIsPk();
             Boolean isRequired = columnDbVo.getIsRequired();
+            Boolean isDefaultValue = columnDbVo.getIsDefaultValue();
             column.setIsPk(isPk);
             column.setIsRequired(isRequired);
-            column.setIsDefaultValue(columnDbVo.getIsDefaultValue());
+            column.setIsDefaultValue(isDefaultValue);
+            column.setIsValidate(false);
+            // 是否校验字段
+            if (validateField) {
+                // 如果不是主键，且是必填字段，没有默认值，则设置为需要校验
+                if (!isPk && isRequired && !isDefaultValue) {
+                    column.setIsValidate(true);
+                }
+            }
             column.setQueryType(GeneratorQueryType.EQ.getCode());
             column.setIsForm(false);
             column.setIsList(false);
@@ -494,19 +506,14 @@ public class GeneratorUtil {
         for (Map.Entry<String, String> entry : templateMap.entrySet()) {
             String templateName = entry.getKey();
             // 获取生成的文件
-            File file = getGeneratorFile(table, dataMap, templateName);
-            if (file == null) {
-                continue;
-            }
-            String fileName = file.getName();
+            GeneratorCodeVo generatorCodeVo = new GeneratorCodeVo();
+            // 设置生成文件信息
+            setGeneratorFile(table, dataMap, templateName, generatorCodeVo);
             // 模板路径
             String templatePath = entry.getValue();
             // 渲染模板数据
             String fileContent = VelocityUtil.writer(templatePath, dataMap);
             // 组装返回数据
-            GeneratorCodeVo generatorCodeVo = new GeneratorCodeVo();
-            generatorCodeVo.setFile(file);
-            generatorCodeVo.setFileName(fileName);
             generatorCodeVo.setFileContent(fileContent);
             generatorCodeVo.setTemplateType(GeneratorTemplateType.getCode(generatorTemplateType));
             generatorCodeVos.add(generatorCodeVo);
@@ -804,9 +811,8 @@ public class GeneratorUtil {
         boolean existsBigDecimalType = false;
         boolean existsDateType = false;
         boolean existsTimeType = false;
-        boolean existsRequired = false;
-        boolean existsValidate = false;
         boolean existsCreateTime = false;
+        boolean existsValidate = false;
         for (GeneratorColumn column : columns) {
             String propertyType = column.getPropertyType();
             if (GeneratorConstant.JAVA_BIG_DECIMAL.equals(propertyType)) {
@@ -816,25 +822,18 @@ public class GeneratorUtil {
             } else if (GeneratorConstant.JAVA_TIME.equals(propertyType)) {
                 existsTimeType = true;
             }
-            if (column.getIsRequired()) {
-                existsRequired = true;
-                Boolean isDefaultValue = column.getIsDefaultValue();
-                if (!column.getIsPk()) {
-                    if (validateField && !isDefaultValue) {
-                        existsValidate = true;
-                    }
-                }
-            }
             if (GeneratorConstant.CREATE_TIME_FIELD.equals(column.getPropertyName())) {
                 existsCreateTime = true;
+            }
+            if (column.getIsValidate()) {
+                existsValidate = true;
             }
         }
         dataMap.put("existsBigDecimalType", existsBigDecimalType);
         dataMap.put("existsDateType", existsDateType);
         dataMap.put("existsTimeType", existsTimeType);
-        dataMap.put("existsRequired", existsRequired);
-        dataMap.put("existsValidate", existsValidate);
         dataMap.put("existsCreateTime", existsCreateTime);
+        dataMap.put("existsValidate", existsValidate);
 
         // 前端相关
         String vueApiPath = String.format(GeneratorConstant.VUE_API_PATH, moduleName + "/" + entityObjectName);
@@ -843,17 +842,17 @@ public class GeneratorUtil {
         // 设置菜单
         // 目录菜单
         SysMenu dirSysMenu = new SysMenu();
-        dirSysMenu.setId(YitIdHelper.nextId());
+        dirSysMenu.setId(IdUtil.getId());
         dirSysMenu.setName(tableComment + GeneratorConstant.MANAGER_NAME);
         if (parentMenuId == null) {
             parentMenuId = 0L;
         }
         dirSysMenu.setParentId(parentMenuId);
         dirSysMenu.setType(1);
-        dirSysMenu.setRouteUrl("/" + moduleName);
+        dirSysMenu.setRouteUrl("/" + moduleName + entity);
         // 菜单
         SysMenu sysMenu = new SysMenu();
-        sysMenu.setId(YitIdHelper.nextId());
+        sysMenu.setId(IdUtil.getId());
         sysMenu.setName(tableComment + GeneratorConstant.LIST_NAME);
         sysMenu.setParentId(dirSysMenu.getId());
         sysMenu.setType(2);
@@ -864,7 +863,7 @@ public class GeneratorUtil {
         List<SysMenu> permissionSysMenus = new ArrayList<>();
         // 添加权限菜单
         SysMenu addSysMenu = new SysMenu();
-        addSysMenu.setId(YitIdHelper.nextId());
+        addSysMenu.setId(IdUtil.getId());
         addSysMenu.setName(addCnComment);
         addSysMenu.setParentId(sysMenu.getId());
         addSysMenu.setType(3);
@@ -873,7 +872,7 @@ public class GeneratorUtil {
         permissionSysMenus.add(addSysMenu);
         // 修改权限菜单
         SysMenu updateSysMenu = new SysMenu();
-        updateSysMenu.setId(IdWorker.getId());
+        updateSysMenu.setId(IdUtil.getId());
         updateSysMenu.setName(updateCnComment);
         updateSysMenu.setParentId(sysMenu.getId());
         updateSysMenu.setType(3);
@@ -882,7 +881,7 @@ public class GeneratorUtil {
         permissionSysMenus.add(updateSysMenu);
         // 删除权限菜单
         SysMenu deleteSysMenu = new SysMenu();
-        deleteSysMenu.setId(IdWorker.getId());
+        deleteSysMenu.setId(IdUtil.getId());
         deleteSysMenu.setName(deleteCnComment);
         deleteSysMenu.setParentId(sysMenu.getId());
         deleteSysMenu.setType(3);
@@ -891,7 +890,7 @@ public class GeneratorUtil {
         permissionSysMenus.add(deleteSysMenu);
         // 详情权限菜单
         SysMenu infoSysMenu = new SysMenu();
-        infoSysMenu.setId(IdWorker.getId());
+        infoSysMenu.setId(IdUtil.getId());
         infoSysMenu.setName(infoCnComment);
         infoSysMenu.setParentId(sysMenu.getId());
         infoSysMenu.setType(3);
@@ -913,7 +912,7 @@ public class GeneratorUtil {
      * @param dataMap
      * @param templateName
      */
-    public static File getGeneratorFile(GeneratorTable table, Map<String, Object> dataMap, String templateName) {
+    public static void setGeneratorFile(GeneratorTable table, Map<String, Object> dataMap, String templateName, GeneratorCodeVo generatorCodeVo) {
         String packageName = table.getPackageName();
         String moduleName = table.getModuleName();
         // 判断自定义后台路径为空或者为/，则输出到当前项目目录下，否则输出到指定项目目录下
@@ -922,82 +921,123 @@ public class GeneratorUtil {
             // 写代码到当前项目路径下
             customBackendPath = GeneratorConstant.USER_DIR;
         }
+        if (customBackendPath.endsWith("/")) {
+            customBackendPath = customBackendPath.substring(0, customBackendPath.length() - 1);
+        }
         // 判断自定义前端路径为空或者为/，则输出到当前项目vue目录下，否则输出到指定项目目录下
         String customFrontendPath = table.getCustomFrontendPath();
         if (StringUtils.isBlank(customFrontendPath) || "/".equals(customFrontendPath)) {
             customFrontendPath = GeneratorConstant.USER_DIR + GeneratorConstant.VUE_DIR;
         }
+        if (customFrontendPath.endsWith("/")) {
+            customFrontendPath = customFrontendPath.substring(0, customFrontendPath.length() - 1);
+        }
         String packageFilePath = packageName.replaceAll("\\.", "/");
-        // java文件路径
-        String moduleFilePath = customBackendPath + "/" + GeneratorConstant.SRC_MAIN_JAVA + packageFilePath + "/" + moduleName + "/";
+        String javaModuleDir = GeneratorConstant.SRC_MAIN_JAVA + packageFilePath + "/" + moduleName + "/";
+        // java 自定义文件路径
+        String customJavaDir = customBackendPath + javaModuleDir;
+        // java zip下载路径
+        String zipJavaDir = GeneratorConstant.JAVA_DIR + javaModuleDir;
         // xml文件路径
-        String mapperFilePath = customBackendPath + "/" + GeneratorConstant.SRC_MAIN_RESOURCES_MAPPER + moduleName + "/";
+        String mapperXmlDir = GeneratorConstant.SRC_MAIN_RESOURCES_MAPPER + moduleName + "/";
+        String customMapperXmlDir = customBackendPath + mapperXmlDir;
+        String zipMapperXmlDir = GeneratorConstant.JAVA_DIR + mapperXmlDir;
         // 菜单SQL文件路径
-        String menuSqlPath = customBackendPath + GeneratorConstant.MENU_SQL_PATH;
+        String customMenuSqlDir = customBackendPath + GeneratorConstant.MENU_SQL_PATH;
+        String zipMenuSqlDir = GeneratorConstant.MENU_SQL_PATH;
         // 实体对象名称
         String entityObjectName = MapUtils.getString(dataMap, "entityObjectName");
         // 前端API文件路径
-        String frontendApiPath = customFrontendPath + GeneratorConstant.VUE_SRC_API + moduleName + "/";
+        String vueApiDir = GeneratorConstant.VUE_SRC_API + moduleName + "/";
+        String customVueApiDir = customFrontendPath + vueApiDir;
+        String zipVueApiDir = GeneratorConstant.VUE_DIR + vueApiDir;
         // 前端页面文件路径
-        String frontendViewPath = customFrontendPath + GeneratorConstant.VUE_SRC_VIEWS + moduleName + "/" + entityObjectName + "/";
+        String vueViewDir = GeneratorConstant.VUE_SRC_VIEWS + moduleName + "/" + entityObjectName + "/";
+        String customVueViewDir = customFrontendPath + vueViewDir;
+        String zipVueViewDir = GeneratorConstant.VUE_DIR + vueViewDir;
         String fileName = null;
         String filePath = null;
+        String customFilePath = null;
+        String zipFilePath = null;
         if (GeneratorConstant.APP_CONTROLLER_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "appControllerName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.APP_CONTROLLER_PACKAGE_FILE_PATH + "/" + fileName;
+            filePath = GeneratorConstant.APP_CONTROLLER_PACKAGE_FILE_PATH + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.APP_QUERY_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "appQueryName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.QUERY_PACKAGE + "/" + fileName;
+            filePath = GeneratorConstant.QUERY_PACKAGE + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.APP_VO_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "appVoName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.VO_PACKAGE + "/" + fileName;
+            filePath = GeneratorConstant.VO_PACKAGE + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.CONTROLLER_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "controllerName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.ADMIN_CONTROLLER_PACKAGE_FILE_PATH + "/" + fileName;
+            filePath = GeneratorConstant.ADMIN_CONTROLLER_PACKAGE_FILE_PATH + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.DTO_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "dtoName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.DTO_PACKAGE + "/" + fileName;
+            filePath = GeneratorConstant.DTO_PACKAGE + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.ENTITY_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "entity") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.ENTITY_PACKAGE + "/" + fileName;
+            filePath = GeneratorConstant.ENTITY_PACKAGE + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.MAPPER_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "mapperName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.MAPPER_PACKAGE + "/" + fileName;
+            filePath = GeneratorConstant.MAPPER_PACKAGE + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.MAPPER_XML_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "mapperXmlName") + GeneratorConstant.DOT_XML;
-            filePath = mapperFilePath + "/" + fileName;
+            customFilePath = customMapperXmlDir + fileName;
+            zipFilePath = zipMapperXmlDir + fileName;
         } else if (GeneratorConstant.QUERY_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "queryName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.QUERY_PACKAGE + "/" + fileName;
+            filePath = GeneratorConstant.QUERY_PACKAGE + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.SERVICE_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "serviceName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.SERVICE_PACKAGE + "/" + fileName;
+            filePath = GeneratorConstant.SERVICE_PACKAGE + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.SERVICE_IMPL_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "serviceImplName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.SERVICE_IMPL_PACKAGE_FILE_PATH + "/" + fileName;
+            filePath = GeneratorConstant.SERVICE_IMPL_PACKAGE_FILE_PATH + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.VO_TEMPLATE_NAME.equals(templateName)) {
             fileName = MapUtils.getString(dataMap, "voName") + GeneratorConstant.DOT_JAVA;
-            filePath = moduleFilePath + GeneratorConstant.VO_PACKAGE + "/" + fileName;
+            filePath = GeneratorConstant.VO_PACKAGE + "/" + fileName;
+            customFilePath = customJavaDir + filePath;
+            zipFilePath = zipJavaDir + filePath;
         } else if (GeneratorConstant.MENU_SQL_TEMPLATE_NAME.equals(templateName)) {
             fileName = String.format(GeneratorConstant.MENU_SQL_FORMAT_FILE_NAME, table.getTableName());
-            filePath = menuSqlPath + fileName;
+            customFilePath = customMenuSqlDir + fileName;
+            zipFilePath = zipMenuSqlDir + fileName;
         } else if (GeneratorConstant.API_TS_TEMPLATE_NAME.equals(templateName)) {
             fileName = String.format(GeneratorConstant.API_TS_FORMAT_FILE_NAME, entityObjectName);
-            filePath = frontendApiPath + fileName;
+            customFilePath = customVueApiDir + fileName;
+            zipFilePath = zipVueApiDir + fileName;
         } else if (GeneratorConstant.VUE_INDEX_TEMPLATE_NAME.equals(templateName)) {
             fileName = GeneratorConstant.VUE_INDEX_FILE_NAME;
-            filePath = frontendViewPath + fileName;
+            customFilePath = customVueViewDir + fileName;
+            zipFilePath = zipVueViewDir + fileName;
         } else if (GeneratorConstant.VUE_FORM_TEMPLATE_NAME.equals(templateName)) {
             fileName = GeneratorConstant.VUE_FORM_FILE_NAME;
-            filePath = frontendViewPath + fileName;
+            customFilePath = customVueViewDir + fileName;
+            zipFilePath = zipVueViewDir + fileName;
         }
-        log.info("generatorFileName：" + fileName);
-        log.info("generatorFilePath：" + filePath);
-        File getGeneratorFile = null;
-        if (StringUtils.isNotBlank(filePath)) {
-            getGeneratorFile = new File(filePath);
-        }
-        return getGeneratorFile;
+        generatorCodeVo.setFileName(fileName);
+        generatorCodeVo.setCustomFilePath(customFilePath);
+        generatorCodeVo.setZipFilePath(zipFilePath);
     }
 
     /**

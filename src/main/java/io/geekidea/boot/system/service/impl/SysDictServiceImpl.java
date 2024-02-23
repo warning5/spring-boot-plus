@@ -72,7 +72,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
     @Override
     public Paging<SysDictVo> getSysDictPage(SysDictQuery query) {
-        PagingUtil.handlePage(query, OrderByItem.orderBy("status desc,id desc"));
+        PagingUtil.handlePage(query, OrderByItem.orderBy("status desc,sort,id"));
         List<SysDictVo> list = sysDictMapper.getSysDictPage(query);
         Paging<SysDictVo> paging = new Paging<>(list);
         return paging;

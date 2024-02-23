@@ -235,5 +235,7 @@ public interface GeneratorConstant {
     String MANAGER_NAME = "管理";
     String LIST_NAME = "列表";
 
+    String Y = "y";
+    String YES = "yes";
 
 }

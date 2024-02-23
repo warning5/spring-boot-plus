@@ -17,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author geekidea
@@ -40,20 +42,89 @@ public class GeneratorHandler {
         if (CollectionUtils.isEmpty(tableNames)) {
             throw new GeneratorException("表名称不能为空");
         }
+        int blankLength = 0;
+        for (String tableName : tableNames) {
+            if (StringUtils.isBlank(tableName)) {
+                blankLength++;
+            }
+        }
+        if (blankLength == tableNames.size()) {
+            throw new GeneratorException("表名称不能为空");
+        }
         // 检查配置
         checkConfig(config);
-        // 循环生成代码
-        try {
-            for (String tableName : tableNames) {
-                GeneratorTable generatorTable = getGeneratorTable(config, tableName);
-                GeneratorUtil.generatorCode(tableName, generatorTable);
+        // 检查所有的表是否已存在实体类
+        boolean isFileOverride = isFileOverride(config, tableNames);
+        if (isFileOverride) {
+            // 循环生成代码
+            try {
+                for (String tableName : tableNames) {
+                    if (StringUtils.isBlank(tableName)) {
+                        continue;
+                    }
+                    GeneratorTable generatorTable = getGeneratorTable(config, tableName);
+                    GeneratorUtil.generatorCode(tableName, generatorTable);
+                }
+                log.info("代码生成成功");
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("代码生成失败");
             }
-            log.info("代码生成成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("代码生成失败");
         }
     }
+
+    /**
+     * 判断代码是否存在，如果存在，则提示输入y(yes)进行覆盖，输入其它则跳过，不会再生成代码
+     * 如果不存在，则继续生成代码
+     *
+     * @param config
+     * @param tableNames
+     * @return
+     */
+    private static boolean isFileOverride(GeneratorProperties config, List<String> tableNames) {
+        boolean isExists = checkExistsEntityCode(config, tableNames);
+        if (isExists) {
+            System.err.println("如需覆盖生成，请输入y(yes)继续覆盖生成代码，输入其它则跳过，不会再生成代码：");
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            if (StringUtils.isNotBlank(line)) {
+                line = line.toLowerCase();
+                if (GeneratorConstant.Y.equals(line) || GeneratorConstant.YES.equals(line)) {
+                    System.out.println("继续覆盖生成代码");
+                    return true;
+                } else {
+                    System.out.println("跳过代码生成");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 检查所有的表是否已存在实体类
+     *
+     * @param config
+     */
+    private static boolean checkExistsEntityCode(GeneratorProperties config, List<String> tableNames) {
+        String moduleName = config.getModuleName();
+        boolean isExists = false;
+        for (String tableName : tableNames) {
+            String className = GeneratorUtil.getTableClassName(tableName, config.getTablePrefixes());
+            // 判断代码是否存在
+            String userDir = GeneratorConstant.USER_DIR;
+            String packageName = config.getPackageName();
+            String packagePath = packageName.replaceAll("\\.", "/");
+            String entityPath = userDir + GeneratorConstant.SRC_MAIN_JAVA + packagePath + "/" + moduleName + "/" + GeneratorConstant.ENTITY_PACKAGE + "/" + className + GeneratorConstant.DOT_JAVA;
+            File file = new File(entityPath);
+            if (file.exists()) {
+                isExists = true;
+                System.err.println(tableName + "表对应的实体类" + className + "已经存在：" + entityPath);
+            }
+        }
+        return isExists;
+    }
+
 
     /**
      * 检查配置
@@ -133,7 +204,8 @@ public class GeneratorHandler {
         // 设置表基础信息
         GeneratorUtil.setGeneratorTable(config, tableName, generatorTableDbVo, table);
         // 设置列信息
-        List<GeneratorColumn> columns = GeneratorUtil.getGeneratorColumns(tableName, generatorColumnDbVos);
+        boolean validateField = config.isValidateField();
+        List<GeneratorColumn> columns = GeneratorUtil.getGeneratorColumns(tableName, generatorColumnDbVos, validateField);
         GeneratorUtil.setTableColumnInfo(table, columns);
         return table;
     }

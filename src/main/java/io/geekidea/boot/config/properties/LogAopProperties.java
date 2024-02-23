@@ -1,5 +1,6 @@
 package io.geekidea.boot.config.properties;
 
+import io.geekidea.boot.framework.enums.ResponseLogType;
 import io.geekidea.boot.util.YamlUtil;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -35,6 +36,11 @@ public class LogAopProperties {
      * 排除的路径
      */
     private List<String> excludePaths;
+
+    /**
+     * 响应日志类型：FULL 全部，PART 部分，NONE 无
+     */
+    private ResponseLogType responseLogType;
 
 
     public void setExcludePaths(List<String> excludePaths) {

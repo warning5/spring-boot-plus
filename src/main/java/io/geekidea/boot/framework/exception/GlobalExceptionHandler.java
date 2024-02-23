@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -56,6 +57,8 @@ public class GlobalExceptionHandler {
             return ApiResult.fail("数据违反唯一约束");
         } else if (exception instanceof DataIntegrityViolationException) {
             return ApiResult.fail("数据完整性异常");
+        } else if (exception instanceof HttpRequestMethodNotSupportedException) {
+            return ApiResult.fail(exception.getMessage());
         }
         return ApiResult.fail();
     }

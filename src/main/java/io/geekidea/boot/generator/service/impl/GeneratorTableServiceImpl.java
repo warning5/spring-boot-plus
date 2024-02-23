@@ -84,10 +84,14 @@ public class GeneratorTableServiceImpl extends ServiceImpl<GeneratorTableMapper,
         List<GeneratorColumn> columns;
         if (table == null) {
             // 添加生成的表
-            addGeneratorTable(tableName);
+            boolean addTableResult = addGeneratorTable(tableName);
+            if (!addTableResult) {
+                throw new BusinessException("添加生成表数据异常");
+            }
             table = generatorTableMapper.getGeneratorTableByTableName(tableName);
+            Boolean validateField = table.getValidateField();
             // 添加生成的列
-            generatorColumnService.addGeneratorColumn(tableName);
+            generatorColumnService.addGeneratorColumn(tableName, validateField);
         }
         // 读取数据库表的列信息
         columns = generatorColumnService.getGeneratorColumnList(tableName);

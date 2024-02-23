@@ -1,13 +1,14 @@
 package io.geekidea.boot.generator.util;
 
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.generator.config.ConstVal;
+import io.geekidea.boot.generator.constant.GeneratorConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -24,11 +25,12 @@ public class VelocityUtil {
 
     static {
         properties = new Properties();
-        properties.setProperty(ConstVal.VM_LOAD_PATH_KEY, ConstVal.VM_LOAD_PATH_VALUE);
-        properties.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, StringPool.EMPTY);
-        properties.setProperty(Velocity.ENCODING_DEFAULT, ConstVal.UTF8);
-        properties.setProperty(Velocity.INPUT_ENCODING, ConstVal.UTF8);
-        properties.setProperty("file.resource.loader.unicode", StringPool.TRUE);
+        properties.setProperty("resource.loader.file.class", ClasspathResourceLoader.class.getName());
+        properties.setProperty("resource.loader.file.unicode", "true");
+        properties.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, "");
+        properties.setProperty(Velocity.ENCODING_DEFAULT, GeneratorConstant.UTF8);
+        properties.setProperty(Velocity.INPUT_ENCODING, GeneratorConstant.UTF8);
+
     }
 
     /**

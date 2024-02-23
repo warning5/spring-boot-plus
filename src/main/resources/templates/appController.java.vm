@@ -43,7 +43,7 @@ public class $!{appControllerName} {
      */
     @Operation(summary = "$!{appInfoCnComment}")
     $!{appInfoRequestMapping}
-    public ApiResult<$!{appVoName}> $!{appInfoMethodName}(@PathVariable $!{pkIdPropertyType} $!{pkIdPropertyName}) throws Exception {
+    public ApiResult<$!{appVoName}> $!{appInfoMethodName}(@PathVariable $!{pkIdPropertyType} $!{pkIdPropertyName}) {
         log.info("$!{appInfoCnComment}：{}", $!{pkIdPropertyName});
         $!{appVoName} $!{appVoObjectName} = $!{serviceObjectName}.$!{appInfoMethodName}ById($!{pkIdPropertyName});
         return ApiResult.success($!{appVoObjectName});
@@ -58,7 +58,7 @@ public class $!{appControllerName} {
      */
     @Operation(summary = "$!{appPageCnComment}")
     $!{appPageRequestMapping}
-    public ApiResult<$!{appVoName}> $!{appPageMethodName}(@Valid $!{pageParamAnnotation} $!{appQueryName} $!{appQueryObjectName}) throws Exception {
+    public ApiResult<$!{appVoName}> $!{appPageMethodName}(@Valid $!{pageParamAnnotation} $!{appQueryName} $!{appQueryObjectName}) {
         log.info("$!{appPageCnComment}：{}", $!{appQueryObjectName});
         Paging<$!{appVoName}> paging = $!{serviceObjectName}.$!{appPageMethodName}($!{appQueryObjectName});
         return ApiResult.success(paging);

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import io.geekidea.boot.generator.enums.GeneratorFormLayout;
 import io.geekidea.boot.generator.enums.GeneratorType;
 import io.geekidea.boot.generator.enums.RequestMappingStyle;
+import io.geekidea.boot.util.YamlUtil;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -140,9 +141,23 @@ public class GeneratorProperties {
     private boolean showDefaultQuery;
 
     /**
+     * 搜索框模糊查询字段
+     */
+    @Value("${keywordFields}")
+    private List<String> keywordFields;
+
+    /**
      * 是否只生成实体类 1：是，0：否
      */
     @Value("${onlyGeneratorEntity}")
     private boolean onlyGeneratorEntity;
+
+    public void setTablePrefixes(List<String> tablePrefixes) {
+        this.tablePrefixes = YamlUtil.parseListArray(tablePrefixes);
+    }
+
+    public void setKeywordFields(List<String> keywordFields) {
+        this.keywordFields = YamlUtil.parseListArray(keywordFields);
+    }
 
 }

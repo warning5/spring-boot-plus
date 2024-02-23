@@ -33,5 +33,8 @@ public class GeneratorTableDbVo implements Serializable {
     @Schema(description = "最近生成的时间")
     private Date updateTime;
 
+    @Schema(description = "生成方式 1：zip压缩包，2：自定义路径")
+    private Integer generatorType;
+
 }
 

@@ -32,12 +32,12 @@ public class GeneratorColumnServiceImpl extends ServiceImpl<GeneratorColumnMappe
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addGeneratorColumn(String tableName) {
+    public boolean addGeneratorColumn(String tableName, Boolean validateField) {
         List<GeneratorColumnDbVo> columnDbVos = getDbColumnListByTableName(tableName);
         if (CollectionUtils.isEmpty(columnDbVos)) {
             throw new BusinessException("没有列信息");
         }
-        List<GeneratorColumn> columns = GeneratorUtil.getGeneratorColumns(tableName, columnDbVos);
+        List<GeneratorColumn> columns = GeneratorUtil.getGeneratorColumns(tableName, columnDbVos, validateField);
         return saveBatch(columns);
     }
 

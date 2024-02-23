@@ -68,6 +68,9 @@ public class GeneratorColumn implements Serializable {
     @Schema(description = "是否有默认值")
     private Boolean isDefaultValue;
 
+    @Schema(description = "是否校验 0：不校验，1：校验")
+    private Boolean isValidate;
+
     @Schema(description = "是否表单字段")
     private Boolean isForm;
 

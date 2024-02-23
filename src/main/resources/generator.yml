@@ -40,5 +40,7 @@ generator:
   showDefaultQuery: true
   # 是否只生成实体类
   onlyGeneratorEntity: false
+  # 搜索框模糊查询字段
+  keywordFields: name
 
 

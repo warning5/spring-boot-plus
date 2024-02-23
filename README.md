@@ -9,10 +9,10 @@
 
 <p align="center">  
   <a href="https://github.com/geekidea/spring-boot-plus/">
-    <img alt="spring-boot-plus version" src="https://img.shields.io/badge/spring--boot--plus-2.7.12-blue">
+    <img alt="spring-boot-plus version" src="https://img.shields.io/badge/spring--boot--plus-2.7.18-blue">
   </a>
   <a href="https://github.com/spring-projects/spring-boot">
-    <img alt="spring boot version" src="https://img.shields.io/badge/spring%20boot-2.7.12-brightgreen">
+    <img alt="spring boot version" src="https://img.shields.io/badge/spring%20boot-2.7.18-brightgreen">
   </a>
   <a href="https://cn.vuejs.org/">
     <img alt="spring boot version" src="https://img.shields.io/badge/vue-3.2-darkgreen">
@@ -32,6 +32,8 @@
 
 ## Open source License MIT-License
 > Any individual or company can conduct secondary development based on this framework for commercial use without authorization!
+
+## Vue Project  [VUE3+TS](https://gitee.com/geekidea/spring-boot-plus-vue3)
 
 #### [GITHUB](https://github.com/geekidea/spring-boot-plus) | [GITEE](https://gitee.com/geekidea/spring-boot-plus)
 
@@ -104,19 +106,19 @@ Redis | 3.2+ |  |
 ### Technology stack 
 Component| Version |  Remark
 -|-|-
-Spring Boot | 2.7.12 |
-Mybatis | 3.5.3.1 | DAO Framework |
-Mybatis Plus | 3.3.1 | mybatis Enhanced framework |
-Fastjson | 2.0.33 | JSON processing toolset |
+Spring Boot | 2.7.18 |
+Mybatis | 3.5.13 | DAO Framework |
+Mybatis Plus | 3.5.4.1 | mybatis Enhanced framework |
+Fastjson | 2.0.42 | JSON processing toolset |
 Swagger | V3 | Api document generation tool |
-Knife4j | 4.1.0 | Api document generation tool |
-commons-lang3 | 3.12.0 | Apache language toolkit |
-commons-io | 2.11.0 | Apache IO Toolkit |
-commons-codec | 1.15 | Apache Toolkit such as encryption and decryption |
+Knife4j | 4.3.0 | Api document generation tool |
+commons-lang3 | 3.14.0 | Apache language toolkit |
+commons-io | 2.15.0 | Apache IO Toolkit |
+commons-codec | 1.16.0 | Apache Toolkit such as encryption and decryption |
 commons-collections4 | 4.4.4 | Apache collections toolkit |
 hibernate-validator | 6.2.5.Final | Validator toolkit |
-hutool-all | 5.8.16 | Common toolset |
-lombok | 1.18.26 | Automatically plugs |
+hutool-all | 5.8.23 | Common toolset |
+lombok | 1.18.30 | Automatically plugs |
 
 ### Project Link Diagram
 ![项目调用链路图](https://geekidea.oss-cn-chengdu.aliyuncs.com/spring-boot-plus/img/system-link.jpg)
@@ -329,15 +331,13 @@ public class SpringBootPlusApplication {
 ## spring-boot-plus Videos  :movie_camera: 
 
 
-## Contact
-QQ 625301326| Wechat geekideaio|  toutiao GeekIdea
--|-|-
-![spring-boot-plus QQ Group](https://spring-boot-plus.gitee.io/img/spring-boot-plus-qq-group.png) | ![Wechat Official Account](https://geekidea.oss-cn-chengdu.aliyuncs.com/geekidea/geekidea-wechat-official.jpg) | ![toutiao](https://geekidea.oss-cn-chengdu.aliyuncs.com/geekidea/geekidea-toutiao.jpeg) |
+QQ群 625301326| 微信公众号 geekideaio|
+-|-|
+![spring-boot-plus QQ Group](https://spring-boot-plus.gitee.io/img/spring-boot-plus-qq-group.png) | ![Wechat Official Account](https://geekidea.oss-cn-chengdu.aliyuncs.com/geekidea/geekidea-wechat-official.jpg) |
 
-## Donate
-Ask the author to drink coffee and let the code fly for a while!
-
-![geekidea-wechat-donate](https://geekidea.oss-cn-chengdu.aliyuncs.com/geekidea/geekidea-wechat-donate.png)
+微信技术交流群| 业务咨询商务合作|
+-|-|
+![微信群](https://geekidea.oss-cn-chengdu.aliyuncs.com/geekidea/wechat-group.png) | ![业务咨询商务合作](https://geekidea.oss-cn-chengdu.aliyuncs.com/geekidea/business-small.png) |
 
 
 ## License

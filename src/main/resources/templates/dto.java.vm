@@ -36,7 +36,7 @@ public class $!{dtoName} implements Serializable {
     #if($!{column.columnComment} != "")
     @Schema(description = "$!{column.columnComment}")
     #end
-    #if($!{existsValidate} && !$!{column.isPk})
+    #if($!{column.isValidate})
     #if($!{column.propertyType} == 'String')
     @NotBlank(message = "$!{column.columnCustomComment}不能为空")
     #if($!{column.existsLength})

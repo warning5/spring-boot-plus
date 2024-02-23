@@ -1,17 +1,19 @@
 package io.geekidea.boot.auth.interceptor;
 
 import io.geekidea.boot.auth.annotation.AppUserRole;
-import io.geekidea.boot.auth.annotation.Login;
 import io.geekidea.boot.auth.cache.AppLoginCache;
+import io.geekidea.boot.auth.enums.LoginInterceptStrategy;
 import io.geekidea.boot.auth.util.AppLoginUtil;
 import io.geekidea.boot.auth.util.TokenUtil;
 import io.geekidea.boot.auth.vo.AppLoginVo;
+import io.geekidea.boot.config.properties.LoginAppProperties;
 import io.geekidea.boot.framework.exception.AuthException;
 import io.geekidea.boot.framework.exception.LoginTokenException;
 import io.geekidea.boot.framework.interceptor.BaseExcludeMethodInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +25,9 @@ import javax.servlet.http.HttpServletResponse;
  **/
 @Slf4j
 public class AppLoginInterceptor extends BaseExcludeMethodInterceptor {
+
+    @Autowired
+    private LoginAppProperties loginAppProperties;
 
     @Override
     protected boolean preHandleMethod(HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
@@ -37,10 +42,29 @@ public class AppLoginInterceptor extends BaseExcludeMethodInterceptor {
                 AppLoginCache.set(appLoginVo);
             }
         }
-        // 如果不存在@Login注解，则跳过
-        Login loginAnnotation = getLoginAnnotation(handlerMethod);
-        if (loginAnnotation == null) {
-            return true;
+        // 判断登录校验策略
+        LoginInterceptStrategy loginInterceptStrategy = loginAppProperties.getLoginInterceptStrategy();
+        if (LoginInterceptStrategy.LOGIN == loginInterceptStrategy) {
+            // 默认都需要登录，此时判断是否有@IgnoreLogin注解，如果有，则跳过，否则，则验证登录
+            boolean existsIgnoreLoginAnnotation = existsIgnoreLoginAnnotation(handlerMethod);
+            if (existsIgnoreLoginAnnotation) {
+                return true;
+            }
+            // 是否是排除登录的路径，如果是，则跳过，否则，则验证
+            boolean isIgnoreLoginPath = isIgnoreLoginPath(request, loginAppProperties.getIgnoreLoginPaths());
+            if (isIgnoreLoginPath) {
+                return true;
+            }
+        } else {
+            // 默认都忽略登录，此时判断是否有@Login注解，如果有，则验证登录，否则，则跳过
+            boolean existsLoginAnnotation = existsLoginAnnotation(handlerMethod);
+            if (!existsLoginAnnotation) {
+                // 如果不是要校验的路径，则跳过
+                boolean isCheckLoginPath = isCheckLoginPath(request, loginAppProperties.getCheckLoginPaths());
+                if (!isCheckLoginPath) {
+                    return true;
+                }
+            }
         }
         // 登录校验
         if (StringUtils.isBlank(token)) {

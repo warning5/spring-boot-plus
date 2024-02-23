@@ -17,6 +17,7 @@ import io.geekidea.boot.common.constant.CommonConstant;
 import io.geekidea.boot.common.enums.SystemType;
 import io.geekidea.boot.config.properties.LogAopProperties;
 import io.geekidea.boot.framework.annotation.Log;
+import io.geekidea.boot.framework.enums.ResponseLogType;
 import io.geekidea.boot.framework.exception.GlobalExceptionHandler;
 import io.geekidea.boot.framework.response.ApiResult;
 import io.geekidea.boot.framework.bean.IpRegion;
@@ -247,7 +248,13 @@ public class SysLogAop {
                         String responseDataString = JSON.toJSONString(responseData);
                         sysLog.setResponseData(responseDataString);
                     }
-                    printLog("response: code:" + apiResult.getCode() + ",success:" + apiResult.isSuccess() + ",msg:" + apiResult.getMsg());
+                    // 响应日志类型
+                    ResponseLogType responseLogType = logAopProperties.getResponseLogType();
+                    if (ResponseLogType.FULL == responseLogType) {
+                        printLog("response：" + JSON.toJSONString(apiResult));
+                    } else if (ResponseLogType.PART == responseLogType) {
+                        printLog("response: code:" + apiResult.getCode() + ",success:" + apiResult.isSuccess() + ",msg:" + apiResult.getMsg());
+                    }
                 } else {
                     printLog("response:" + result);
                 }

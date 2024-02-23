@@ -1,12 +1,3 @@
--- 创建数据库
-create database if not exists spring_boot_plus;
-
--- 使用过数据库
-use spring_boot_plus;
-
-SET NAMES utf8mb4;
-
-
 -- ----------------------------
 -- Table structure for foo_bar
 -- ----------------------------
@@ -56,6 +47,7 @@ CREATE TABLE generator_column
     is_pk                 tinyint(1)   NOT NULL DEFAULT 0 COMMENT '是否主键',
     is_required           tinyint(1)   NOT NULL DEFAULT 0 COMMENT '是否必填',
     is_default_value      tinyint(1)   NOT NULL DEFAULT 0 COMMENT '是否有默认值 1：有，0：无',
+    is_validate           tinyint(1)   NOT NULL DEFAULT 0 COMMENT '是否校验 0：不校验，1：校验',
     is_form               tinyint(1)   NOT NULL DEFAULT 0 COMMENT '是否表单字段',
     is_list               tinyint(1)   NOT NULL DEFAULT 0 COMMENT '是否列表字段',
     is_query              tinyint(1)   NOT NULL DEFAULT 0 COMMENT '是否条件查询',
@@ -77,38 +69,37 @@ CREATE TABLE generator_column
 -- Table structure for generator_table
 -- ----------------------------
 DROP TABLE IF EXISTS generator_table;
-create table generator_table
+CREATE TABLE generator_table
 (
-    id                        bigint                               not null comment '主键'
-        primary key,
-    table_name                varchar(200)                         not null comment '表名称',
-    table_comment             varchar(200)                         null comment '表注释',
-    class_name                varchar(200)                         null comment '类名称',
-    module_name               varchar(100)                         null comment '模块名称',
-    package_name              varchar(200)                         null comment '包名称',
-    author                    varchar(100)                         null comment '作者',
-    id_type                   varchar(32)                          null comment '生成ID类型枚举',
-    generator_backend         tinyint(1) default 1                 not null comment '是否生成后端 1：是，0：否',
-    generator_app_backend     tinyint(1) default 0                 null comment '是否生成App后端代码 1：是，0：否',
-    generator_frontend        tinyint(1) default 1                 not null comment '是否生成前端 1：是，0：否',
-    validate_field            tinyint(1) default 0                 not null comment '是否校验字段 1：是，0：否',
-    enable_log                tinyint(1) default 1                 not null comment '是否启用日志注解  1：是，0：否',
-    enable_permission         tinyint(1) default 1                 not null comment '是否启用权限编码 1：是，0：否',
-    request_mapping_style     int        default 1                 not null comment '请求映射风格 1：默认，2：restful，3：全部小写，4：中横线，5：下划线',
-    default_order_column_name varchar(100)                         null comment '默认排序列名称',
-    parent_menu_id            bigint                               null comment '上级菜单ID',
-    form_layout               tinyint    default 2                 not null comment '表单布局方式 1：一行一列，2：一行两列',
-    generator_type            tinyint    default 1                 not null comment '生成方式 1：zip压缩包，2：自定义路径',
-    custom_backend_path       varchar(300)                         null comment '自定义生成后端路径',
-    custom_frontend_path      varchar(300)                         null comment '自定义生成前端路径',
-    show_default_query        tinyint(1)                           null comment '是否显示默认查询条件 1：是，0：否',
-    only_generator_entity     tinyint(1)                           null comment '是否只生成实体类 1：是，0：否',
-    create_id                 bigint                               null comment '创建人ID',
-    create_time               datetime   default CURRENT_TIMESTAMP null comment '创建时间',
-    update_id                 bigint                               null comment '修改人ID',
-    update_time               datetime   default CURRENT_TIMESTAMP null comment '创建时间',
-    constraint generator_table_name
-        unique (table_name)
+    id                        bigint(0)    NOT NULL COMMENT '主键',
+    table_name                varchar(200) NOT NULL COMMENT '表名称',
+    table_comment             varchar(200)          DEFAULT NULL COMMENT '表注释',
+    class_name                varchar(200)          DEFAULT NULL COMMENT '类名称',
+    module_name               varchar(100)          DEFAULT NULL COMMENT '模块名称',
+    package_name              varchar(200)          DEFAULT NULL COMMENT '包名称',
+    author                    varchar(100)          DEFAULT NULL COMMENT '作者',
+    id_type                   varchar(32)           DEFAULT NULL COMMENT '生成ID类型枚举',
+    generator_backend         tinyint(1)   NOT NULL DEFAULT 1 COMMENT '是否生成后端 1：是，0：否',
+    generator_app_backend     tinyint(1)            DEFAULT 0 COMMENT '是否生成App后端代码 1：是，0：否',
+    generator_frontend        tinyint(1)   NOT NULL DEFAULT 1 COMMENT '是否生成前端 1：是，0：否',
+    validate_field            tinyint(1)   NOT NULL DEFAULT 0 COMMENT '是否校验字段 1：是，0：否',
+    enable_log                tinyint(1)   NOT NULL DEFAULT 1 COMMENT '是否启用日志注解  1：是，0：否',
+    enable_permission         tinyint(1)   NOT NULL DEFAULT 1 COMMENT '是否启用权限编码 1：是，0：否',
+    request_mapping_style     int(0)       NOT NULL DEFAULT 1 COMMENT '请求映射风格 1：默认，2：restful，3：全部小写，4：中横线，5：下划线',
+    default_order_column_name varchar(100)          DEFAULT NULL COMMENT '默认排序列名称',
+    parent_menu_id            bigint(0)             DEFAULT NULL COMMENT '上级菜单ID',
+    form_layout               tinyint(0)   NOT NULL DEFAULT 2 COMMENT '表单布局方式 1：一行一列，2：一行两列',
+    generator_type            tinyint(0)   NOT NULL DEFAULT 1 COMMENT '生成方式 1：zip压缩包，2：自定义路径',
+    custom_backend_path       varchar(300)          DEFAULT NULL COMMENT '自定义生成后端路径',
+    custom_frontend_path      varchar(300)          DEFAULT NULL COMMENT '自定义生成前端路径',
+    show_default_query        tinyint(1)            DEFAULT NULL COMMENT '是否显示默认查询条件 1：是，0：否',
+    only_generator_entity     tinyint(1)            DEFAULT NULL COMMENT '是否只生成实体类 1：是，0：否',
+    create_id                 bigint(0)             DEFAULT NULL COMMENT '创建人ID',
+    create_time               datetime(0)           DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_id                 bigint(0)             DEFAULT NULL COMMENT '修改人ID',
+    update_time               datetime(0)           DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (id) USING BTREE,
+    UNIQUE INDEX generator_table_name (table_name) USING BTREE
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_general_ci COMMENT = '生成代码表'
@@ -273,55 +264,15 @@ CREATE TABLE sys_file
 -- Records of sys_file
 -- ----------------------------
 INSERT INTO sys_file
-VALUES (492544603975685, '492544593481733', 2, 'any', '202312', 'test2.png', '20231212210907492544594493445.png',
-        'image/png', 'png', 1238026, 1.18,
-        'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202312/20231212210907492544594493445.png', 1, 1, NULL, 1,
-        '117.174.233.62', '四川 阿坝', 1, '2023-12-12 21:09:09', NULL, NULL);
-INSERT INTO sys_file
-VALUES (492544887226373, '492544878112773', 2, 'any', '202312', 'test2.png', '20231212211016492544878702597.png',
-        'image/png', 'png', 1238026, 1.18,
-        'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202312/20231212211016492544878702597.png', 1, 1, NULL, 1,
-        '117.174.233.62', '四川 阿坝', 1, '2023-12-12 21:10:18', NULL, NULL);
-INSERT INTO sys_file
 VALUES (492564876013573, '492564820004869', 2, 'any', '202312', 'logo.png', '20231212223125492564821676037.png',
         'image/png', 'png', 8046, 0.01,
         'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202312/20231212223125492564821676037.png', 1, 1, NULL, 1,
         '127.0.0.1', '内网IP', 1, '2023-12-12 22:31:38', NULL, NULL);
 INSERT INTO sys_file
-VALUES (492845292949509, '492845292363781', 2, 'head', '202312', '2.jpg', '20231213173239492845292462085.jpg',
-        'image/jpeg', 'jpg', 102436, 0.10,
-        'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202312/20231213173239492845292462085.jpg', 1, 1, NULL, 1,
-        '171.223.95.186', '四川 成都', 1, '2023-12-13 17:32:39', NULL, NULL);
-INSERT INTO sys_file
-VALUES (492845493194757, '492845492965381', 2, 'head', '202312', '1.jpeg', '20231213173328492845493088261.jpeg',
-        'image/jpeg', 'jpeg', 189339, 0.18,
-        'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202312/20231213173328492845493088261.jpeg', 1, 1, NULL, 1,
-        '171.223.95.186', '四川 成都', 1, '2023-12-13 17:33:28', NULL, NULL);
-INSERT INTO sys_file
-VALUES (492845558136837, '492845557948421', 2, 'head', '202312', '2.jpg', '20231213173344492845558075397.jpg',
-        'image/jpeg', 'jpg', 102436, 0.10,
-        'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202312/20231213173344492845558075397.jpg', 1, 1, NULL, 1,
-        '171.223.95.186', '四川 成都', 1, '2023-12-13 17:33:44', NULL, NULL);
-INSERT INTO sys_file
-VALUES (492947238580229, '492947238023173', 2, 'head', '202312', '2.jpg', '20231214002728492947238158341.jpg',
-        'image/jpeg', 'jpg', 102436, 0.10,
-        'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202312/20231214002728492947238158341.jpg', 1, 1, NULL, 1,
-        '171.223.95.186', '四川 成都', 1, '2023-12-14 00:27:28', NULL, NULL);
-INSERT INTO sys_file
-VALUES (493810964246533, '493810914603013', 2, 'any', '202312', 'test.png', '20231216110156493810953740293.png',
-        'image/png', 'png', 2186366, 2.09,
-        'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202312/20231216110156493810953740293.png', 1, 1, NULL, 1,
-        '127.0.0.1', '内网IP', 1, '2023-12-16 11:01:59', NULL, NULL);
-INSERT INTO sys_file
-VALUES (497535931400197, '497535931092997', 1, 'head', '202312', '2.jpg', '20231226233855497535931211781.jpg',
-        'image/jpeg', 'jpg', 102436, 0.10, 'http://localhost:8888/api/file/202312/20231226233855497535931211781.jpg', 1,
-        1, '/Users/mrliu/upload/boot/202312/20231226233855497535931211781.jpg', 1, '182.148.200.178', '四川 成都', 1,
-        '2023-12-26 23:38:55', NULL, NULL);
-INSERT INTO sys_file
-VALUES (498530514169861, '498530513960965', 1, 'head', '202312', 'logo.png', '20231229190553498530514120709.png',
-        'image/png', 'png', 8046, 0.01, 'http://localhost:8888/api/file/202312/20231229190553498530514120709.png', 1, 1,
-        '/Users/mrliu/upload/boot/202312/20231229190553498530514120709.png', 1, '171.223.95.30', '四川 成都', 1,
-        '2023-12-29 19:05:53', NULL, NULL);
+VALUES (507346623787013, '507346619826181', 2, 'any', '202401', '144.png', '20240123165843507346622103557.png',
+        'image/png', 'png', 4288, 0.00,
+        'https://geekidea.oss-cn-chengdu.aliyuncs.com/boot/202401/20240123165843507346622103557.png', 1, 1, NULL, 1,
+        '127.0.0.1', '内网IP', 1, '2024-01-23 16:58:44', NULL, '2024-01-23 16:58:44');
 
 -- ----------------------------
 -- Table structure for sys_log
@@ -520,10 +471,10 @@ INSERT INTO sys_menu
 VALUES (488299583537157, '字典管理', 11, 2, 'dict', '/system/dict', 'system/dict/index', NULL, 'ele-notebook', 3, 1, 0, 1,
         1, '2023-11-30 21:16:07', NULL, NULL);
 INSERT INTO sys_menu
-VALUES (489978240356357, '系统配置', 11, 2, 'sys:config:manager', '/system/config', 'system/config/index', NULL,
-        'ele-platform', 4, 1, 0, 1, 1, '2023-12-05 15:06:35', NULL, '2023-12-05 16:18:59');
+VALUES (489978240356357, '系统配置', 11, 2, 'sys:config:manager', '/system/config', 'system/config/index', NULL, 'ele-cpu',
+        4, 1, 0, 1, 1, '2023-12-05 15:06:35', NULL, '2023-12-05 16:18:59');
 INSERT INTO sys_menu
-VALUES (499911770910725, '系统工具', 0, 1, '', '/tool', '', '', 'ele-briefcase', 98, 1, 0, 1, 1, '2024-01-02 16:46:14', 1,
+VALUES (499911770910725, '系统工具', 0, 1, '', '/tool', '', '', 'ele-monitor', 98, 1, 0, 1, 1, '2024-01-02 16:46:14', 1,
         '2024-01-21 20:15:22');
 INSERT INTO sys_menu
 VALUES (499912002056197, '代码生成', 499911770910725, 2, 'code', '/tool/code', 'tool/code/index', '', 'ele-document-copy',
@@ -546,6 +497,7 @@ VALUES (506687030714373, '生成代码', 499912002056197, 3, 'generator:generato
 INSERT INTO sys_menu
 VALUES (506687093297157, '下载代码', 499912002056197, 3, 'generator:download-code', NULL, NULL, NULL, NULL, 6, 0, 0, 1, 1,
         '2024-01-21 20:15:06', 1, '2024-01-21 20:15:05');
+
 
 -- ----------------------------
 -- Table structure for sys_role
@@ -577,6 +529,8 @@ INSERT INTO sys_role
 VALUES (1, 'admin', '管理员', 1, NULL, 1, '2023-02-15 13:22:21', NULL, NULL);
 INSERT INTO sys_role
 VALUES (497014598377477, 'test', '测试', 1, '测试角色，普通权限1', 1, '2023-12-25 12:17:37', 1, '2023-12-25 12:24:52');
+INSERT INTO sys_role
+VALUES (507811226501125, 'custom_role', '自定义角色', 0, '用户自定义角色', 1, '2024-01-25 00:29:12', NULL, '2024-01-25 00:29:12');
 
 -- ----------------------------
 -- Table structure for sys_role_menu
@@ -603,76 +557,53 @@ CREATE TABLE sys_role_menu
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
-INSERT INTO sys_role_menu
-VALUES (490996903432197, 490425003896837, 11, 1, 1, '2023-12-08 12:11:32', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (490996903436293, 490425003896837, 1101, 1, 1, '2023-12-08 12:11:32', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (490996903436294, 490425003896837, 489660839669765, 1, 1, '2023-12-08 12:11:32', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (490996903436295, 490425003896837, 489667312177157, 1, 1, '2023-12-08 12:11:32', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (490996903436296, 490425003896837, 489668635201541, 1, 1, '2023-12-08 12:11:32', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (490996903440389, 490425003896837, 489668695695365, 1, 1, '2023-12-08 12:11:32', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (490996903440390, 490425003896837, 489668795486213, 1, 1, '2023-12-08 12:11:32', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (491477241692165, 491472570187781, 110101, 1, 1, '2023-12-09 20:46:03', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (491477241700357, 491472570187781, 110102, 1, 1, '2023-12-09 20:46:03', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (491477241700358, 491472570187781, 11, 0, 1, '2023-12-09 20:46:03', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (491477241704453, 491472570187781, 1101, 0, 1, '2023-12-09 20:46:03', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (495707737645061, 495707261153285, 11, 1, 1, '2023-12-21 19:39:59', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (495707737657349, 495707261153285, 1101, 1, 1, '2023-12-21 19:39:59', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (495707737665541, 495707261153285, 110101, 1, 1, '2023-12-21 19:39:59', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (495707737669637, 495707261153285, 110102, 1, 1, '2023-12-21 19:39:59', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017157316613, 497014598377477, 1101, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185705989, 497014598377477, 110101, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185714181, 497014598377477, 110102, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185730565, 497014598377477, 110103, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185742853, 497014598377477, 110104, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185767429, 497014598377477, 110105, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185771525, 497014598377477, 110109, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185796101, 497014598377477, 110108, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185820677, 497014598377477, 110107, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185845253, 497014598377477, 110106, 1, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (497017185853445, 497014598377477, 11, 0, 1, '2023-12-25 12:28:08', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (500516359094277, 500516312236037, 110102, 1, 1, '2024-01-04 09:46:19', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (500516359110661, 500516312236037, 11, 0, 1, '2024-01-04 09:46:19', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (500516359114757, 500516312236037, 1101, 0, 1, '2024-01-04 09:46:19', NULL, NULL);
-INSERT INTO sys_role_menu
-VALUES (504436322971653, 503547141394437, 504433517756421, 1, 1, '2024-01-15 11:36:41', NULL, '2024-01-15 11:36:41');
-INSERT INTO sys_role_menu
-VALUES (504436322979845, 503547141394437, 504433756549125, 1, 1, '2024-01-15 11:36:41', NULL, '2024-01-15 11:36:41');
-INSERT INTO sys_role_menu
-VALUES (504436322983941, 503547141394437, 504434178572293, 1, 1, '2024-01-15 11:36:41', NULL, '2024-01-15 11:36:41');
-INSERT INTO sys_role_menu
-VALUES (505545488814085, 497741963337733, 110201, 1, 1, '2024-01-18 14:49:54', NULL, '2024-01-18 14:49:53');
-INSERT INTO sys_role_menu
-VALUES (505545488818181, 497741963337733, 11, 0, 1, '2024-01-18 14:49:54', NULL, '2024-01-18 14:49:53');
-INSERT INTO sys_role_menu
-VALUES (505545488818182, 497741963337733, 1102, 0, 1, '2024-01-18 14:49:54', NULL, '2024-01-18 14:49:53');
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (490996903432197, 490425003896837, 11, 1, 1, '2023-12-08 12:11:32', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (490996903436293, 490425003896837, 1101, 1, 1, '2023-12-08 12:11:32', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (491477241692165, 491472570187781, 110101, 1, 1, '2023-12-09 20:46:03', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (491477241700357, 491472570187781, 110102, 1, 1, '2023-12-09 20:46:03', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (491477241700358, 491472570187781, 11, 0, 1, '2023-12-09 20:46:03', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (491477241704453, 491472570187781, 1101, 0, 1, '2023-12-09 20:46:03', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (495707737645061, 495707261153285, 11, 1, 1, '2023-12-21 19:39:59', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (495707737657349, 495707261153285, 1101, 1, 1, '2023-12-21 19:39:59', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (495707737665541, 495707261153285, 110101, 1, 1, '2023-12-21 19:39:59', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (495707737669637, 495707261153285, 110102, 1, 1, '2023-12-21 19:39:59', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (497017157316613, 497014598377477, 1101, 1, 1, '2023-12-25 12:28:08', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (497017185705989, 497014598377477, 110101, 1, 1, '2023-12-25 12:28:08', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (497017185714181, 497014598377477, 110102, 1, 1, '2023-12-25 12:28:08', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (497017185730565, 497014598377477, 110103, 1, 1, '2023-12-25 12:28:08', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (497017185742853, 497014598377477, 110104, 1, 1, '2023-12-25 12:28:08', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (497017185845253, 497014598377477, 110106, 1, 1, '2023-12-25 12:28:08', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (497017185853445, 497014598377477, 11, 0, 1, '2023-12-25 12:28:08', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (500516359094277, 500516312236037, 110102, 1, 1, '2024-01-04 09:46:19', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (500516359110661, 500516312236037, 11, 0, 1, '2024-01-04 09:46:19', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (500516359114757, 500516312236037, 1101, 0, 1, '2024-01-04 09:46:19', null, null);
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (505545488814085, 497741963337733, 110201, 1, 1, '2024-01-18 14:49:54', null, '2024-01-18 14:49:53');
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (505545488818181, 497741963337733, 11, 0, 1, '2024-01-18 14:49:54', null, '2024-01-18 14:49:53');
+INSERT INTO sys_role_menu (id, role_id, menu_id, is_choice, create_id, create_time, update_id, update_time)
+VALUES (505545488818182, 497741963337733, 1102, 0, 1, '2024-01-18 14:49:54', null, '2024-01-18 14:49:53');
+
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -694,7 +625,7 @@ CREATE TABLE sys_user
     create_id   bigint(0)            DEFAULT NULL COMMENT '创建人ID',
     create_time datetime(0)          DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_id   bigint(0)            DEFAULT NULL COMMENT '修改人ID',
-    update_time datetime(0)          DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time datetime(0)          DEFAULT NULL COMMENT '修改时间',
     PRIMARY KEY (id) USING BTREE,
     UNIQUE INDEX sys_us (username) USING BTREE,
     INDEX sys_user_status_index (status) USING BTREE
@@ -715,92 +646,6 @@ INSERT INTO sys_user
 VALUES (497024442028037, 'test', '测试账号', '36d561f763fa5d40a886fa4511edb318b69529bd5cf1886b8034148a3bd1553d',
         '9f6640f628a14d81ab94122c6d1ef41b', '15888888888', 'geekidea@qq.com', NULL, 1, 497014598377477, 0, 1,
         '2023-12-25 12:57:40', 1, '2023-12-27 11:12:42');
-
--- ----------------------------
--- Table structure for test_data_demo
--- ----------------------------
-DROP TABLE IF EXISTS test_data_demo;
-CREATE TABLE test_data_demo
-(
-    id          bigint(0)  NOT NULL COMMENT 'ID',
-    type        tinyint(0) NOT NULL COMMENT 'int类型 1：首页轮播图，2：广告轮播图，3：详情轮播图',
-    name        varchar(32)         DEFAULT NULL COMMENT '名称',
-    image_url   varchar(200)        DEFAULT NULL COMMENT '图片路径',
-    age         int(0)              DEFAULT NULL COMMENT '年龄',
-    score       decimal(10, 2)      DEFAULT NULL COMMENT '分数',
-    buss_id     bigint(0)           DEFAULT NULL COMMENT '业务ID',
-    remark      varchar(200)        DEFAULT NULL COMMENT '备注',
-    status      tinyint(1) NOT NULL DEFAULT 1 COMMENT 'boolean类型 1：启用，0：禁用',
-    xxx         int(0)              DEFAULT NULL,
-    create_id   bigint(0)           DEFAULT NULL COMMENT '创建人ID',
-    create_time datetime(0)         DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_id   bigint(0)           DEFAULT NULL COMMENT '修改人ID',
-    update_time datetime(0)         DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
-    PRIMARY KEY (id) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '测试数据'
-  ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of test_data_demo
--- ----------------------------
-INSERT INTO test_data_demo
-VALUES (1, 2, '3', '1.png', 4, 5.00, 6, '7', 1, 1, 1, '2024-01-11 18:13:22', NULL, '2024-01-11 18:13:22');
-INSERT INTO test_data_demo
-VALUES (2, 1, '类型名称1', '2', 4, 6.00, 8, '11', 1, 2, 1, '2024-01-11 18:14:25', NULL, '2024-01-11 18:14:25');
-INSERT INTO test_data_demo
-VALUES (503562808610821, 1, '1', '3', 5, 7.00, 9, '12', 0, 3, 1, '2024-01-13 00:22:21', 1, '2024-01-13 00:22:21');
-INSERT INTO test_data_demo
-VALUES (506736154554373, 1, '1', '2', 3, 4.00, 5, '6', 1, 7, 1, '2024-01-21 23:34:43', NULL, '2024-01-21 23:34:43');
-INSERT INTO test_data_demo
-VALUES (506736331067397, 2, '测试', '请求', 5, 6.00, 7, '8', 1, 9, 1, '2024-01-21 23:35:27', NULL, '2024-01-21 23:35:26');
-
--- ----------------------------
--- Table structure for test_visual_code
--- ----------------------------
-DROP TABLE IF EXISTS test_visual_code;
-CREATE TABLE test_visual_code
-(
-    id              bigint(0)      NOT NULL COMMENT '主键',
-    name            varchar(20)    NOT NULL COMMENT '名称',
-    test_tinyint1   tinyint(1)     NOT NULL DEFAULT 0 COMMENT '测试tinyint1  0-待支付；1：已支付，2:已发货；3：发货中',
-    test_tinyint2   tinyint(0)     NOT NULL COMMENT '测试tinyint2 1-微信支付 0-余额支付',
-    test_smallint1  smallint(0)             DEFAULT NULL COMMENT '测试smallint1 0-待支付；1：已支付，2:已发货；3：发货中',
-    test_smallint2  smallint(0)             DEFAULT NULL COMMENT '测试smallint2 1-微信支付 0-余额支付',
-    test_mediumint1 mediumint(0)            DEFAULT NULL COMMENT '测试mediumint1',
-    test_mediumint2 mediumint(0)            DEFAULT NULL COMMENT '测试mediumint2',
-    test_int        int(0)         NOT NULL COMMENT '测试int',
-    test_integer    int(0)         NOT NULL COMMENT '测试integer',
-    test_bigint     bigint(0)      NOT NULL COMMENT '测试bigint',
-    test_float      float                   DEFAULT NULL COMMENT '测试float',
-    test_double     double                  DEFAULT NULL COMMENT '测试double',
-    test_decimal    decimal(10, 2) NOT NULL COMMENT '测试decimal',
-    test_bit        bit(1)                  DEFAULT NULL COMMENT '测试bit',
-    test_char1      char(1)                 DEFAULT NULL COMMENT '测试char1',
-    test_char2      char(2)        NOT NULL COMMENT '测试char2',
-    test_varchar1   varchar(1)              DEFAULT NULL COMMENT '测试varchar1',
-    test_varchar    varchar(10)    NOT NULL COMMENT '测试varchar',
-    test_tinytext   tinytext       NOT NULL COMMENT '测试tinytext',
-    test_text       text COMMENT '测试text',
-    test_mediumtext mediumtext COMMENT '测试mediumtext',
-    test_longtext   longtext COMMENT '测试longtext',
-    test_date       date                    DEFAULT NULL COMMENT '测试date',
-    test_datetime   datetime(0)             DEFAULT NULL COMMENT '测试datetime',
-    test_timestamp  timestamp(0)            DEFAULT NULL COMMENT '测试timestamp',
-    test_time       time(0)                 DEFAULT NULL COMMENT '测试time',
-    test_json       json COMMENT '测试json',
-    remark          varchar(200)   NOT NULL COMMENT '备注',
-    create_id       bigint(0)      NOT NULL COMMENT '创建人ID',
-    update_id       bigint(0)               DEFAULT NULL COMMENT '修改人ID',
-    status          tinyint(1)     NOT NULL DEFAULT 1 COMMENT '状态，0：禁用，1：启用',
-    create_time     datetime(0)             DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_time     datetime(0)             DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (id) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '测试代码生成'
-  ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user
@@ -843,12 +688,11 @@ CREATE TABLE user
 INSERT INTO user
 VALUES (1, 'boot', 'boot用户11', '35d9d2ad09f0a7b0c2b3143bd60affb719766972aa720827c97240ea04d0f304',
         '94132dcd55eb478bb63170a2fa510ea1', NULL, NULL, NULL, NULL, 1, 1, '2023-11-25 00:00:00', NULL, NULL,
-        '2024-01-13 00:16:16', '127.0.0.1', '内网IP', NULL, NULL, '2023-11-25 23:54:31', 1, '2024-01-12 23:07:01');
+        '2024-02-12 16:29:45', '127.0.0.1', '内网IP', NULL, NULL, '2023-11-25 23:54:31', 1, '2024-01-12 23:07:01');
 INSERT INTO user
 VALUES (2, 'geekidea', 'geekidea用户', '35d9d2ad09f0a7b0c2b3143bd60affb719766972aa720827c97240ea04d0f304',
         '94132dcd55eb478bb63170a2fa510ea1', NULL, NULL, NULL, NULL, 2, 1, '2023-11-25 00:00:00', NULL, NULL,
         '2023-11-26 00:56:15', '127.0.0.1', '内网IP', NULL, NULL, '2023-11-25 23:54:31', NULL, NULL);
-
 
 -- ----------------------------
 -- Table structure for user_banner
@@ -901,6 +745,4 @@ INSERT INTO user_role
 VALUES (1, 'normal', '普通用户', NULL, NULL, '2024-01-06 21:21:23', NULL, NULL);
 INSERT INTO user_role
 VALUES (2, 'vip', 'VIP用户', NULL, NULL, '2024-01-06 21:21:23', NULL, NULL);
-
-
 

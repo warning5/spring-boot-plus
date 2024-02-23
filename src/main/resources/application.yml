@@ -113,7 +113,7 @@ login:
     # 是否单次登录
     single-Login: false
     # token过期时间，单位为分钟
-    token-expire-minutes: 60
+    token-expire-minutes: 120
     # 是否校验目标方法权限
     login-permission: false
     # 包含的路径
@@ -129,10 +129,30 @@ login:
     # 是否单次登录
     single-Login: false
     # token过期时间，单位为天
-    token-expire-minutes: 30
+    token-expire-days: 7
+    # 登录拦截策略 LOGIN、IGNORE_LOGIN
+    # LOGIN：也可以在login-paths中指定
+    #   默认拦截include-paths路径开头的所有请求，如：/app/**
+    #   在不需要验证登录的controller方法加上@IgnoreLogin
+    #   表示此方法不需要登录就能调用
+    # IGNORE_LOGIN：也可以在ignore-login-paths中指定
+    #   默认不拦截include-paths路径开头的所有请求，如：/app/**
+    #   在需要登录的controller方法上加上注解@Login
+    #   表示此方法必须登录才能调用
+    login-intercept-strategy: LOGIN
     # 包含路径
     include-paths:
       - /app/**
+    # 排除的路径：完全不需要登录校验，也不需要获取登录信息的路径
+    exclude-paths:
+      - /app/login,/app/accountLogin
+    # 需要登录校验的请求路径，与@Login效果一样
+    check-login-paths:
+      -
+    # 忽略登录校验的请求路径，与@IgnoreLogin效果一样
+    # 可登录也可不登录的情况下均可通过
+    ignore-login-paths:
+      - /app/logout
   # 系统公共请求
   common:
     # 是否启用拦截器
@@ -149,6 +169,8 @@ log-aop:
   print-log: true
   # 是否打印请求头
   print-head-log: false
+  # 响应日志模式：FULL 全部，PART 部分，NONE 无
+  response-log-type: FULL
   # 排除路径
   excludePaths:
     - /sysLog/**
@@ -185,7 +207,8 @@ file:
     # 上传文件访问路径
     access-path: /file/**
     # 上传文件保存路径，注意：最后带上反斜杠
-    # 示例：/Users/mrliu/upload/boot/
+    # 如果为空，默认为当前项目路径下的upload目录
+    # 示例：/Users/mrliu/geekidea/spring-boot-plus/upload/
     upload-path:
     # 上传文件访问URL前缀
     # 示例：http://localhost:8888/api/file
@@ -197,6 +220,7 @@ file:
     endpoint:
     bucketName:
     accessDomain:
+    rootDir:
 
 # 微信小程序配置
 wx:
